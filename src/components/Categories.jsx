@@ -4,6 +4,12 @@ import { useContent } from '../context/ContentContext';
 function Categories() {
   const { content } = useContent();
   const { title, subtitle, items } = content.categories;
+  const productos = content.products.items;
+
+  const getPortada = (slug) => {
+    const destacado = productos.find(p => p.categoria === slug && p.destacado);
+    return destacado?.imagen || null;
+  };
 
   const primeraFila = items.slice(0, 5);
   const segundaFila = items.slice(5, 10);
@@ -23,7 +29,7 @@ function Categories() {
               className="category-card"
             >
               <div className="category-img">
-                <img src={cat.imagen} alt={cat.nombre} />
+                <img src={getPortada(cat.slug) || cat.imagen} alt={cat.nombre} />
               </div>
               <div className="category-info">
                 <h4>{cat.nombre}</h4>
@@ -41,7 +47,7 @@ function Categories() {
               className="category-card"
             >
               <div className="category-img">
-                <img src={cat.imagen} alt={cat.nombre} />
+                <img src={getPortada(cat.slug) || cat.imagen} alt={cat.nombre} />
               </div>
               <div className="category-info">
                 <h4>{cat.nombre}</h4>

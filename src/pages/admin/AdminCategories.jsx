@@ -8,12 +8,27 @@ function AdminCategories() {
   const { content, updateSection } = useContent();
   const [data, setData] = useState(JSON.parse(JSON.stringify(content.categories)));
   const [editIndex, setEditIndex] = useState(null);
-  const [productsData, setProductsData] = useState(JSON.parse(JSON.stringify(content.products)));
+  const [productsData, setProductsData] = useState(() => {
+    const products = JSON.parse(JSON.stringify(content.products));
+    const vistos = {};
+    products.items = products.items.map(p => {
+      if (p.destacado && p.categoria !== 'piezas-unicas') {
+        if (vistos[p.categoria]) {
+          return { ...p, destacado: false };
+        }
+        vistos[p.categoria] = true;
+      }
+      return p;
+    });
+    return products;
+  });
   const [selectedCategory, setSelectedCategory] = useState(data.items.length > 0 ? data.items[0].slug : '');
   const [editProduct, setEditProduct] = useState(null);
   const [isNewProduct, setIsNewProduct] = useState(false);
   const [saved, setSaved] = useState(false);
   const [tab, setTab] = useState('tipos');
+  const [showLimitPopup, setShowLimitPopup] = useState(false);
+  const [showSelectPopup, setShowSelectPopup] = useState(false);
 
   const [modalPos, setModalPos] = useState({ x: 0, y: 0 });
   const [productModalPos, setProductModalPos] = useState({ x: 0, y: 0 });
@@ -48,7 +63,10 @@ function AdminCategories() {
     updateSection('categories', data);
     const nombres = {};
     data.items.forEach(cat => { nombres[cat.slug] = cat.nombre; });
-    const updatedProducts = { ...productsData, nombresCategorias: { ...productsData.nombresCategorias, ...nombres } };
+    if (productsData.nombresCategorias['unicas']) {
+      nombres['unicas'] = productsData.nombresCategorias['unicas'];
+    }
+    const updatedProducts = { ...productsData, nombresCategorias: nombres };
     updateSection('products', updatedProducts);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -56,6 +74,27 @@ function AdminCategories() {
 
 
   const filteredProducts = productsData.items.filter(p => p.categoria === selectedCategory);
+
+  const faltaPortada = () => {
+    const prods = productsData.items.filter(p => p.categoria === selectedCategory);
+    return prods.length > 0 && !prods.some(p => p.destacado);
+  };
+
+  const handleChangeCategory = (slug) => {
+    if (faltaPortada()) {
+      setShowSelectPopup(true);
+      return;
+    }
+    setSelectedCategory(slug);
+  };
+
+  const handleChangeTab = (newTab) => {
+    if (tab === 'productos' && faltaPortada()) {
+      setShowSelectPopup(true);
+      return;
+    }
+    setTab(newTab);
+  };
 
   const addProduct = () => {
     const maxId = productsData.items.reduce((max, p) => Math.max(max, p.id), 0);
@@ -96,6 +135,19 @@ function AdminCategories() {
   const saveProduct = () => {
     setEditProduct(null);
     setIsNewProduct(false);
+  };
+
+  const toggleDestacado = (id) => {
+    const prod = productsData.items.find(p => p.id === id);
+    if (!prod.destacado) {
+      const yaHayDestacado = productsData.items.some(p => p.categoria === prod.categoria && p.destacado);
+      if (yaHayDestacado) {
+        setShowLimitPopup(true);
+        return;
+      }
+    }
+    const items = productsData.items.map(p => p.id === id ? { ...p, destacado: !p.destacado } : p);
+    setProductsData({ ...productsData, items });
   };
 
   const getEditingProduct = () => productsData.items.find(p => p.id === editProduct);
@@ -156,10 +208,10 @@ function AdminCategories() {
       <p className="admin-page-subtitle">Gestiona las colecciones de joyería</p>
 
       <div className="admin-tabs">
-        <button className={`admin-tab ${tab === 'tipos' ? 'active' : ''}`} onClick={() => setTab('tipos')}>
+        <button className={`admin-tab ${tab === 'tipos' ? 'active' : ''}`} onClick={() => handleChangeTab('tipos')}>
           <i className="fas fa-th-large"></i> Tipos de categorías
         </button>
-        <button className={`admin-tab ${tab === 'productos' ? 'active' : ''}`} onClick={() => setTab('productos')}>
+        <button className={`admin-tab ${tab === 'productos' ? 'active' : ''}`} onClick={() => handleChangeTab('productos')}>
           <i className="fas fa-upload"></i> Subir productos
         </button>
       </div>
@@ -198,7 +250,7 @@ function AdminCategories() {
               <h3 style={{ margin: 0, whiteSpace: 'nowrap', fontSize: '0.95rem' }}>Selecciona una categoría</h3>
               <select
                 value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
+                onChange={(e) => handleChangeCategory(e.target.value)}
                 style={{ padding: '4px 8px', fontSize: '0.8rem', borderRadius: '4px', border: '1px solid #ccc', maxWidth: '180px' }}
               >
                 {data.items.map(cat => (
@@ -214,6 +266,13 @@ function AdminCategories() {
                 </div>
                 {filteredProducts.map((prod) => (
                   <div key={prod.id} className="admin-grid-card-wrapper">
+                    <div
+                      className={`card-toggle-bar ${prod.destacado ? 'active' : ''}`}
+                      onClick={() => toggleDestacado(prod.id)}
+                      title={prod.destacado ? 'Visible en página principal' : 'No visible en página principal'}
+                    >
+                      <div className="card-toggle-bar-knob"></div>
+                    </div>
                     <div className="admin-grid-card">
                       {prod.imagen && <img src={prod.imagen} alt={prod.nombre} className="admin-grid-card-img" />}
                       <div className="admin-grid-card-info">
@@ -301,6 +360,32 @@ function AdminCategories() {
                 Cancelar
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showLimitPopup && (
+        <div className="admin-modal-overlay" onClick={() => setShowLimitPopup(false)}>
+          <div className="limit-popup" onClick={(e) => e.stopPropagation()}>
+            <div className="limit-popup-icon">
+              <i className="fas fa-exclamation-circle"></i>
+            </div>
+            <h3>Portada ya seleccionada</h3>
+            <p>Ya hay <strong>1 producto</strong> seleccionado como portada de esta categoría. Desactívalo antes de seleccionar otro.</p>
+            <button className="btn-save-modal" onClick={() => setShowLimitPopup(false)}>Entendido</button>
+          </div>
+        </div>
+      )}
+
+      {showSelectPopup && (
+        <div className="admin-modal-overlay" onClick={() => setShowSelectPopup(false)}>
+          <div className="limit-popup" onClick={(e) => e.stopPropagation()}>
+            <div className="limit-popup-icon">
+              <i className="fas fa-image"></i>
+            </div>
+            <h3>Selecciona una portada</h3>
+            <p>Debes activar <strong>1 producto</strong> como imagen de portada para la categoría <strong>"{data.items.find(c => c.slug === selectedCategory)?.nombre || selectedCategory}"</strong> antes de continuar.</p>
+            <button className="btn-save-modal" onClick={() => setShowSelectPopup(false)}>Entendido</button>
           </div>
         </div>
       )}

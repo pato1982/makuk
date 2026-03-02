@@ -58,6 +58,7 @@ function Productos() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { content } = useContent();
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 700);
 
   const productos = content.products.items;
   const nombresCategorias = content.products.nombresCategorias;
@@ -72,9 +73,13 @@ function Productos() {
   }, []);
 
   useEffect(() => {
-    if (categoriaURL) {
-      setCategoriaFiltro(categoriaURL);
-    }
+    const handleResize = () => setIsMobile(window.innerWidth < 700);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    setCategoriaFiltro(categoriaURL || 'todos');
   }, [categoriaURL]);
 
   const productosFiltrados = useMemo(() => {
@@ -102,6 +107,14 @@ function Productos() {
 
     return filtrados;
   }, [categoriaFiltro, orden, productos]);
+
+  const productosEnFilas = useMemo(() => {
+    const filas = [];
+    for (let i = 0; i < productosFiltrados.length; i += 5) {
+      filas.push(productosFiltrados.slice(i, i + 5));
+    }
+    return filas;
+  }, [productosFiltrados]);
 
   const titulo = categoriaFiltro === 'todos'
     ? 'Todos los Productos'
@@ -144,11 +157,23 @@ function Productos() {
             </div>
           </div>
 
-          <div className="productos-grid">
-            {productosFiltrados.map((producto) => (
-              <ProductoCard key={producto.id} producto={producto} />
-            ))}
-          </div>
+          {isMobile ? (
+            <div className="productos-filas-mobile">
+              {productosEnFilas.map((fila, idx) => (
+                <div className="productos-fila-scroll" key={idx}>
+                  {fila.map((producto) => (
+                    <ProductoCard key={producto.id} producto={producto} />
+                  ))}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="productos-grid">
+              {productosFiltrados.map((producto) => (
+                <ProductoCard key={producto.id} producto={producto} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

@@ -10,7 +10,7 @@
 
 .footer-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    grid-template-columns: 3fr 1fr 1.5fr;
     gap: 30px;
     margin-bottom: 20px;
 }
@@ -60,6 +60,16 @@
     font-size: 1rem;
     margin-bottom: 10px;
     letter-spacing: 1px;
+}
+
+.footer-section h4 a {
+    color: inherit;
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+}
+
+.footer-section h4 a:hover {
+    opacity: 0.8;
 }
 
 .footer-section ul {
@@ -153,12 +163,11 @@
         flex: 0 0 100%;
     }
 
-    .footer-section:nth-child(2),
-    .footer-section:nth-child(3) {
-        flex: 0 0 45%;
+    .footer-section:nth-child(2) {
+        flex: 0 0 100%;
     }
 
-    .footer-section:nth-child(4) {
+    .footer-section:nth-child(3) {
         display: none;
     }
 
@@ -195,9 +204,5 @@
     .footer-grid {
         grid-template-columns: repeat(3, 1fr);
         gap: 25px;
-    }
-
-    .footer-section:nth-child(4) {
-        display: none;
     }
 }

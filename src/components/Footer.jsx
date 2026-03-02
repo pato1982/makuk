@@ -4,10 +4,6 @@ import { useContent } from '../context/ContentContext';
 function Footer() {
   const { content } = useContent();
   const footer = content.footer;
-  const categories = content.categories.items;
-
-  const firstCol = categories.slice(0, 5);
-  const secondCol = categories.slice(5, 10);
 
   return (
     <footer id="contacto" className="footer">
@@ -27,24 +23,10 @@ function Footer() {
             </div>
           </div>
 
-          {/* Categorías */}
-          <div className="footer-section">
-            <h4>Colecciones</h4>
-            <ul>
-              {firstCol.map((cat) => (
-                <li key={cat.slug}><Link to={`/productos?cat=${cat.slug}`}>{cat.nombre}</Link></li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Más categorías */}
-          <div className="footer-section">
-            <h4>Más Joyas</h4>
-            <ul>
-              {secondCol.map((cat) => (
-                <li key={cat.slug}><Link to={`/productos?cat=${cat.slug}`}>{cat.nombre}</Link></li>
-              ))}
-            </ul>
+          {/* Colecciones y Más Joyas */}
+          <div className="footer-section footer-links-col">
+            <h4><Link to="/productos">Colecciones</Link></h4>
+            <h4><Link to="/productos?cat=unicas">Más Joyas</Link></h4>
           </div>
 
           {/* Contacto */}

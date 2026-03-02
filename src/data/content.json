@@ -300,7 +300,7 @@
         "imagen": "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=400&h=400&fit=crop",
         "precioActual": 52000,
         "precioAnterior": 65000,
-        "destacado": true,
+        "destacado": false,
         "descripcion": "Brazalete ancho con diseño de raíces entrelazadas."
       },
       {

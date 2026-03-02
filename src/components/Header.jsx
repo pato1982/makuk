@@ -2,10 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useContent } from '../context/ContentContext';
+import ContactModal from './ContactModal';
 
 function Header({ alwaysScrolled = false }) {
   const [isScrolled, setIsScrolled] = useState(alwaysScrolled);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
   const { cantidadProductos, setShowCartModal } = useCart();
   const { content } = useContent();
   const location = useLocation();
@@ -41,6 +43,14 @@ function Header({ alwaysScrolled = false }) {
 
   const scrollToSection = (sectionId) => {
     setMenuOpen(false);
+    if (sectionId === 'categorias') {
+      navigate('/productos');
+      return;
+    }
+    if (sectionId === 'contacto') {
+      setShowContactModal(true);
+      return;
+    }
     if (location.pathname !== '/') {
       navigate('/', { state: { scrollTo: sectionId } });
       return;
@@ -52,6 +62,7 @@ function Header({ alwaysScrolled = false }) {
   };
 
   return (
+    <>
     <header ref={headerRef} className={`header ${isScrolled ? 'scrolled' : ''}`}>
       <div className="header-container">
         <div className="logo">
@@ -92,6 +103,9 @@ function Header({ alwaysScrolled = false }) {
         </button>
       </div>
     </header>
+
+    <ContactModal show={showContactModal} onClose={() => setShowContactModal(false)} />
+    </>
   );
 }
 

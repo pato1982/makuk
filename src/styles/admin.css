@@ -1413,6 +1413,44 @@
   left: 18px;
 }
 
+/* --- Toggle externo (categorías productos) --- */
+.card-toggle-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 4px 4px 0;
+  cursor: pointer;
+}
+
+.card-toggle-bar-knob {
+  width: 32px;
+  height: 16px;
+  border-radius: 8px;
+  background: #ddd;
+  position: relative;
+  transition: background 0.3s;
+}
+
+.card-toggle-bar.active .card-toggle-bar-knob {
+  background: #e8a862;
+}
+
+.card-toggle-bar-knob::after {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: left 0.3s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.card-toggle-bar.active .card-toggle-bar-knob::after {
+  left: 18px;
+}
+
 /* --- Popup límite --- */
 .limit-popup {
   background: #fff;
@@ -2004,6 +2042,7 @@
   /* Inline Group */
   .admin-inline-group {
     flex-direction: column;
+    align-items: stretch;
   }
 
   /* Grid */
