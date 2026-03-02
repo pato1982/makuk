@@ -1,7 +1,7 @@
 import { useRef, useEffect, useCallback } from 'react';
 
 function AdminFormField({ label, type = 'text', value, onChange, placeholder, rows = 3, options, helpText }) {
-  const id = `field-${label.replace(/\s/g, '-').toLowerCase()}`;
+  const id = `field-${typeof label === 'string' ? label.replace(/\s/g, '-').toLowerCase() : 'field'}`;
   const textareaRef = useRef(null);
 
   const autoResize = useCallback((el) => {

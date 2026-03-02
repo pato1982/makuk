@@ -1810,8 +1810,9 @@
   background: #a0622b;
 }
 
-/* --- Responsive --- */
-@media (max-width: 768px) {
+/* --- Responsive: Tablet (700px - 1100px) --- */
+@media (max-width: 1100px) and (min-width: 700px) {
+  /* Layout */
   .admin-sidebar {
     transform: translateX(-100%);
   }
@@ -1822,7 +1823,7 @@
 
   .admin-main {
     margin-left: 0;
-    padding: 70px 15px 30px;
+    padding: 70px 20px 30px;
   }
 
   .admin-menu-toggle {
@@ -1837,26 +1838,264 @@
     z-index: 90;
   }
 
-  .admin-inline-group {
-    flex-direction: column;
+  /* Page Title */
+  .admin-page-title {
+    font-size: 1.5rem;
   }
 
+  /* Tabs */
+  .admin-tab {
+    padding: 10px 18px;
+  }
+
+  /* Cards */
+  .admin-card {
+    padding: 18px;
+  }
+
+  /* Grid */
+  .admin-grid-4 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Testimonials grid */
+  .testimonials-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Dashboard stats */
+  .dashboard-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Card buttons */
+  .btn-card-label {
+    display: none;
+  }
+
+  .btn-card-icon {
+    display: inline;
+  }
+}
+
+/* --- Responsive: Móvil (0px - 699px) --- */
+@media (max-width: 699px) {
+  /* Layout — sidebar angosto desde la izquierda */
+  .admin-sidebar {
+    width: auto;
+    min-width: 0;
+    left: 0;
+    right: auto;
+    transform: translateX(-100%);
+    padding-bottom: 10px;
+  }
+
+  .admin-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .admin-sidebar-header {
+    padding: 16px 16px;
+  }
+
+  .admin-sidebar-header h2 {
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+  }
+
+  .admin-nav-item {
+    padding: 10px 16px;
+    gap: 10px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+
+  /* Footer: botones apilados, Salir abajo */
+  .admin-sidebar-footer-row {
+    flex-direction: column-reverse;
+    gap: 6px;
+  }
+
+  .admin-main {
+    margin-left: 0;
+    padding: 60px 12px 24px;
+  }
+
+  .admin-menu-toggle {
+    display: block;
+    left: auto;
+    right: 15px;
+  }
+
+  .admin-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 90;
+  }
+
+  /* Evitar desbordamiento horizontal */
+  .admin-page {
+    overflow-x: hidden;
+  }
+
+  /* Page Title / Subtitle */
+  .admin-page-title {
+    font-size: 1.3rem;
+  }
+
+  .admin-page-subtitle {
+    font-size: 0.8rem;
+    margin-bottom: 20px;
+  }
+
+  /* Tabs */
+  .admin-tabs {
+    gap: 2px;
+  }
+
+  .admin-tab {
+    padding: 8px 12px;
+    font-size: 0.82rem;
+  }
+
+  /* Cards */
+  .admin-card {
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+
+  /* Form Fields */
+  .admin-field label {
+    font-size: 0.78rem;
+  }
+
+  .admin-field input[type="text"],
+  .admin-field input[type="email"],
+  .admin-field input[type="number"],
+  .admin-field input[type="url"],
+  .admin-field textarea,
+  .admin-field select {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
+
+  /* Admin Row */
   .admin-row {
     flex-direction: column;
   }
 
+  /* Admin Row dentro de modal: mantener fila (ej. precios) */
+  .admin-modal .admin-row {
+    flex-direction: row;
+  }
+
+  /* WhatsApp + Teléfono: mantener en fila */
+  .admin-row-phone {
+    flex-direction: row;
+  }
+
+  /* Ocultar paréntesis del label en móvil */
+  .label-hint {
+    display: none;
+  }
+
+  /* Inline Group */
+  .admin-inline-group {
+    flex-direction: column;
+  }
+
+  /* Grid */
   .admin-grid-4 {
     grid-template-columns: 1fr 1fr;
+  }
+
+  /* Steps: grid de 2 columnas */
+  .steps-horizontal {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .step-card {
+    min-width: 0;
+  }
+
+  /* Step edit panel: apilar verticalmente */
+  .step-edit-panel {
+    overflow: hidden;
+  }
+
+  .step-edit-panel > div[style] {
+    flex-direction: column !important;
+  }
+
+  .step-edit-panel > div[style] > div[style] {
+    flex: 1 1 auto !important;
+  }
+
+  /* Testimonials grid */
+  .testimonials-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Stats columns */
+  .stats-columns {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Features editor */
+  .features-editor {
+    flex-direction: column;
+  }
+
+  .features-icons-panel {
+    width: 100%;
+  }
+
+  /* Control panel */
+  .control-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .control-status-list {
+    flex-direction: row;
+    gap: 6px;
+  }
+
+  .control-status-item {
+    flex: 1;
+    padding: 8px 6px;
+    font-size: 0.7rem;
+  }
+
+  .control-note-extra {
+    display: none;
+  }
+
+  /* Modals */
+  .admin-modal {
+    max-width: 95%;
+    padding: 14px;
   }
 
   .admin-modal-footer {
     flex-direction: column;
   }
 
+  /* Botón guardar */
+  .btn-save {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Dashboard stats */
   .dashboard-stats {
     grid-template-columns: 1fr 1fr;
   }
 
+  /* Card buttons */
   .btn-card-label {
     display: none;
   }

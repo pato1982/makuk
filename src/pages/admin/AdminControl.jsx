@@ -49,7 +49,7 @@ function AdminControl() {
           </div>
         </div>
         <p className="control-note">
-          <i className="fas fa-info-circle"></i> Almacenamiento local. Se conectará a base de datos en el futuro.
+          <i className="fas fa-info-circle"></i> Almacenamiento local<span className="control-note-extra">. Se conectará a base de datos en el futuro</span>.
         </p>
       </AdminCard>
 

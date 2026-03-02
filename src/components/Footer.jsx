@@ -56,8 +56,8 @@ function Footer() {
                 <a href={`mailto:${footer.email}`}>{footer.email}</a>
               </p>
               <p>
-                <i className="fab fa-whatsapp"></i>
-                <a href={`https://wa.me/${footer.whatsappNumber}`} target="_blank" rel="noopener noreferrer">
+                <i className="fas fa-phone"></i>
+                <a href={`tel:${footer.whatsappDisplay}`}>
                   {footer.whatsappDisplay}
                 </a>
               </p>

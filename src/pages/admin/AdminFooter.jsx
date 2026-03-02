@@ -32,14 +32,12 @@ function AdminFooter() {
       </AdminCard>
 
       <AdminCard title="Contacto">
-        <div className="admin-row">
-          <AdminFormField label="Email" type="email" value={data.email} onChange={(v) => setData({ ...data, email: v })} />
-          <AdminFormField label="WhatsApp (número sin +)" value={data.whatsappNumber} onChange={(v) => setData({ ...data, whatsappNumber: v })} helpText="Solo números, ej: 34612345678" />
+        <AdminFormField label="Email" type="email" value={data.email} onChange={(v) => setData({ ...data, email: v })} />
+        <div className="admin-row admin-row-phone">
+          <AdminFormField label={<>WhatsApp <span className="label-hint">(número)</span></>} value={data.whatsappNumber} onChange={(v) => setData({ ...data, whatsappNumber: v })} />
+          <AdminFormField label="Teléfono" value={data.whatsappDisplay} onChange={(v) => setData({ ...data, whatsappDisplay: v })} />
         </div>
-        <div className="admin-row">
-          <AdminFormField label="WhatsApp (display)" value={data.whatsappDisplay} onChange={(v) => setData({ ...data, whatsappDisplay: v })} helpText="Lo que ve el usuario, ej: +34 612 345 678" />
-          <AdminFormField label="Dirección" value={data.address} onChange={(v) => setData({ ...data, address: v })} />
-        </div>
+        <AdminFormField label="Dirección" value={data.address} onChange={(v) => setData({ ...data, address: v })} />
       </AdminCard>
 
       <AdminCard title="Legal">
