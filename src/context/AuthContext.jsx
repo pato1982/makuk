@@ -11,8 +11,6 @@ export function AuthProvider({ children }) {
   const login = useCallback((email, password) => {
     const validUser = import.meta.env.VITE_ADMIN_USER || 'admin@makuk.cl';
     const validPass = import.meta.env.VITE_ADMIN_PASS || 'makuk2024';
-    console.log('ENV:', validUser, validPass);
-    console.log('INPUT:', email, password);
     if (email === validUser && password === validPass) {
       localStorage.setItem(AUTH_KEY, 'true');
       setIsAuthenticated(true);

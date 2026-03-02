@@ -48,6 +48,19 @@ function Login() {
           </div>
           <button type="submit" className="btn-login">Iniciar Sesión</button>
         </form>
+        <button
+          type="button"
+          className="btn-quick-login"
+          onClick={() => {
+            const user = import.meta.env.VITE_ADMIN_USER || 'admin@makuk.cl';
+            const pass = import.meta.env.VITE_ADMIN_PASS || 'makuk2024';
+            if (login(user, pass)) {
+              navigate('/admin');
+            }
+          }}
+        >
+          <i className="fas fa-bolt"></i> Acceso rápido
+        </button>
       </div>
     </div>
   );

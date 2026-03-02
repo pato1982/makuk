@@ -89,6 +89,29 @@
   background: #a0622b;
 }
 
+.btn-quick-login {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background: transparent;
+  color: #b87333;
+  border: 2px solid #b87333;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-quick-login:hover {
+  background: #b87333;
+  color: #fff;
+}
+
+.btn-quick-login i {
+  margin-right: 6px;
+}
+
 /* --- Admin Layout --- */
 .admin-layout {
   display: flex;
