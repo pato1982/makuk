@@ -4,8 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 
 
 const navItems = [
-  { to: '/admin', label: 'Dashboard', icon: 'fa-tachometer-alt', end: true },
-  { to: '/admin/header', label: 'Header', icon: 'fa-heading' },
+  { to: '/admin', label: 'Header', icon: 'fa-heading', end: true },
   { to: '/admin/categories', label: 'Categorías', icon: 'fa-th-large' },
   { to: '/admin/unique-pieces', label: 'Piezas Únicas', icon: 'fa-gem' },
   { to: '/admin/about', label: 'Nosotros', icon: 'fa-users' },
@@ -13,8 +12,7 @@ const navItems = [
   { to: '/admin/worldwide', label: 'Presencia Global', icon: 'fa-globe' },
   { to: '/admin/testimonials', label: 'Testimonios', icon: 'fa-quote-left' },
   { to: '/admin/footer', label: 'Footer', icon: 'fa-shoe-prints' },
-  { to: '/admin/products', label: 'Productos', icon: 'fa-box' },
-  { to: '/admin/products-page', label: 'Pág. Productos', icon: 'fa-store' },
+  { to: '/admin/control', label: 'Control', icon: 'fa-database' },
 ];
 
 function AdminLayout() {

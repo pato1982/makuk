@@ -22,6 +22,7 @@ import AdminTestimonials from './pages/admin/AdminTestimonials';
 import AdminFooter from './pages/admin/AdminFooter';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminProductsPage from './pages/admin/AdminProductsPage';
+import AdminControl from './pages/admin/AdminControl';
 
 // Importar estilos
 import './styles/variables.css';
@@ -46,8 +47,7 @@ function App() {
               {/* Admin */}
               <Route path="/admin/login" element={<Login />} />
               <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
-                <Route index element={<Dashboard />} />
-                <Route path="header" element={<AdminHeader />} />
+                <Route index element={<AdminHeader />} />
                 <Route path="categories" element={<AdminCategories />} />
                 <Route path="unique-pieces" element={<AdminUniquePieces />} />
                 <Route path="about" element={<AdminAbout />} />
@@ -57,6 +57,7 @@ function App() {
                 <Route path="footer" element={<AdminFooter />} />
                 <Route path="products" element={<AdminProducts />} />
                 <Route path="products-page" element={<AdminProductsPage />} />
+                <Route path="control" element={<AdminControl />} />
               </Route>
             </Routes>
             <CartModal />

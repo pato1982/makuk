@@ -14,6 +14,7 @@ function AdminCategories() {
   const [isNewProduct, setIsNewProduct] = useState(false);
   const [saved, setSaved] = useState(false);
   const [tab, setTab] = useState('tipos');
+
   const [modalPos, setModalPos] = useState({ x: 0, y: 0 });
   const [productModalPos, setProductModalPos] = useState({ x: 0, y: 0 });
   const dragging = useRef(false);
@@ -52,6 +53,7 @@ function AdminCategories() {
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
+
 
   const filteredProducts = productsData.items.filter(p => p.categoria === selectedCategory);
 
@@ -192,15 +194,18 @@ function AdminCategories() {
 
         {tab === 'productos' && (
           <>
-            <AdminCard title="Selecciona una categoría">
-              <AdminFormField
-                label="Categoría"
-                type="select"
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
+              <h3 style={{ margin: 0, whiteSpace: 'nowrap', fontSize: '0.95rem' }}>Selecciona una categoría</h3>
+              <select
                 value={selectedCategory}
-                onChange={(v) => setSelectedCategory(v)}
-                options={data.items.map(cat => ({ value: cat.slug, label: cat.nombre }))}
-              />
-            </AdminCard>
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                style={{ padding: '4px 8px', fontSize: '0.8rem', borderRadius: '4px', border: '1px solid #ccc', maxWidth: '180px' }}
+              >
+                {data.items.map(cat => (
+                  <option key={cat.slug} value={cat.slug}>{cat.nombre}</option>
+                ))}
+              </select>
+            </div>
 
             <AdminCard title={`Productos en "${data.items.find(c => c.slug === selectedCategory)?.nombre || selectedCategory}" (${filteredProducts.length})`}>
               <div className="admin-grid-4">
@@ -230,6 +235,7 @@ function AdminCategories() {
             </AdminCard>
           </>
         )}
+
       </div>
 
       {/* Modal de edición */}

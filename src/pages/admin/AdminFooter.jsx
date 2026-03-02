@@ -25,15 +25,21 @@ function AdminFooter() {
       </AdminCard>
 
       <AdminCard title="Redes Sociales">
-        <AdminFormField label="URL Facebook" value={data.facebookUrl} onChange={(v) => setData({ ...data, facebookUrl: v })} />
-        <AdminFormField label="URL Instagram" value={data.instagramUrl} onChange={(v) => setData({ ...data, instagramUrl: v })} />
+        <div className="admin-row">
+          <AdminFormField label="URL Facebook" value={data.facebookUrl} onChange={(v) => setData({ ...data, facebookUrl: v })} />
+          <AdminFormField label="URL Instagram" value={data.instagramUrl} onChange={(v) => setData({ ...data, instagramUrl: v })} />
+        </div>
       </AdminCard>
 
       <AdminCard title="Contacto">
-        <AdminFormField label="Email" type="email" value={data.email} onChange={(v) => setData({ ...data, email: v })} />
-        <AdminFormField label="WhatsApp (número sin +)" value={data.whatsappNumber} onChange={(v) => setData({ ...data, whatsappNumber: v })} helpText="Solo números, ej: 34612345678" />
-        <AdminFormField label="WhatsApp (display)" value={data.whatsappDisplay} onChange={(v) => setData({ ...data, whatsappDisplay: v })} helpText="Lo que ve el usuario, ej: +34 612 345 678" />
-        <AdminFormField label="Dirección" value={data.address} onChange={(v) => setData({ ...data, address: v })} />
+        <div className="admin-row">
+          <AdminFormField label="Email" type="email" value={data.email} onChange={(v) => setData({ ...data, email: v })} />
+          <AdminFormField label="WhatsApp (número sin +)" value={data.whatsappNumber} onChange={(v) => setData({ ...data, whatsappNumber: v })} helpText="Solo números, ej: 34612345678" />
+        </div>
+        <div className="admin-row">
+          <AdminFormField label="WhatsApp (display)" value={data.whatsappDisplay} onChange={(v) => setData({ ...data, whatsappDisplay: v })} helpText="Lo que ve el usuario, ej: +34 612 345 678" />
+          <AdminFormField label="Dirección" value={data.address} onChange={(v) => setData({ ...data, address: v })} />
+        </div>
       </AdminCard>
 
       <AdminCard title="Legal">

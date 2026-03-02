@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 
-function ImageUploader({ label, value, onChange, compact = false }) {
+function ImageUploader({ label, value, onChange, compact = false, noPreview = false }) {
   const fileRef = useRef(null);
   const [imgError, setImgError] = useState(false);
 
@@ -65,7 +65,7 @@ function ImageUploader({ label, value, onChange, compact = false }) {
           style={{ display: 'none' }}
         />
       </div>
-      {value && (
+      {value && !noPreview && (
         <div className="image-preview">
           <img src={value} alt="Preview" onError={(e) => { e.target.style.display = 'none'; }} />
         </div>

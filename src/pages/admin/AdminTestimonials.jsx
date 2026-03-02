@@ -45,30 +45,33 @@ function AdminTestimonials() {
       </AdminCard>
 
       <AdminCard title={`Testimonios (${data.items.length})`}>
-        <div className="admin-items-list">
+        <div className="testimonials-grid">
           {data.items.map((item, i) => (
-            <div key={i} className={`admin-list-item ${editIndex === i ? 'editing' : ''}`}>
-              <div className="admin-list-item-header" onClick={() => setEditIndex(editIndex === i ? null : i)}>
-                <span className="item-name">{item.nombre}</span>
-                <span className="item-slug">— {item.ubicacion}</span>
-                <i className={`fas fa-chevron-${editIndex === i ? 'up' : 'down'} item-toggle`}></i>
-              </div>
-              {editIndex === i && (
-                <div className="admin-list-item-body">
-                  <AdminFormField label="Texto" type="textarea" rows={3} value={item.texto} onChange={(v) => updateItem(i, 'texto', v)} />
-                  <AdminFormField label="Nombre" value={item.nombre} onChange={(v) => updateItem(i, 'nombre', v)} />
-                  <AdminFormField label="Ubicación" value={item.ubicacion} onChange={(v) => updateItem(i, 'ubicacion', v)} />
-                  <button type="button" className="btn-delete-item" onClick={() => removeItem(i)}>
-                    <i className="fas fa-trash"></i> Eliminar testimonio
-                  </button>
-                </div>
-              )}
+            <div
+              key={i}
+              className={`testimonial-card ${editIndex === i ? 'active' : ''}`}
+              onClick={() => setEditIndex(editIndex === i ? null : i)}
+            >
+              <span className="testimonial-card-name">{item.nombre}</span>
+              <span className="testimonial-card-location">{item.ubicacion}</span>
             </div>
           ))}
+          <div className="testimonial-card testimonial-card-add" onClick={addItem}>
+            <i className="fas fa-plus"></i> Agregar
+          </div>
         </div>
-        <button type="button" className="btn-add-item" onClick={addItem}>
-          <i className="fas fa-plus"></i> Agregar testimonio
-        </button>
+        {editIndex !== null && data.items[editIndex] && (
+          <div className="step-edit-panel">
+            <AdminFormField label="Texto" type="textarea" rows={3} value={data.items[editIndex].texto} onChange={(v) => updateItem(editIndex, 'texto', v)} />
+            <div className="admin-row">
+              <AdminFormField label="Nombre" value={data.items[editIndex].nombre} onChange={(v) => updateItem(editIndex, 'nombre', v)} />
+              <AdminFormField label="Ubicación" value={data.items[editIndex].ubicacion} onChange={(v) => updateItem(editIndex, 'ubicacion', v)} />
+            </div>
+            <button type="button" className="btn-delete-item" onClick={() => removeItem(editIndex)}>
+              <i className="fas fa-trash"></i> Eliminar testimonio
+            </button>
+          </div>
+        )}
       </AdminCard>
 
       <button className={`btn-save ${saved ? 'saved' : ''}`} onClick={handleSave}>

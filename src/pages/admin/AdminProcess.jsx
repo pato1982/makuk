@@ -54,34 +54,57 @@ function AdminProcess() {
       </AdminCard>
 
       <AdminCard title={`Pasos (${data.steps.length})`}>
-        <div className="admin-items-list">
+        <div className="steps-horizontal">
           {data.steps.map((step, i) => (
-            <div key={i} className={`admin-list-item ${editIndex === i ? 'editing' : ''}`}>
-              <div className="admin-list-item-header" onClick={() => setEditIndex(editIndex === i ? null : i)}>
-                <div className="item-sort-btns">
-                  <button type="button" onClick={(e) => { e.stopPropagation(); moveStep(i, -1); }} disabled={i === 0}><i className="fas fa-chevron-up"></i></button>
-                  <button type="button" onClick={(e) => { e.stopPropagation(); moveStep(i, 1); }} disabled={i === data.steps.length - 1}><i className="fas fa-chevron-down"></i></button>
-                </div>
-                <i className={`fas ${step.icon} item-icon`}></i>
-                <span className="item-name">{step.title}</span>
-                <i className={`fas fa-chevron-${editIndex === i ? 'up' : 'down'} item-toggle`}></i>
-              </div>
-              {editIndex === i && (
-                <div className="admin-list-item-body">
-                  <IconPicker label="Icono" value={step.icon} onChange={(v) => updateStep(i, 'icon', v)} />
-                  <AdminFormField label="Título" value={step.title} onChange={(v) => updateStep(i, 'title', v)} />
-                  <AdminFormField label="Descripción" type="textarea" value={step.description} onChange={(v) => updateStep(i, 'description', v)} />
-                  <button type="button" className="btn-delete-item" onClick={() => removeStep(i)}>
-                    <i className="fas fa-trash"></i> Eliminar paso
-                  </button>
-                </div>
-              )}
+            <div
+              key={i}
+              className={`step-card ${editIndex === i ? 'active' : ''}`}
+              onClick={() => setEditIndex(editIndex === i ? null : i)}
+            >
+              <i className={`fas ${step.icon} step-card-icon`}></i>
+              <span className="step-card-title">{step.title}</span>
+              <i className={`fas fa-chevron-${editIndex === i ? 'up' : 'down'} step-card-toggle`}></i>
             </div>
           ))}
+          <div className="step-card step-card-add" onClick={addStep}>
+            <i className="fas fa-plus"></i>
+          </div>
         </div>
-        <button type="button" className="btn-add-item" onClick={addStep}>
-          <i className="fas fa-plus"></i> Agregar paso
-        </button>
+        {editIndex !== null && data.steps[editIndex] && (
+          <div className="step-edit-panel">
+            <div className="step-edit-sort">
+              <button type="button" onClick={() => { moveStep(editIndex, -1); setEditIndex(editIndex - 1); }} disabled={editIndex === 0}><i className="fas fa-chevron-left"></i></button>
+              <button type="button" onClick={() => { moveStep(editIndex, 1); setEditIndex(editIndex + 1); }} disabled={editIndex === data.steps.length - 1}><i className="fas fa-chevron-right"></i></button>
+            </div>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ flex: '0 0 25%' }}>
+                <AdminFormField label="Título" value={data.steps[editIndex].title} onChange={(v) => updateStep(editIndex, 'title', v)} />
+              </div>
+              <div style={{ flex: '1 1 35%' }}>
+                <AdminFormField label="Descripción" type="textarea" value={data.steps[editIndex].description} onChange={(v) => updateStep(editIndex, 'description', v)} />
+              </div>
+              <div className="admin-field" style={{ flex: '0 0 220px' }}>
+                <label>Icono</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px' }}>
+                  {['fa-gem', 'fa-ring', 'fa-fire', 'fa-cut', 'fa-hammer', 'fa-paint-brush', 'fa-hands', 'fa-eye', 'fa-check', 'fa-gift'].map((icon) => (
+                    <button
+                      key={icon}
+                      type="button"
+                      className={`icon-option ${data.steps[editIndex].icon === icon ? 'active' : ''}`}
+                      onClick={() => updateStep(editIndex, 'icon', icon)}
+                      title={icon}
+                    >
+                      <i className={`fas ${icon}`}></i>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <button type="button" className="btn-delete-item" onClick={() => removeStep(editIndex)}>
+              <i className="fas fa-trash"></i> Eliminar paso
+            </button>
+          </div>
+        )}
       </AdminCard>
 
       <button className={`btn-save ${saved ? 'saved' : ''}`} onClick={handleSave}>
