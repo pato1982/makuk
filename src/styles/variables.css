@@ -1,0 +1,98 @@
+/* ========================================
+   MAKUK - Variables y Estilos Base
+   ======================================== */
+
+/* Variables de colores */
+:root {
+    --copper: #B87333;
+    --copper-dark: #8B4513;
+    --copper-light: #CD7F32;
+    --copper-shine: #DAA520;
+    --copper-metallic: #D4956A;
+    --gold: #C9A227;
+    --cream: #FDF8F3;
+    --cream-dark: #F5EBE0;
+    --charcoal: #2C2C2C;
+    --dark-brown: #3D2914;
+    --white: #FFFFFF;
+    --text-dark: #1A1A1A;
+    --text-light: #666666;
+}
+
+/* Reset y base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--text-dark);
+    background-color: var(--cream);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Divisor de cobre */
+.copper-divider {
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--copper-dark), var(--copper-shine), var(--copper-dark));
+    margin: 20px 0 30px;
+}
+
+.copper-divider.center {
+    margin: 20px auto 30px;
+}
+
+.copper-divider.light {
+    background: linear-gradient(90deg, transparent, var(--copper-shine), transparent);
+}
+
+/* Títulos de sección */
+.section-title {
+    font-size: 2.8rem;
+    text-align: center;
+    color: var(--dark-brown);
+    margin-bottom: 10px;
+}
+
+.section-title.light {
+    color: var(--cream);
+}
+
+.section-subtitle {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 1.1rem;
+    margin-bottom: 50px;
+}

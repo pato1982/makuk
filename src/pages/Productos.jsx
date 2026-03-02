@@ -1,0 +1,164 @@
+import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+import { useCart } from '../context/CartContext';
+import { useContent } from '../context/ContentContext';
+
+function ProductoCard({ producto }) {
+  const [cantidad, setCantidad] = useState(1);
+  const { agregarAlCarrito } = useCart();
+
+  const formatearPrecio = (valor) => {
+    return '$' + Math.round(valor).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  };
+
+  const handleComprar = () => {
+    agregarAlCarrito(producto.nombre, producto.precioActual, cantidad);
+    setCantidad(1);
+  };
+
+  return (
+    <div className="producto-card">
+      <div className="producto-img">
+        <img src={producto.imagen} alt={producto.nombre} />
+      </div>
+      <div className="producto-info">
+        <h4>{producto.nombre}</h4>
+        <div className="producto-precios">
+          <span className="precio-actual">{formatearPrecio(producto.precioActual)}</span>
+          <span className="precio-anterior">{formatearPrecio(producto.precioAnterior)}</span>
+        </div>
+        <div className="producto-acciones">
+          <div className="cantidad-selector">
+            <button
+              className="cantidad-btn menos"
+              onClick={() => cantidad > 1 && setCantidad(cantidad - 1)}
+            >
+              -
+            </button>
+            <span className="cantidad-numero">{cantidad}</span>
+            <button
+              className="cantidad-btn mas"
+              onClick={() => cantidad < 10 && setCantidad(cantidad + 1)}
+            >
+              +
+            </button>
+          </div>
+          <button className="btn-comprar" onClick={handleComprar}>
+            Comprar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Productos() {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { content } = useContent();
+
+  const productos = content.products.items;
+  const nombresCategorias = content.products.nombresCategorias;
+  const pageConfig = content.productsPage;
+
+  const categoriaURL = searchParams.get('cat');
+  const [categoriaFiltro, setCategoriaFiltro] = useState(categoriaURL || 'todos');
+  const [orden, setOrden] = useState('destacados');
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    if (categoriaURL) {
+      setCategoriaFiltro(categoriaURL);
+    }
+  }, [categoriaURL]);
+
+  const productosFiltrados = useMemo(() => {
+    let filtrados = [...productos];
+
+    if (categoriaFiltro !== 'todos') {
+      filtrados = filtrados.filter(p => p.categoria === categoriaFiltro);
+    }
+
+    switch (orden) {
+      case 'precio-menor':
+        filtrados.sort((a, b) => a.precioActual - b.precioActual);
+        break;
+      case 'precio-mayor':
+        filtrados.sort((a, b) => b.precioActual - a.precioActual);
+        break;
+      case 'nombre':
+        filtrados.sort((a, b) => a.nombre.localeCompare(b.nombre));
+        break;
+      case 'destacados':
+      default:
+        filtrados.sort((a, b) => (b.destacado ? 1 : 0) - (a.destacado ? 1 : 0));
+        break;
+    }
+
+    return filtrados;
+  }, [categoriaFiltro, orden, productos]);
+
+  const titulo = categoriaFiltro === 'todos'
+    ? 'Todos los Productos'
+    : nombresCategorias[categoriaFiltro] || 'Productos';
+
+  return (
+    <>
+      <Header alwaysScrolled={true} />
+
+      <section className="productos-page">
+        <div className="container">
+          <div className="productos-header">
+            <h1 className="productos-titulo">{titulo}</h1>
+            <p className="productos-subtitulo">
+              {pageConfig.subtitle}
+            </p>
+          </div>
+
+          <div className="filtros-bar">
+            <div className="filtro-categoria">
+              <select
+                value={categoriaFiltro}
+                onChange={(e) => setCategoriaFiltro(e.target.value)}
+              >
+                <option value="todos">{pageConfig.filterAllText}</option>
+                {Object.entries(nombresCategorias).map(([slug, name]) => (
+                  <option key={slug} value={slug}>{name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="filtro-orden">
+              <select
+                value={orden}
+                onChange={(e) => setOrden(e.target.value)}
+              >
+                {Object.entries(pageConfig.sortLabels).map(([key, label]) => (
+                  <option key={key} value={key}>{label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="productos-grid">
+            {productosFiltrados.map((producto) => (
+              <ProductoCard key={producto.id} producto={producto} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <button className="btn-flotante-volver" onClick={() => navigate('/', { state: { scrollTo: 'categorias' } })}>
+        <i className="fas fa-arrow-left"></i>
+      </button>
+
+      <Footer />
+    </>
+  );
+}
+
+export default Productos;
