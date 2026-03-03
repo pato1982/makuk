@@ -26,6 +26,7 @@ function AdminCategories() {
   const [editProduct, setEditProduct] = useState(null);
   const [isNewProduct, setIsNewProduct] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const [tab, setTab] = useState('tipos');
 
   const [modalPos, setModalPos] = useState({ x: 0, y: 0 });
@@ -57,17 +58,24 @@ function AdminCategories() {
     document.addEventListener('mouseup', handleDragEnd);
   }, [modalPos]);
 
-  const handleSave = () => {
-    updateSection('categories', data);
+  const handleSave = async () => {
+    setSaveError('');
     const nombres = {};
     data.items.forEach(cat => { nombres[cat.slug] = cat.nombre; });
     if (productsData.nombresCategorias['unicas']) {
       nombres['unicas'] = productsData.nombresCategorias['unicas'];
     }
     const updatedProducts = { ...productsData, nombresCategorias: nombres };
-    updateSection('products', updatedProducts);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    try {
+      await Promise.all([
+        updateSection('categories', data),
+        updateSection('products', updatedProducts),
+      ]);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {
+      setSaveError('Error al guardar. Intenta de nuevo.');
+    }
   };
 
 
@@ -354,6 +362,7 @@ function AdminCategories() {
         </div>
       )}
 
+      {saveError && <div className="save-error"><i className="fas fa-exclamation-circle"></i> {saveError}</div>}
       <button className={`btn-save ${saved ? 'saved' : ''}`} onClick={handleSave}>
         {saved ? <><i className="fas fa-check"></i> Guardado</> : <><i className="fas fa-save"></i> Guardar cambios</>}
       </button>

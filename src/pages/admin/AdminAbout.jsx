@@ -9,13 +9,19 @@ function AdminAbout() {
   const { content, updateSection } = useContent();
   const [data, setData] = useState(JSON.parse(JSON.stringify(content.about)));
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const [editingFeature, setEditingFeature] = useState(null);
   const [tab, setTab] = useState('general');
 
-  const handleSave = () => {
-    updateSection('about', data);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const handleSave = async () => {
+    setSaveError('');
+    try {
+      await updateSection('about', data);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {
+      setSaveError('Error al guardar. Intenta de nuevo.');
+    }
   };
 
   const fullText = data.paragraphs.join('\n\n');
@@ -135,6 +141,7 @@ function AdminAbout() {
         )}
       </div>
 
+      {saveError && <div className="save-error"><i className="fas fa-exclamation-circle"></i> {saveError}</div>}
       <button className={`btn-save ${saved ? 'saved' : ''}`} onClick={handleSave}>
         {saved ? <><i className="fas fa-check"></i> Guardado</> : <><i className="fas fa-save"></i> Guardar cambios</>}
       </button>

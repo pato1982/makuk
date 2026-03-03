@@ -740,6 +740,18 @@
   box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
 }
 
+.save-error {
+  background: #fdecea;
+  color: #b71c1c;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* --- Image Preview --- */
 .image-preview {
   margin-top: 8px;

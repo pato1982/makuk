@@ -32,18 +32,26 @@ function AdminUniquePieces() {
   const [editProduct, setEditProduct] = useState(null);
   const [isNewProduct, setIsNewProduct] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const [showLimitPopup, setShowLimitPopup] = useState(false);
 
   const uniqueProducts = productsData.items.filter(p => p.categoria === 'piezas-unicas');
   const selectedCount = uniqueProducts.filter(p => p.destacado).length;
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    setSaveError('');
     const selectedProducts = productsData.items.filter(p => p.categoria === 'piezas-unicas' && p.destacado);
     const newItems = selectedProducts.map(p => ({ nombre: p.nombre, imagen: p.imagen }));
-    updateSection('uniquePieces', { ...data, items: newItems });
-    updateSection('products', productsData);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    try {
+      await Promise.all([
+        updateSection('uniquePieces', { ...data, items: newItems }),
+        updateSection('products', productsData),
+      ]);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {
+      setSaveError('Error al guardar. Intenta de nuevo.');
+    }
   };
 
   const toggleDestacado = (id) => {
@@ -188,6 +196,7 @@ function AdminUniquePieces() {
         </div>
       )}
 
+      {saveError && <div className="save-error"><i className="fas fa-exclamation-circle"></i> {saveError}</div>}
       <button className={`btn-save ${saved ? 'saved' : ''}`} onClick={handleSave}>
         {saved ? <><i className="fas fa-check"></i> Guardado</> : <><i className="fas fa-save"></i> Guardar cambios</>}
       </button>

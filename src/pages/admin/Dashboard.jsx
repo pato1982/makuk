@@ -36,9 +36,8 @@ function Dashboard() {
           <h3><i className="fas fa-info-circle"></i> Cómo funciona</h3>
           <ul>
             <li>Usa el menú lateral para navegar entre las secciones editables</li>
-            <li>Los cambios se guardan automáticamente en el navegador (localStorage)</li>
-            <li>Usa "Restaurar" para volver a los valores originales</li>
-            <li>Los cambios se reflejan en tiempo real en el sitio público</li>
+            <li>Los cambios se guardan en la base de datos al hacer click en "Guardar cambios"</li>
+            <li>Los cambios se reflejan en el sitio público al recargar la página</li>
           </ul>
         </div>
       </div>

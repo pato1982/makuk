@@ -7,11 +7,17 @@ function AdminFooter() {
   const { content, updateSection } = useContent();
   const [data, setData] = useState({ ...content.footer });
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
-  const handleSave = () => {
-    updateSection('footer', data);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const handleSave = async () => {
+    setSaveError('');
+    try {
+      await updateSection('footer', data);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {
+      setSaveError('Error al guardar. Intenta de nuevo.');
+    }
   };
 
   return (
@@ -48,6 +54,7 @@ function AdminFooter() {
         </div>
       </AdminCard>
 
+      {saveError && <div className="save-error"><i className="fas fa-exclamation-circle"></i> {saveError}</div>}
       <button className={`btn-save ${saved ? 'saved' : ''}`} onClick={handleSave}>
         {saved ? <><i className="fas fa-check"></i> Guardado</> : <><i className="fas fa-save"></i> Guardar cambios</>}
       </button>

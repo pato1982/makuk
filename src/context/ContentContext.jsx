@@ -24,18 +24,17 @@ export function ContentProvider({ children }) {
   const updateSection = useCallback(async (sectionKey, data) => {
     // Actualización optimista del state local
     setContent(prev => ({ ...prev, [sectionKey]: data }));
-
-    // Persistir en el backend
-    try {
-      await saveSection(sectionKey, data);
-    } catch (err) {
-      console.error(`Error guardando ${sectionKey}:`, err);
-    }
+    // Persistir en el backend (los errores suben al caller para mostrar feedback)
+    await saveSection(sectionKey, data);
   }, []);
 
   const reloadContent = useCallback(async () => {
-    const data = await fetchContentApi();
-    setContent(data);
+    try {
+      const data = await fetchContentApi();
+      setContent(data);
+    } catch (err) {
+      console.error('Error recargando contenido:', err);
+    }
   }, []);
 
   return (

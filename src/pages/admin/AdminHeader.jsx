@@ -9,14 +9,22 @@ function AdminHeader() {
   const [heroData, setHeroData] = useState({ ...content.hero });
   const [introData, setIntroData] = useState({ ...content.intro });
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const [tab, setTab] = useState('identidad');
 
-  const handleSave = () => {
-    updateSection('header', data);
-    updateSection('hero', heroData);
-    updateSection('intro', introData);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const handleSave = async () => {
+    setSaveError('');
+    try {
+      await Promise.all([
+        updateSection('header', data),
+        updateSection('hero', heroData),
+        updateSection('intro', introData),
+      ]);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {
+      setSaveError('Error al guardar. Intenta de nuevo.');
+    }
   };
 
   const updateNavItem = (index, field, value) => {
@@ -109,6 +117,7 @@ function AdminHeader() {
         )}
       </div>
 
+      {saveError && <div className="save-error"><i className="fas fa-exclamation-circle"></i> {saveError}</div>}
       <button className={`btn-save ${saved ? 'saved' : ''}`} onClick={handleSave}>
         {saved ? <><i className="fas fa-check"></i> Guardado</> : <><i className="fas fa-save"></i> Guardar cambios</>}
       </button>

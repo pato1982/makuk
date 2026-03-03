@@ -49,7 +49,7 @@ function AdminControl() {
           </div>
         </div>
         <p className="control-note">
-          <i className="fas fa-info-circle"></i> Almacenamiento local<span className="control-note-extra">. Se conectará a base de datos en el futuro</span>.
+          <i className="fas fa-info-circle"></i> Almacenamiento en base de datos MySQL.
         </p>
       </AdminCard>
 
@@ -73,9 +73,9 @@ function AdminControl() {
             <span className="control-status-tag">En línea</span>
           </div>
           <div className="control-status-item">
-            <span className="control-status-dot pending"></span>
+            <span className="control-status-dot online"></span>
             <span>Base de datos</span>
-            <span className="control-status-tag pending">Pendiente</span>
+            <span className="control-status-tag">Conectada</span>
           </div>
           <div className="control-status-item">
             <span className="control-status-dot online"></span>

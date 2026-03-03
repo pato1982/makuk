@@ -52,7 +52,11 @@ async function apiFetch(endpoint, options = {}) {
     if (refreshed) {
       // Reintentar con el nuevo token
       headers['Authorization'] = `Bearer ${getAccessToken()}`;
-      res = await fetch(url, { ...options, headers });
+      try {
+        res = await fetch(url, { ...options, headers });
+      } catch {
+        throw new Error('Error de conexión. Verifica tu internet e intenta de nuevo.');
+      }
     } else {
       // Refresh falló — limpiar y redirigir a login
       clearTokens();

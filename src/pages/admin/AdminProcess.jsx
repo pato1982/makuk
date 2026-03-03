@@ -9,11 +9,17 @@ function AdminProcess() {
   const [data, setData] = useState(JSON.parse(JSON.stringify(content.process)));
   const [editIndex, setEditIndex] = useState(null);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
-  const handleSave = () => {
-    updateSection('process', data);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const handleSave = async () => {
+    setSaveError('');
+    try {
+      await updateSection('process', data);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {
+      setSaveError('Error al guardar. Intenta de nuevo.');
+    }
   };
 
   const updateStep = (index, field, value) => {
@@ -107,6 +113,7 @@ function AdminProcess() {
         )}
       </AdminCard>
 
+      {saveError && <div className="save-error"><i className="fas fa-exclamation-circle"></i> {saveError}</div>}
       <button className={`btn-save ${saved ? 'saved' : ''}`} onClick={handleSave}>
         {saved ? <><i className="fas fa-check"></i> Guardado</> : <><i className="fas fa-save"></i> Guardar cambios</>}
       </button>
