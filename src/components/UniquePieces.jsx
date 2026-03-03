@@ -5,6 +5,8 @@ function UniquePieces() {
   const { content } = useContent();
   const { title, subtitle, items } = content.uniquePieces;
 
+  if (!items || items.length === 0) return null;
+
   return (
     <section className="unique-pieces">
       <div className="container">

@@ -62,7 +62,7 @@
 
 .producto-card {
     background: var(--white);
-    border-radius: 10px;
+    border-radius: 0 0 10px 10px;
     overflow: hidden;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
     transition: all 0.4s ease;

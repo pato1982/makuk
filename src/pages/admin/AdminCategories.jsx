@@ -237,10 +237,9 @@ function AdminCategories() {
               <div className="admin-grid-4">
                 {data.items.map((item, i) => {
                   const portada = productsData.items.find(p => p.categoria === item.slug && p.destacado);
-                  const img = portada ? portada.imagen : item.imagen;
                   return (
                     <div key={i} className="admin-grid-card" onClick={() => openModal(i)}>
-                      {img && <img src={img} alt={item.nombre} className="admin-grid-card-img" />}
+                      {portada ? <img src={portada.imagen} alt={item.nombre} className="admin-grid-card-img" /> : null}
                       <div className="admin-grid-card-info">
                         <span className="admin-grid-card-name">{item.nombre}</span>
                         {item.descripcion && <span className="admin-grid-card-slug">{item.descripcion}</span>}
