@@ -129,7 +129,7 @@ Continuacion del desarrollo del panel de administracion. Se trabajaron mejoras d
 - **Clave privada:** `~/.ssh/makuk_vps`
 - **Clave publica:** `~/.ssh/makuk_vps.pub`
 - **Comentario clave:** segundo-usuario-makuk
-- **Contraseña (respaldo):** 2uHQ8ba1E5c3JPo
+- **Contraseña (respaldo):** (ver gestor de credenciales)
 
 ### Conexion rapida
 ```bash
@@ -152,7 +152,7 @@ Host makuk
 - **Host:** localhost (desde el servidor)
 - **Puerto:** 3306
 - **Usuario:** makuk_user
-- **Contraseña:** IqLcocwnzLyabEJoTZsSA
+- **Contraseña:** (en .env del backend en VPS)
 - **Base de datos:** makuk_db
 
 ### Comandos utiles
@@ -161,10 +161,10 @@ Host makuk
 ssh makuk
 
 # Consultar MySQL
-ssh makuk "mysql -u makuk_user -p'IqLcocwnzLyabEJoTZsSA' makuk_db -e 'SHOW TABLES;'"
+ssh makuk "mysql -u makuk_user -p'***' makuk_db -e 'SHOW TABLES;'"
 
 # Entrar a MySQL interactivo
-ssh makuk -t "mysql -u makuk_user -p'IqLcocwnzLyabEJoTZsSA' makuk_db"
+ssh makuk -t "mysql -u makuk_user -p'***' makuk_db"
 ```
 
 ---
@@ -182,7 +182,7 @@ PC local (git push) → GitHub → VPS (git pull + npm install + npm run build)
 ### GitHub
 - **Repositorio:** https://github.com/pato1982/makuk.git
 - **Usuario:** pato1982
-- **Token (PAT):** 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
+- **Token (PAT):** (almacenado en credential manager local)
 - **Branch:** main
 
 ### Pasos realizados
