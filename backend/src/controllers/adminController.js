@@ -284,15 +284,34 @@ export async function updateProductsPage(req, res) {
 // GET /api/admin/stats
 export async function getStats(req, res) {
   try {
-    const [[prodCount]] = await pool.query('SELECT COUNT(*) as total FROM products');
-    const [[catCount]] = await pool.query('SELECT COUNT(*) as total FROM categories');
-    const [[testCount]] = await pool.query('SELECT COUNT(*) as total FROM testimonials');
-    const [[countryCount]] = await pool.query('SELECT COUNT(*) as total FROM worldwide_countries');
+    const [
+      [[prodCount]],
+      [[catCount]],
+      [[testCount]],
+      [[countryCount]],
+      [[stepsCount]],
+      [[featuresCount]],
+      [[dbSizeRow]]
+    ] = await Promise.all([
+      pool.query('SELECT COUNT(*) as total FROM products'),
+      pool.query('SELECT COUNT(*) as total FROM categories'),
+      pool.query('SELECT COUNT(*) as total FROM testimonials'),
+      pool.query('SELECT COUNT(*) as total FROM worldwide_countries'),
+      pool.query('SELECT COUNT(*) as total FROM process_steps'),
+      pool.query('SELECT COUNT(*) as total FROM about_features'),
+      pool.query(
+        `SELECT SUM(data_length + index_length) as dbSize
+         FROM information_schema.tables WHERE table_schema = DATABASE()`
+      )
+    ]);
     res.json({
       products: prodCount.total,
       categories: catCount.total,
       testimonials: testCount.total,
-      countries: countryCount.total
+      countries: countryCount.total,
+      processSteps: stepsCount.total,
+      aboutFeatures: featuresCount.total,
+      dbSizeBytes: Number(dbSizeRow.dbSize) || 0
     });
   } catch (err) {
     console.error('Error getStats:', err);
