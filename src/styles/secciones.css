@@ -56,7 +56,7 @@
 .category-img {
     height: 180px;
     overflow: hidden;
-    background: #f5f0eb;
+    background: var(--cream-dark);
 }
 
 .category-img img {

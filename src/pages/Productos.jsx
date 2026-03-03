@@ -5,7 +5,7 @@ import Footer from '../components/Footer';
 import { useCart } from '../context/CartContext';
 import { useContent } from '../context/ContentContext';
 
-function ProductoCard({ producto }) {
+function ProductoCard({ producto, onImageClick }) {
   const [cantidad, setCantidad] = useState(1);
   const { agregarAlCarrito } = useCart();
 
@@ -20,7 +20,7 @@ function ProductoCard({ producto }) {
 
   return (
     <div className="producto-card">
-      <div className="producto-img">
+      <div className="producto-img" onClick={() => onImageClick(producto)} style={{ cursor: 'pointer' }}>
         <img src={producto.imagen} alt={producto.nombre} />
       </div>
       <div className="producto-info">
@@ -67,6 +67,7 @@ function Productos() {
   const categoriaURL = searchParams.get('cat');
   const [categoriaFiltro, setCategoriaFiltro] = useState(categoriaURL || 'todos');
   const [orden, setOrden] = useState('destacados');
+  const [popupProducto, setPopupProducto] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -162,7 +163,7 @@ function Productos() {
               {productosEnFilas.map((fila, idx) => (
                 <div className="productos-fila-scroll" key={idx}>
                   {fila.map((producto) => (
-                    <ProductoCard key={producto.id} producto={producto} />
+                    <ProductoCard key={producto.id} producto={producto} onImageClick={setPopupProducto} />
                   ))}
                 </div>
               ))}
@@ -170,7 +171,7 @@ function Productos() {
           ) : (
             <div className="productos-grid">
               {productosFiltrados.map((producto) => (
-                <ProductoCard key={producto.id} producto={producto} />
+                <ProductoCard key={producto.id} producto={producto} onImageClick={setPopupProducto} />
               ))}
             </div>
           )}
@@ -182,6 +183,23 @@ function Productos() {
       </button>
 
       <Footer />
+
+      {popupProducto && (
+        <div className="producto-popup-overlay" onClick={() => setPopupProducto(null)}>
+          <div className="producto-popup" onClick={(e) => e.stopPropagation()}>
+            <button className="producto-popup-close" onClick={() => setPopupProducto(null)}>
+              <i className="fas fa-times"></i>
+            </button>
+            <div className="producto-popup-img">
+              <img src={popupProducto.imagen} alt={popupProducto.nombre} />
+            </div>
+            <h3 className="producto-popup-nombre">{popupProducto.nombre}</h3>
+            {popupProducto.descripcion && (
+              <p className="producto-popup-desc">{popupProducto.descripcion}</p>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }
