@@ -1,18 +1,28 @@
 import { useRef, useState } from 'react';
+import { uploadImage } from '../../services/api';
 
 function ImageUploader({ label, value, onChange, compact = false, noPreview = false }) {
   const fileRef = useRef(null);
   const [imgError, setImgError] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
+    setUploadError('');
+    setUploading(true);
+    try {
+      const { url } = await uploadImage(file);
       setImgError(false);
-      onChange(ev.target.result);
-    };
-    reader.readAsDataURL(file);
+      onChange(url);
+    } catch (err) {
+      setUploadError(err.message || 'Error al subir imagen');
+    } finally {
+      setUploading(false);
+      // Limpiar input para permitir subir el mismo archivo otra vez
+      e.target.value = '';
+    }
   };
 
   const showPlaceholder = !value || imgError;
@@ -22,10 +32,15 @@ function ImageUploader({ label, value, onChange, compact = false, noPreview = fa
       <div className="admin-field">
         {label && <label>{label}</label>}
         <div
-          className="image-upload-area"
-          onClick={() => fileRef.current.click()}
+          className={`image-upload-area ${uploading ? 'uploading' : ''}`}
+          onClick={() => !uploading && fileRef.current.click()}
         >
-          {!showPlaceholder ? (
+          {uploading ? (
+            <div className="image-upload-placeholder">
+              <i className="fas fa-spinner fa-spin" style={{ fontSize: '1.2rem', marginBottom: '4px' }}></i>
+              <span className="upload-text">Subiendo...</span>
+            </div>
+          ) : !showPlaceholder ? (
             <img src={value} alt="Preview" onError={() => setImgError(true)} />
           ) : (
             <div className="image-upload-placeholder">
@@ -40,6 +55,7 @@ function ImageUploader({ label, value, onChange, compact = false, noPreview = fa
             style={{ display: 'none' }}
           />
         </div>
+        {uploadError && <span className="upload-error">{uploadError}</span>}
       </div>
     );
   }
@@ -53,9 +69,18 @@ function ImageUploader({ label, value, onChange, compact = false, noPreview = fa
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="URL de la imagen"
+          disabled={uploading}
         />
-        <button type="button" className="btn-upload" onClick={() => fileRef.current.click()}>
-          <i className="fas fa-upload"></i>
+        <button
+          type="button"
+          className="btn-upload"
+          onClick={() => fileRef.current.click()}
+          disabled={uploading}
+        >
+          {uploading
+            ? <i className="fas fa-spinner fa-spin"></i>
+            : <i className="fas fa-upload"></i>
+          }
         </button>
         <input
           ref={fileRef}
@@ -65,6 +90,7 @@ function ImageUploader({ label, value, onChange, compact = false, noPreview = fa
           style={{ display: 'none' }}
         />
       </div>
+      {uploadError && <span className="upload-error">{uploadError}</span>}
       {value && !noPreview && (
         <div className="image-preview">
           <img src={value} alt="Preview" onError={(e) => { e.target.style.display = 'none'; }} />

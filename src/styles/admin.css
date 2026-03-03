@@ -1121,6 +1121,18 @@
   font-size: 0.85rem;
 }
 
+.image-upload-area.uploading {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.upload-error {
+  display: block;
+  color: #b71c1c;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
 /* --- Image Upload Row (normal mode) --- */
 .image-upload-row {
   display: flex;
