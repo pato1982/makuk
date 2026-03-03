@@ -618,8 +618,12 @@
         border-radius: 5px !important;
     }
 
+    .producto-img {
+        height: 105px !important;
+    }
+
     .producto-img img {
-        height: 130px !important;
+        height: 105px !important;
     }
 
     .producto-info {
