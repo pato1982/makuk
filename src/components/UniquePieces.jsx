@@ -12,7 +12,7 @@ function UniquePieces() {
       <div className="container">
         <div className="section-header">
           <h2 className="section-title">{title}</h2>
-          <Link to="/productos?cat=unicas" className="ver-todas">
+          <Link to="/productos?cat=piezas-unicas" className="ver-todas">
             Ver todas <i className="fas fa-arrow-right"></i>
           </Link>
         </div>

@@ -61,7 +61,7 @@ export async function getAllContent(req, res) {
     // Construir nombresCategorias desde categories + piezas unicas
     const nombresCategorias = {};
     categoryRows.forEach(c => { nombresCategorias[c.slug] = c.nombre; });
-    nombresCategorias['unicas'] = 'Piezas Únicas';
+    nombresCategorias['piezas-unicas'] = 'Piezas Únicas';
 
     // Armar JSON con la misma forma que content.json
     const content = {

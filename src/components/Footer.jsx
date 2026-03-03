@@ -26,7 +26,7 @@ function Footer() {
           {/* Colecciones y Más Joyas */}
           <div className="footer-section footer-links-col">
             <h4><Link to="/productos">Colecciones</Link></h4>
-            <h4><Link to="/productos?cat=unicas">Más Joyas</Link></h4>
+            <h4><Link to="/productos?cat=piezas-unicas">Más Joyas</Link></h4>
           </div>
 
           {/* Contacto */}

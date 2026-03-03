@@ -64,8 +64,8 @@ function AdminCategories() {
     setSaveError('');
     const nombres = {};
     data.items.forEach(cat => { nombres[cat.slug] = cat.nombre; });
-    if (productsData.nombresCategorias['unicas']) {
-      nombres['unicas'] = productsData.nombresCategorias['unicas'];
+    if (productsData.nombresCategorias['piezas-unicas']) {
+      nombres['piezas-unicas'] = productsData.nombresCategorias['piezas-unicas'];
     }
     const updatedProducts = { ...productsData, nombresCategorias: nombres };
     try {
