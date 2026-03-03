@@ -75,7 +75,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 280px;
+    height: 180px;
 }
 
 .producto-img img {
@@ -686,7 +686,7 @@
     }
 
     .producto-img img {
-        height: 240px;
+        height: 180px;
     }
 
     .cantidad-selector {
