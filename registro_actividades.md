@@ -1,8 +1,8 @@
 # Registro de Actividades - MAKUK Admin Panel
 
 ## Acceso al Panel de Administracion
-- **Correo:** admin@makuk.cl
-- **Clave:** makuk2024
+- **Correo:** patcorher@gmail.com
+- **Clave:** 123456
 - **Ruta:** /admin/login
 
 ---
@@ -476,3 +476,86 @@ Migracion completa del frontend y backend para conectar el sitio a MySQL. Se imp
 | `src/styles/admin.css` | .save-error |
 | `src/services/contentService.js` | **Eliminado** |
 | `.gitignore` | Backend .env |
+
+#### Paso 12: ImageUploader con uploadImage()
+- **Archivo:** `src/components/admin/ImageUploader.jsx`
+- Cambiado de base64 `readAsDataURL` a subida real via `POST /api/upload`
+- `uploadImage(file)` envia FormData al backend, Multer guarda con UUID en `/var/www/makuk/uploads/`
+- Estados: `uploading` (spinner), `uploadError` (mensaje de error)
+- Input file se limpia despues de cada upload para permitir resubir el mismo archivo
+- Modo compact: click en el area completa abre selector de archivos
+- Modo normal: boton de upload al lado del input de URL
+
+#### Paso 13: Backend en VPS con PM2
+- Instalado PM2 globalmente: `npm install -g pm2`
+- Backend subido a `/var/www/makuk/backend/` via SCP
+- `.env` creado con credenciales MySQL, JWT secrets (generados con `openssl rand -hex 64`), y `UPLOAD_DIR=/var/www/makuk/uploads`
+- `npm install` en el servidor
+- Iniciado con PM2: `pm2 start src/server.js --name makuk-api`
+- PM2 configurado para autostart: `pm2 startup && pm2 save`
+- Backend corriendo en puerto 3001
+
+#### Paso 14: NGINX reverse proxy
+- Config en `/etc/nginx/sites-available/makuk`:
+  - `location /api/` → proxy a `http://127.0.0.1:3001` (sin trailing slash para preservar prefijo `/api/`)
+  - `location ^~ /uploads/` → alias a `/var/www/makuk/uploads/` (con `^~` para prioridad sobre regex de assets)
+  - `location ~* \.(js|css|png|...)$` → cache 30 dias
+  - Security headers: X-Frame-Options, X-Content-Type-Options, X-XSS-Protection
+- Fix: trailing slash en proxy_pass eliminado (causaba strip de `/api/` prefix)
+- Fix: `^~` agregado a `/uploads/` (regex de assets `.png` interceptaba las imagenes subidas)
+
+#### Paso 15: Testing E2E
+- Todos los endpoints verificados via IP directa (186.64.122.100):
+  - Frontend: HTML carga correctamente
+  - GET /api/content: 12 secciones desde MySQL
+  - GET /api/health: status ok
+  - Rutas admin protegidas: "Token requerido" sin auth
+  - POST /api/auth/login: tokens JWT generados correctamente
+  - GET /api/auth/me: datos de usuario
+  - GET /api/admin/stats: contadores y tamaño DB
+  - PUT /api/admin/hero: guardado exitoso
+  - POST /api/upload: imagen subida con UUID
+  - GET /uploads/: imagen accesible via NGINX
+
+### Plan de 15 pasos — Estado final
+| Paso | Descripcion | Estado |
+|------|------------|--------|
+| 1 | Crear base de datos MySQL y tablas | Completado |
+| 2 | Seed inicial con datos de content.json | Completado |
+| 3 | Backend Express con estructura MVC | Completado |
+| 4 | Rutas de autenticacion (JWT access/refresh) | Completado |
+| 5 | Rutas admin CRUD (PUT por seccion) | Completado |
+| 6 | Ruta publica GET /api/content | Completado |
+| 7 | api.js en frontend (apiFetch con auto-refresh) | Completado |
+| 8 | Migrar AuthContext a JWT | Completado |
+| 9 | Migrar ContentContext a API | Completado |
+| 10 | Conectar paginas admin con saveSection | Completado |
+| 11 | AdminControl con getAdminStats | Completado |
+| 12 | ImageUploader con uploadImage | Completado |
+| 13 | Subir backend al VPS + PM2 | Completado |
+| 14 | NGINX reverse proxy | Completado |
+| 15 | Testing E2E | Completado |
+
+### Push a GitHub
+- Push exitoso despues de permitir secreto via GitHub secret scanning
+- Commit `21d7573` → `origin/main`
+
+### Pendiente: DNS
+- El dominio `makuk.cl` aun apunta al hosting cPanel (15.204.101.117)
+- El VPS con todo funcionando esta en 186.64.122.100
+- Cuando se tenga acceso a NIC Chile:
+  1. Cambiar registro A de `makuk.cl` → `186.64.122.100`
+  2. Cambiar registro A de `www.makuk.cl` → `186.64.122.100`
+  3. Instalar SSL: `sudo certbot --nginx -d makuk.cl -d www.makuk.cl`
+- Mientras tanto, el sitio es accesible via `http://186.64.122.100`
+
+### Commits de la sesion
+| Hash | Descripcion |
+|------|------------|
+| `205b1bd` | Backend Express + MySQL y migracion auth a JWT (pasos 1-8) |
+| `5faba12` | Paso 9: Migrar ContentContext a API |
+| `74c77ef` | Fix 6 problemas del paso 9 |
+| `ee5d8d3` | Paso 11: AdminControl con getAdminStats() desde MySQL |
+| `b40b91c` | Actualizar registro de actividades con pasos 1-11 |
+| `2ed332d` | Paso 12: ImageUploader sube archivos al servidor via API |
+| `21d7573` | Remover credenciales del registro de actividades |

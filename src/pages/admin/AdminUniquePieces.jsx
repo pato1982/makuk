@@ -82,8 +82,10 @@ function AdminUniquePieces() {
   };
 
   const updateProduct = (id, field, value) => {
-    const items = productsData.items.map(p => p.id === id ? { ...p, [field]: value } : p);
-    setProductsData({ ...productsData, items });
+    setProductsData(prev => ({
+      ...prev,
+      items: prev.items.map(p => p.id === id ? { ...p, [field]: value } : p)
+    }));
   };
 
   const removeProduct = (id) => {
@@ -155,8 +157,8 @@ function AdminUniquePieces() {
 
       {/* Modal de edición de producto */}
       {editProduct !== null && getEditingProduct() && (
-        <div className="admin-modal-overlay" onClick={cancelProduct}>
-          <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="admin-modal-overlay">
+          <div className="admin-modal">
             <button className="admin-modal-close" onClick={cancelProduct}>
               <i className="fas fa-times"></i>
             </button>

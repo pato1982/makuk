@@ -60,7 +60,7 @@ function Login() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@makuk.cl"
+              placeholder="correo@ejemplo.com"
               required
               disabled={submitting}
             />

@@ -8,6 +8,7 @@ function AdminCategories() {
   const { content, updateSection } = useContent();
   const [data, setData] = useState(JSON.parse(JSON.stringify(content.categories)));
   const [editIndex, setEditIndex] = useState(null);
+  const [isNewCategory, setIsNewCategory] = useState(false);
   const [productsData, setProductsData] = useState(() => {
     const products = JSON.parse(JSON.stringify(content.products));
     const vistos = {};
@@ -37,6 +38,7 @@ function AdminCategories() {
   const openModal = (index) => {
     setModalPos({ x: 0, y: 0 });
     setEditIndex(index);
+    setIsNewCategory(false);
   };
 
   const handleDragStart = useCallback((e) => {
@@ -67,10 +69,8 @@ function AdminCategories() {
     }
     const updatedProducts = { ...productsData, nombresCategorias: nombres };
     try {
-      await Promise.all([
-        updateSection('categories', data),
-        updateSection('products', updatedProducts),
-      ]);
+      await updateSection('categories', data);
+      await updateSection('products', updatedProducts);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch {
@@ -107,8 +107,10 @@ function AdminCategories() {
   };
 
   const updateProduct = (id, field, value) => {
-    const items = productsData.items.map(p => p.id === id ? { ...p, [field]: value } : p);
-    setProductsData({ ...productsData, items });
+    setProductsData(prev => ({
+      ...prev,
+      items: prev.items.map(p => p.id === id ? { ...p, [field]: value } : p)
+    }));
   };
 
   const removeProduct = (id) => {
@@ -176,12 +178,27 @@ function AdminCategories() {
       items: [...data.items, { slug: 'nueva', nombre: 'Nueva Categoría', descripcion: 'Descripción', imagen: '' }]
     });
     setEditIndex(newIndex);
+    setIsNewCategory(true);
   };
 
   const removeItem = (index) => {
     if (!window.confirm('¿Eliminar esta categoría?')) return;
     setData({ ...data, items: data.items.filter((_, i) => i !== index) });
     setEditIndex(null);
+    setIsNewCategory(false);
+  };
+
+  const saveCategory = () => {
+    setEditIndex(null);
+    setIsNewCategory(false);
+  };
+
+  const cancelCategory = () => {
+    if (isNewCategory) {
+      setData({ ...data, items: data.items.filter((_, i) => i !== editIndex) });
+    }
+    setEditIndex(null);
+    setIsNewCategory(false);
   };
 
   const moveItem = (index, direction) => {
@@ -218,14 +235,19 @@ function AdminCategories() {
 
             <AdminCard title={`Categorías (${data.items.length})`}>
               <div className="admin-grid-4">
-                {data.items.map((item, i) => (
-                  <div key={i} className="admin-grid-card" onClick={() => openModal(i)}>
-                    {item.imagen && <img src={item.imagen} alt={item.nombre} className="admin-grid-card-img" />}
-                    <div className="admin-grid-card-info">
-                      <span className="admin-grid-card-name">{item.nombre}</span>
+                {data.items.map((item, i) => {
+                  const portada = productsData.items.find(p => p.categoria === item.slug && p.destacado);
+                  const img = portada ? portada.imagen : item.imagen;
+                  return (
+                    <div key={i} className="admin-grid-card" onClick={() => openModal(i)}>
+                      {img && <img src={img} alt={item.nombre} className="admin-grid-card-img" />}
+                      <div className="admin-grid-card-info">
+                        <span className="admin-grid-card-name">{item.nombre}</span>
+                        {item.descripcion && <span className="admin-grid-card-slug">{item.descripcion}</span>}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
                 <div className="admin-grid-card admin-grid-card-add" onClick={addItem}>
                   <span className="upload-text">+ Agregar</span>
                 </div>
@@ -289,12 +311,12 @@ function AdminCategories() {
 
       {/* Modal de edición */}
       {editIndex !== null && data.items[editIndex] && (
-        <div className="admin-modal-overlay" onClick={() => setEditIndex(null)}>
-          <div className="admin-modal" onClick={(e) => e.stopPropagation()} style={{ transform: `translate(${modalPos.x}px, ${modalPos.y}px)` }}>
-            <button className="admin-modal-close" onClick={() => setEditIndex(null)}>
+        <div className="admin-modal-overlay">
+          <div className="admin-modal" style={{ transform: `translate(${modalPos.x}px, ${modalPos.y}px)` }}>
+            <button className="admin-modal-close" onClick={cancelCategory}>
               <i className="fas fa-times"></i>
             </button>
-            <h3 className="admin-modal-title" onMouseDown={handleDragStart} style={{ cursor: 'grab', userSelect: 'none' }}>Editar categoría</h3>
+            <h3 className="admin-modal-title" onMouseDown={handleDragStart} style={{ cursor: 'grab', userSelect: 'none' }}>{isNewCategory ? 'Agregar categoría' : 'Editar categoría'}</h3>
 
             <AdminFormField label="Nombre de la categoría" value={data.items[editIndex].nombre} onChange={(v) => updateItem(editIndex, 'nombre', v)} />
             <AdminFormField label="Descripción" value={data.items[editIndex].descripcion} onChange={(v) => updateItem(editIndex, 'descripcion', v)} />
@@ -322,11 +344,11 @@ function AdminCategories() {
             </div>
 
             <div className="admin-modal-footer-center">
-              <button type="button" className="btn-delete-item" onClick={() => removeItem(editIndex)}>
-                <i className="fas fa-trash"></i> Eliminar
+              <button type="button" className="btn-save-modal" onClick={saveCategory}>
+                <i className="fas fa-check"></i> Guardar
               </button>
-              <button type="button" className="btn-modal-cancel" onClick={() => setEditIndex(null)}>
-                Cerrar
+              <button type="button" className="btn-modal-cancel" onClick={cancelCategory}>
+                Cancelar
               </button>
             </div>
           </div>
@@ -335,8 +357,8 @@ function AdminCategories() {
 
       {/* Modal de edición de producto */}
       {editProduct !== null && getEditingProduct() && (
-        <div className="admin-modal-overlay" onClick={cancelProduct}>
-          <div className="admin-modal" onClick={(e) => e.stopPropagation()} style={{ transform: `translate(${productModalPos.x}px, ${productModalPos.y}px)` }}>
+        <div className="admin-modal-overlay">
+          <div className="admin-modal" style={{ transform: `translate(${productModalPos.x}px, ${productModalPos.y}px)` }}>
             <button className="admin-modal-close" onClick={cancelProduct}>
               <i className="fas fa-times"></i>
             </button>

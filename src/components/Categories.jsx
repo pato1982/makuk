@@ -11,8 +11,10 @@ function Categories() {
     return destacado?.imagen || null;
   };
 
-  const primeraFila = items.slice(0, 5);
-  const segundaFila = items.slice(5, 10);
+  const filas = [];
+  for (let i = 0; i < items.length; i += 5) {
+    filas.push(items.slice(i, i + 5));
+  }
 
   return (
     <section id="categorias" className="categories">
@@ -21,41 +23,25 @@ function Categories() {
         <div className="copper-divider center"></div>
         <p className="section-subtitle">{subtitle}</p>
 
-        <div className="categories-row">
-          {primeraFila.map((cat) => (
-            <Link
-              key={cat.slug}
-              to={`/productos?cat=${cat.slug}`}
-              className="category-card"
-            >
-              <div className="category-img">
-                <img src={getPortada(cat.slug) || cat.imagen} alt={cat.nombre} />
-              </div>
-              <div className="category-info">
-                <h4>{cat.nombre}</h4>
-                <p>{cat.descripcion}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        <div className="categories-row">
-          {segundaFila.map((cat) => (
-            <Link
-              key={cat.slug}
-              to={`/productos?cat=${cat.slug}`}
-              className="category-card"
-            >
-              <div className="category-img">
-                <img src={getPortada(cat.slug) || cat.imagen} alt={cat.nombre} />
-              </div>
-              <div className="category-info">
-                <h4>{cat.nombre}</h4>
-                <p>{cat.descripcion}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
+        {filas.map((fila, fi) => (
+          <div key={fi} className="categories-row">
+            {fila.map((cat) => (
+              <Link
+                key={cat.slug}
+                to={`/productos?cat=${cat.slug}`}
+                className="category-card"
+              >
+                <div className="category-img">
+                  <img src={getPortada(cat.slug) || cat.imagen} alt={cat.nombre} />
+                </div>
+                <div className="category-info">
+                  <h4>{cat.nombre}</h4>
+                  <p>{cat.descripcion}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ))}
       </div>
     </section>
   );
