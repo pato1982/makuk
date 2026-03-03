@@ -27,8 +27,6 @@ function AdminCategories() {
   const [isNewProduct, setIsNewProduct] = useState(false);
   const [saved, setSaved] = useState(false);
   const [tab, setTab] = useState('tipos');
-  const [showLimitPopup, setShowLimitPopup] = useState(false);
-  const [showSelectPopup, setShowSelectPopup] = useState(false);
 
   const [modalPos, setModalPos] = useState({ x: 0, y: 0 });
   const [productModalPos, setProductModalPos] = useState({ x: 0, y: 0 });
@@ -75,24 +73,11 @@ function AdminCategories() {
 
   const filteredProducts = productsData.items.filter(p => p.categoria === selectedCategory);
 
-  const faltaPortada = () => {
-    const prods = productsData.items.filter(p => p.categoria === selectedCategory);
-    return prods.length > 0 && !prods.some(p => p.destacado);
-  };
-
   const handleChangeCategory = (slug) => {
-    if (faltaPortada()) {
-      setShowSelectPopup(true);
-      return;
-    }
     setSelectedCategory(slug);
   };
 
   const handleChangeTab = (newTab) => {
-    if (tab === 'productos' && faltaPortada()) {
-      setShowSelectPopup(true);
-      return;
-    }
     setTab(newTab);
   };
 
@@ -139,14 +124,11 @@ function AdminCategories() {
 
   const toggleDestacado = (id) => {
     const prod = productsData.items.find(p => p.id === id);
-    if (!prod.destacado) {
-      const yaHayDestacado = productsData.items.some(p => p.categoria === prod.categoria && p.destacado);
-      if (yaHayDestacado) {
-        setShowLimitPopup(true);
-        return;
-      }
-    }
-    const items = productsData.items.map(p => p.id === id ? { ...p, destacado: !p.destacado } : p);
+    const items = productsData.items.map(p => {
+      if (p.id === id) return { ...p, destacado: !prod.destacado };
+      if (!prod.destacado && p.categoria === prod.categoria && p.destacado) return { ...p, destacado: false };
+      return p;
+    });
     setProductsData({ ...productsData, items });
   };
 
@@ -308,16 +290,24 @@ function AdminCategories() {
 
             <AdminFormField label="Nombre de la categoría" value={data.items[editIndex].nombre} onChange={(v) => updateItem(editIndex, 'nombre', v)} />
             <AdminFormField label="Descripción" value={data.items[editIndex].descripcion} onChange={(v) => updateItem(editIndex, 'descripcion', v)} />
-            <AdminFormField label="Imagen (URL)" value={data.items[editIndex].imagen} onChange={(v) => updateItem(editIndex, 'imagen', v)} />
             <div className="admin-modal-image-row">
               <button type="button" onClick={() => { moveItem(editIndex, -1); setEditIndex(editIndex - 1); }} disabled={editIndex === 0} className="btn-move-modal">
                 <i className="fas fa-chevron-left"></i>
               </button>
-              {data.items[editIndex].imagen && (
-                <div className="admin-modal-image-preview">
-                  <img src={data.items[editIndex].imagen} alt="Preview" />
-                </div>
-              )}
+              {(() => {
+                const portada = productsData.items.find(p => p.categoria === data.items[editIndex].slug && p.destacado);
+                return portada ? (
+                  <div className="admin-modal-image-preview">
+                    <img src={portada.imagen} alt="Portada" />
+                    <span className="admin-modal-portada-label">Portada: {portada.nombre}</span>
+                  </div>
+                ) : (
+                  <div className="admin-modal-image-preview admin-modal-no-portada">
+                    <i className="fas fa-image"></i>
+                    <span>Sin portada — activa un producto en "Subir productos"</span>
+                  </div>
+                );
+              })()}
               <button type="button" onClick={() => { moveItem(editIndex, 1); setEditIndex(editIndex + 1); }} disabled={editIndex === data.items.length - 1} className="btn-move-modal">
                 <i className="fas fa-chevron-right"></i>
               </button>
@@ -360,32 +350,6 @@ function AdminCategories() {
                 Cancelar
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {showLimitPopup && (
-        <div className="admin-modal-overlay" onClick={() => setShowLimitPopup(false)}>
-          <div className="limit-popup" onClick={(e) => e.stopPropagation()}>
-            <div className="limit-popup-icon">
-              <i className="fas fa-exclamation-circle"></i>
-            </div>
-            <h3>Portada ya seleccionada</h3>
-            <p>Ya hay <strong>1 producto</strong> seleccionado como portada de esta categoría. Desactívalo antes de seleccionar otro.</p>
-            <button className="btn-save-modal" onClick={() => setShowLimitPopup(false)}>Entendido</button>
-          </div>
-        </div>
-      )}
-
-      {showSelectPopup && (
-        <div className="admin-modal-overlay" onClick={() => setShowSelectPopup(false)}>
-          <div className="limit-popup" onClick={(e) => e.stopPropagation()}>
-            <div className="limit-popup-icon">
-              <i className="fas fa-image"></i>
-            </div>
-            <h3>Selecciona una portada</h3>
-            <p>Debes activar <strong>1 producto</strong> como imagen de portada para la categoría <strong>"{data.items.find(c => c.slug === selectedCategory)?.nombre || selectedCategory}"</strong> antes de continuar.</p>
-            <button className="btn-save-modal" onClick={() => setShowSelectPopup(false)}>Entendido</button>
           </div>
         </div>
       )}

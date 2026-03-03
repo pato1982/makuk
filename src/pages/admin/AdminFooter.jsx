@@ -42,7 +42,10 @@ function AdminFooter() {
 
       <AdminCard title="Legal">
         <AdminFormField label="Copyright" value={data.copyright} onChange={(v) => setData({ ...data, copyright: v })} />
-        <AdminFormField label="Créditos" value={data.credits} onChange={(v) => setData({ ...data, credits: v })} />
+        <div className="admin-field">
+          <label>Créditos</label>
+          <input type="text" value={data.credits} disabled style={{ opacity: 0.6, cursor: 'not-allowed' }} />
+        </div>
       </AdminCard>
 
       <button className={`btn-save ${saved ? 'saved' : ''}`} onClick={handleSave}>

@@ -1,31 +1,40 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { loginApi, logoutApi, getMe } from '../services/api';
 
 const AuthContext = createContext();
-const AUTH_KEY = 'makuk_auth';
 
 export function AuthProvider({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem(AUTH_KEY) === 'true';
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const login = useCallback((email, password) => {
-    const validUser = import.meta.env.VITE_ADMIN_USER || 'admin@makuk.cl';
-    const validPass = import.meta.env.VITE_ADMIN_PASS || 'makuk2024';
-    if (email === validUser && password === validPass) {
-      localStorage.setItem(AUTH_KEY, 'true');
-      setIsAuthenticated(true);
-      return true;
+  // Al montar, limpiar auth viejo y verificar si hay un token válido
+  useEffect(() => {
+    localStorage.removeItem('makuk_auth'); // Limpiar sistema viejo
+
+    const token = localStorage.getItem('makuk_access_token');
+    if (!token) {
+      setLoading(false);
+      return;
     }
-    return false;
+    getMe()
+      .then(() => setIsAuthenticated(true))
+      .catch(() => setIsAuthenticated(false))
+      .finally(() => setLoading(false));
   }, []);
 
-  const logout = useCallback(() => {
-    localStorage.removeItem(AUTH_KEY);
+  const login = useCallback(async (email, password) => {
+    const user = await loginApi(email, password);
+    setIsAuthenticated(true);
+    return user;
+  }, []);
+
+  const logout = useCallback(async () => {
+    await logoutApi();
     setIsAuthenticated(false);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
