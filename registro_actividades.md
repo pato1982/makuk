@@ -559,3 +559,70 @@ Migracion completa del frontend y backend para conectar el sitio a MySQL. Se imp
 | `b40b91c` | Actualizar registro de actividades con pasos 1-11 |
 | `2ed332d` | Paso 12: ImageUploader sube archivos al servidor via API |
 | `21d7573` | Remover credenciales del registro de actividades |
+
+---
+
+## 2026-03-03 (sesion 2) - Mejoras UI/UX y Panel de Control
+
+### Resumen
+Fix de testimonios publicos, mejoras en el header/footer, pagina de login, y reestructuracion completa del panel de control admin.
+
+### Cambios realizados
+
+#### 1. Fix testimonios publicos invisibles
+- **Archivos:** `src/pages/admin/AdminTestimonials.jsx`, `src/styles/admin.css`
+- Las clases `.testimonial-card` del admin sobreescribian los estilos publicos (fondo blanco sobre texto color crema = invisible).
+- Solucion: renombrar clases del admin a `.admin-testimonial-card`, `.admin-testimonials-grid`, etc.
+
+#### 2. Icono de sesion en el Header
+- **Archivos:** `src/components/Header.jsx`, `src/styles/header.css`
+- Se agrego icono de usuario (`fa-user`) al lado derecho del carrito de compras.
+- Click navega a `/admin/login`.
+- Mismo tamano y estilo que el carrito.
+- En movil: gap reducido a 5px entre carrito e icono de sesion.
+
+#### 3. Boton volver en Login
+- **Archivos:** `src/pages/admin/Login.jsx`, `src/styles/admin.css`
+- Flecha circular (`fa-arrow-left`) a la izquierda del titulo "MAKUK" en la pagina de login.
+- Click vuelve a la pagina principal (`/`).
+- Transparente con borde cobre suave, hover relleno cobre.
+- Responsive: 36px desktop, 33px tablet, 30px movil.
+
+#### 4. Barra de almacenamiento del Servidor (VPS)
+- **Archivos:** `backend/src/controllers/adminController.js`, `src/pages/admin/AdminControl.jsx`, `src/styles/admin.css`
+- Backend: endpoint `/api/admin/stats` ahora devuelve `diskTotal` y `diskUsed` via `df -B1 /`.
+- Frontend: dos barras lado a lado — MySQL y Servidor.
+- Muestra GB usados, GB totales y GB libres.
+- En movil se apilan en columna.
+- Colores dinamicos: verde (<50%), naranja (<80%), rojo (>80%).
+
+#### 5. KPIs del panel de control simplificados
+- **Archivo:** `src/pages/admin/AdminControl.jsx`
+- Se redujeron de 6 a 4 KPIs: Productos, Categorias, Piezas unicas, Testimonios.
+- Se eliminaron: Paises, Pasos proceso, Features.
+- Grilla: 4 columnas en desktop/tablet, 2x2 en movil.
+- Tamanos ajustados para cada modo responsive.
+
+#### 6. Estado del sistema: Servidor agregado
+- **Archivo:** `src/pages/admin/AdminControl.jsx`
+- Se agrego indicador "Servidor" con estado "Activo".
+- "Panel de administracion" renombrado a "Panel admin".
+- Ahora muestra 4 indicadores: Sitio web, Base de datos, Servidor, Panel admin.
+
+#### 7. Responsive panel de control (movil)
+- **Archivo:** `src/styles/admin.css`
+- Fix overflow horizontal: `overflow-x: hidden` y `box-sizing: border-box` en `.admin-main`, `.admin-page`, `.admin-card`.
+- Barras de almacenamiento: altura 18px, textos 0.65rem.
+- KPIs: padding 8px, icono 0.85rem, numero 1rem, label 0.6rem.
+- Estado del sistema: grid 2 columnas.
+
+### Commits de la sesion
+| Hash | Descripcion |
+|------|------------|
+| `7d6a29f` | Fix: testimonios publicos invisibles por conflicto CSS con admin |
+| `845e39d` | Icono login en header, boton volver en login, barra almacenamiento servidor |
+| `f39a5f6` | Fix: overflow horizontal en panel control movil y KPIs mas compactos |
+| `b71923d` | Panel control: KPIs simplificados, servidor en estado del sistema |
+
+### Pendiente
+- Backend: agregar conteo `uniquePieces` en endpoint stats (productos de categoria piezas-unicas)

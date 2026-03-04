@@ -284,7 +284,7 @@ export async function updateProductsPage(req, res) {
 // GET /api/admin/stats
 export async function getStats(req, res) {
   try {
-    const { execSync } = await import('child_process');
+    const { statfs } = await import('node:fs/promises');
 
     const [
       [[prodCount]],
@@ -307,13 +307,13 @@ export async function getStats(req, res) {
       )
     ]);
 
-    // Disk usage
+    // Disk usage (sin execSync, usando fs.statfs nativo)
     let diskTotal = 0, diskUsed = 0;
     try {
-      const dfOutput = execSync("df -B1 / | tail -1").toString().trim();
-      const parts = dfOutput.split(/\s+/);
-      diskTotal = Number(parts[1]) || 0;
-      diskUsed = Number(parts[2]) || 0;
+      const stats = await statfs('/');
+      diskTotal = stats.blocks * stats.bsize;
+      const diskFree = stats.bfree * stats.bsize;
+      diskUsed = diskTotal - diskFree;
     } catch {}
 
     res.json({
