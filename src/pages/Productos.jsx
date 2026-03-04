@@ -69,6 +69,10 @@ function Productos() {
   const [orden, setOrden] = useState('destacados');
   const [popupProducto, setPopupProducto] = useState(null);
 
+  const formatearPrecio = (valor) => {
+    return '$' + Math.round(valor).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -193,10 +197,22 @@ function Productos() {
             <div className="producto-popup-img">
               <img src={popupProducto.imagen} alt={popupProducto.nombre} />
             </div>
-            <h3 className="producto-popup-nombre">{popupProducto.nombre}</h3>
-            {popupProducto.descripcion && (
-              <p className="producto-popup-desc">{popupProducto.descripcion}</p>
-            )}
+            <div className="producto-popup-info">
+              <div className="producto-popup-col-izq">
+                <h3 className="producto-popup-nombre">{popupProducto.nombre}</h3>
+                <div className="producto-popup-precios">
+                  {popupProducto.precioAnterior && popupProducto.precioAnterior !== popupProducto.precioActual && (
+                    <span className="precio-anterior">{formatearPrecio(popupProducto.precioAnterior)}</span>
+                  )}
+                  <span className="precio-actual">{formatearPrecio(popupProducto.precioActual)}</span>
+                </div>
+              </div>
+              {popupProducto.descripcion && (
+                <div className="producto-popup-col-der">
+                  <p className="producto-popup-desc">{popupProducto.descripcion}</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

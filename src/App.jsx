@@ -46,9 +46,8 @@ function App() {
               <Route path="/productos" element={<Productos />} />
 
               {/* Admin (lazy loaded) */}
-              <Suspense fallback={<div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh'}}>Cargando...</div>}>
-                <Route path="/admin/login" element={<Login />} />
-                <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+                <Route path="/admin/login" element={<Suspense fallback={<div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh'}}>Cargando...</div>}><Login /></Suspense>} />
+                <Route path="/admin" element={<Suspense fallback={<div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh'}}>Cargando...</div>}><ProtectedRoute><AdminLayout /></ProtectedRoute></Suspense>}>
                   <Route index element={<AdminHeader />} />
                   <Route path="categories" element={<AdminCategories />} />
                   <Route path="unique-pieces" element={<AdminUniquePieces />} />
@@ -61,7 +60,6 @@ function App() {
                   <Route path="products-page" element={<AdminProductsPage />} />
                   <Route path="control" element={<AdminControl />} />
                 </Route>
-              </Suspense>
             </Routes>
             <CartModal />
             <ConfirmModal />
