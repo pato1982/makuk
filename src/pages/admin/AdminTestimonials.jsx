@@ -51,18 +51,18 @@ function AdminTestimonials() {
       </AdminCard>
 
       <AdminCard title={`Testimonios (${data.items.length})`}>
-        <div className="testimonials-grid">
+        <div className="admin-testimonials-grid">
           {data.items.map((item, i) => (
             <div
               key={i}
-              className={`testimonial-card ${editIndex === i ? 'active' : ''}`}
+              className={`admin-testimonial-card ${editIndex === i ? 'active' : ''}`}
               onClick={() => setEditIndex(editIndex === i ? null : i)}
             >
-              <span className="testimonial-card-name">{item.nombre}</span>
-              <span className="testimonial-card-location">{item.ubicacion}</span>
+              <span className="admin-testimonial-card-name">{item.nombre}</span>
+              <span className="admin-testimonial-card-location">{item.ubicacion}</span>
             </div>
           ))}
-          <div className="testimonial-card testimonial-card-add" onClick={addItem}>
+          <div className="admin-testimonial-card admin-testimonial-card-add" onClick={addItem}>
             <i className="fas fa-plus"></i> Agregar
           </div>
         </div>
