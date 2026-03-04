@@ -80,6 +80,9 @@
   .login-header-row h1 {
     font-size: 1.8rem;
   }
+  .control-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .login-subtitle {
@@ -378,6 +381,8 @@
   margin-left: 260px;
   padding: 30px;
   min-height: 100vh;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .admin-menu-toggle {
@@ -403,6 +408,9 @@
 .admin-page {
   max-width: 900px;
   margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .admin-page-title {
@@ -1678,6 +1686,8 @@
 
 .control-storage {
   margin-bottom: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .control-storage-bar {
@@ -1715,34 +1725,34 @@
 
 .control-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
 }
 
 .control-stat-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 14px 10px;
+  gap: 2px;
+  padding: 8px 4px;
   background: #fafafa;
   border: 2px solid #eee;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .control-stat-icon {
-  font-size: 1.2rem;
+  font-size: 0.85rem;
   color: #b87333;
 }
 
 .control-stat-count {
-  font-size: 1.4rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #333;
 }
 
 .control-stat-label {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   color: #888;
 }
 
@@ -2071,7 +2081,10 @@
 
   .admin-main {
     margin-left: 0;
-    padding: 70px 20px 30px;
+    padding: 60px 12px 24px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
   }
 
   .admin-menu-toggle {
@@ -2098,7 +2111,7 @@
 
   /* Cards */
   .admin-card {
-    padding: 18px;
+    padding: 14px;
   }
 
   /* Grid */
@@ -2167,6 +2180,9 @@
   .admin-main {
     margin-left: 0;
     padding: 60px 12px 24px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
   }
 
   .admin-menu-toggle {
@@ -2181,11 +2197,6 @@
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: 90;
-  }
-
-  /* Evitar desbordamiento horizontal */
-  .admin-page {
-    overflow-x: hidden;
   }
 
   /* Page Title / Subtitle */
@@ -2210,8 +2221,9 @@
 
   /* Cards */
   .admin-card {
-    padding: 14px;
+    padding: 12px;
     margin-bottom: 12px;
+    overflow: hidden;
   }
 
   /* Form Fields */
@@ -2304,19 +2316,63 @@
   }
 
   /* Control panel */
+  .control-storage-row {
+    gap: 10px;
+    overflow: hidden;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .control-storage {
+    max-width: 100%;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .control-storage-bar {
+    height: 14px;
+  }
+
+  .control-storage-info {
+    font-size: 0.55rem;
+    word-break: break-word;
+  }
+
+  .control-storage-title {
+    font-size: 0.65rem;
+  }
+
   .control-stats {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+  }
+
+  .control-stat-card {
+    padding: 5px 3px;
+    gap: 1px;
+  }
+
+  .control-stat-icon {
+    font-size: 0.7rem;
+  }
+
+  .control-stat-count {
+    font-size: 0.8rem;
+  }
+
+  .control-stat-label {
+    font-size: 0.5rem;
   }
 
   .control-status-list {
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 6px;
   }
 
   .control-status-item {
-    flex: 1;
-    padding: 8px 6px;
-    font-size: 0.7rem;
+    padding: 6px 5px;
+    font-size: 0.65rem;
   }
 
   .control-note-extra {
