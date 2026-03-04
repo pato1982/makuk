@@ -37,9 +37,14 @@ function AdminControl() {
   }
 
   const dbSizeKB = (stats.dbSizeBytes / 1024).toFixed(1);
-  const dbMaxMB = 100; // Límite típico MySQL shared hosting
+  const dbMaxMB = 100;
   const dbMaxKB = dbMaxMB * 1024;
   const dbPercentage = ((stats.dbSizeBytes / (dbMaxMB * 1024 * 1024)) * 100).toFixed(2);
+
+  const diskTotalGB = (stats.diskTotal / (1024 ** 3)).toFixed(1);
+  const diskUsedGB = (stats.diskUsed / (1024 ** 3)).toFixed(1);
+  const diskFreeGB = ((stats.diskTotal - stats.diskUsed) / (1024 ** 3)).toFixed(1);
+  const diskPercentage = stats.diskTotal ? ((stats.diskUsed / stats.diskTotal) * 100).toFixed(1) : 0;
 
   const sections = [
     { label: 'Productos', count: stats.products, icon: 'fa-box' },
@@ -50,9 +55,9 @@ function AdminControl() {
     { label: 'Features', count: stats.aboutFeatures, icon: 'fa-star' },
   ];
 
-  const getBarColor = () => {
-    if (dbPercentage < 50) return '#4caf50';
-    if (dbPercentage < 80) return '#e8a862';
+  const getBarColor = (pct) => {
+    if (pct < 50) return '#4caf50';
+    if (pct < 80) return '#e8a862';
     return '#e05555';
   };
 
@@ -61,19 +66,29 @@ function AdminControl() {
       <h1 className="admin-page-title">Control</h1>
       <p className="admin-page-subtitle">Estado del sistema y almacenamiento</p>
 
-      <AdminCard title="Almacenamiento MySQL">
-        <div className="control-storage">
-          <div className="control-storage-bar">
-            <div className="control-storage-fill" style={{ width: `${Math.min(dbPercentage, 100)}%`, background: getBarColor() }}></div>
+      <AdminCard title="Almacenamiento">
+        <div className="control-storage-row">
+          <div className="control-storage">
+            <h4 className="control-storage-title"><i className="fas fa-database"></i> MySQL</h4>
+            <div className="control-storage-bar">
+              <div className="control-storage-fill" style={{ width: `${Math.min(dbPercentage, 100)}%`, background: getBarColor(dbPercentage) }}></div>
+            </div>
+            <div className="control-storage-info">
+              <span><strong>{dbSizeKB} KB</strong> de {dbMaxKB.toLocaleString()} KB</span>
+              <span>{dbPercentage}%</span>
+            </div>
           </div>
-          <div className="control-storage-info">
-            <span><strong>{dbSizeKB} KB</strong> de {dbMaxKB.toLocaleString()} KB disponibles</span>
-            <span>{dbPercentage}%</span>
+          <div className="control-storage">
+            <h4 className="control-storage-title"><i className="fas fa-server"></i> Servidor</h4>
+            <div className="control-storage-bar">
+              <div className="control-storage-fill" style={{ width: `${Math.min(diskPercentage, 100)}%`, background: getBarColor(diskPercentage) }}></div>
+            </div>
+            <div className="control-storage-info">
+              <span><strong>{diskUsedGB} GB</strong> de {diskTotalGB} GB ({diskFreeGB} GB libres)</span>
+              <span>{diskPercentage}%</span>
+            </div>
           </div>
         </div>
-        <p className="control-note">
-          <i className="fas fa-info-circle"></i> Almacenamiento en base de datos MySQL.
-        </p>
       </AdminCard>
 
       <AdminCard title="Resumen de contenido">

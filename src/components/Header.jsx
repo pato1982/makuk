@@ -91,6 +91,13 @@ function Header({ alwaysScrolled = false }) {
               {cantidadProductos}
             </span>
           </button>
+          <button
+            className="cart-icon"
+            onClick={() => navigate('/admin/login')}
+            aria-label="Iniciar sesión"
+          >
+            <i className="fas fa-user"></i>
+          </button>
         </div>
 
         <button

@@ -50,7 +50,12 @@ function Login() {
   return (
     <div className="admin-login">
       <div className="login-card">
-        <h1>MAKUK</h1>
+        <div className="login-header-row">
+          <button className="login-back-btn" onClick={() => navigate('/')} aria-label="Volver al inicio">
+            <i className="fas fa-arrow-left"></i>
+          </button>
+          <h1>MAKUK</h1>
+        </div>
         <p className="login-subtitle">Panel de Administración</p>
         <form onSubmit={handleSubmit}>
           {error && <div className="login-error">{error}</div>}

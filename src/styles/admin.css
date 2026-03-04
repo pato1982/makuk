@@ -22,11 +22,64 @@
   text-align: center;
 }
 
-.login-card h1 {
+.login-header-row {
+  display: flex;
+  align-items: center;
+  position: relative;
+  justify-content: center;
+  margin-bottom: 5px;
+}
+
+.login-header-row h1 {
   font-size: 2rem;
   color: #b87333;
-  margin-bottom: 5px;
   letter-spacing: 3px;
+  margin: 0;
+}
+
+.login-back-btn {
+  position: absolute;
+  left: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(184, 115, 51, 0.4);
+  background: transparent;
+  color: #b87333;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.login-back-btn:hover {
+  background: #b87333;
+  color: #fff;
+  border-color: #b87333;
+}
+
+@media (max-width: 699px) {
+  .login-back-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 0.75rem;
+  }
+  .login-header-row h1 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (min-width: 700px) and (max-width: 1100px) {
+  .login-back-btn {
+    width: 33px;
+    height: 33px;
+    font-size: 0.85rem;
+  }
+  .login-header-row h1 {
+    font-size: 1.8rem;
+  }
 }
 
 .login-subtitle {
@@ -1598,8 +1651,33 @@
 }
 
 /* --- Control panel --- */
+.control-storage-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 699px) {
+  .control-storage-row {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+}
+
+.control-storage-title {
+  font-size: 0.8rem;
+  color: #555;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+}
+
+.control-storage-title i {
+  color: #b87333;
+  margin-right: 5px;
+}
+
 .control-storage {
-  margin-bottom: 12px;
+  margin-bottom: 0;
 }
 
 .control-storage-bar {

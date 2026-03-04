@@ -284,6 +284,8 @@ export async function updateProductsPage(req, res) {
 // GET /api/admin/stats
 export async function getStats(req, res) {
   try {
+    const { execSync } = await import('child_process');
+
     const [
       [[prodCount]],
       [[catCount]],
@@ -304,6 +306,16 @@ export async function getStats(req, res) {
          FROM information_schema.tables WHERE table_schema = DATABASE()`
       )
     ]);
+
+    // Disk usage
+    let diskTotal = 0, diskUsed = 0;
+    try {
+      const dfOutput = execSync("df -B1 / | tail -1").toString().trim();
+      const parts = dfOutput.split(/\s+/);
+      diskTotal = Number(parts[1]) || 0;
+      diskUsed = Number(parts[2]) || 0;
+    } catch {}
+
     res.json({
       products: prodCount.total,
       categories: catCount.total,
@@ -311,7 +323,9 @@ export async function getStats(req, res) {
       countries: countryCount.total,
       processSteps: stepsCount.total,
       aboutFeatures: featuresCount.total,
-      dbSizeBytes: Number(dbSizeRow.dbSize) || 0
+      dbSizeBytes: Number(dbSizeRow.dbSize) || 0,
+      diskTotal,
+      diskUsed
     });
   } catch (err) {
     console.error('Error getStats:', err);
