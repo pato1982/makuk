@@ -81,7 +81,7 @@
     font-size: 1.8rem;
   }
   .control-stats {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -1725,34 +1725,34 @@
 
 .control-stats {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
 }
 
 .control-stat-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 8px 4px;
+  gap: 3px;
+  padding: 10px 6px;
   background: #fafafa;
   border: 2px solid #eee;
   border-radius: 8px;
 }
 
 .control-stat-icon {
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: #b87333;
 }
 
 .control-stat-count {
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: #333;
 }
 
 .control-stat-label {
-  font-size: 0.6rem;
+  font-size: 0.7rem;
   color: #888;
 }
 
@@ -2330,38 +2330,38 @@
   }
 
   .control-storage-bar {
-    height: 14px;
+    height: 18px;
   }
 
   .control-storage-info {
-    font-size: 0.55rem;
+    font-size: 0.65rem;
     word-break: break-word;
   }
 
   .control-storage-title {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
   }
 
   .control-stats {
     grid-template-columns: repeat(2, 1fr);
-    gap: 5px;
+    gap: 8px;
   }
 
   .control-stat-card {
-    padding: 5px 3px;
-    gap: 1px;
+    padding: 8px 5px;
+    gap: 2px;
   }
 
   .control-stat-icon {
-    font-size: 0.7rem;
+    font-size: 0.85rem;
   }
 
   .control-stat-count {
-    font-size: 0.8rem;
+    font-size: 1rem;
   }
 
   .control-stat-label {
-    font-size: 0.5rem;
+    font-size: 0.6rem;
   }
 
   .control-status-list {

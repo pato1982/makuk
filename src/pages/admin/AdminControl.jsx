@@ -49,10 +49,8 @@ function AdminControl() {
   const sections = [
     { label: 'Productos', count: stats.products, icon: 'fa-box' },
     { label: 'Categorías', count: stats.categories, icon: 'fa-th-large' },
+    { label: 'Piezas únicas', count: stats.uniquePieces, icon: 'fa-gem' },
     { label: 'Testimonios', count: stats.testimonials, icon: 'fa-quote-left' },
-    { label: 'Países', count: stats.countries, icon: 'fa-globe' },
-    { label: 'Pasos proceso', count: stats.processSteps, icon: 'fa-cogs' },
-    { label: 'Features', count: stats.aboutFeatures, icon: 'fa-star' },
   ];
 
   const getBarColor = (pct) => {
@@ -117,7 +115,12 @@ function AdminControl() {
           </div>
           <div className="control-status-item">
             <span className="control-status-dot online"></span>
-            <span>Panel de administración</span>
+            <span>Servidor</span>
+            <span className="control-status-tag">Activo</span>
+          </div>
+          <div className="control-status-item">
+            <span className="control-status-dot online"></span>
+            <span>Panel admin</span>
             <span className="control-status-tag">Activo</span>
           </div>
         </div>
