@@ -626,3 +626,91 @@ Fix de testimonios publicos, mejoras en el header/footer, pagina de login, y ree
 
 ### Pendiente
 - Backend: agregar conteo `uniquePieces` en endpoint stats (productos de categoria piezas-unicas)
+
+---
+
+## 2026-03-04 - Auditoria de Seguridad y Popup de Producto
+
+### Resumen del dia
+Auditoria completa de seguridad del backend, optimizacion del frontend con lazy loading, tests automatizados, backups del VPS, y rediseno del popup de detalle de producto.
+
+### Cambios realizados
+
+#### 1. Auditoria de seguridad backend
+- **Archivo:** `backend/src/controllers/adminController.js`
+- Reemplazado `execSync('df -B1 /')` por `fs.statfs()` nativo de Node.js para obtener espacio en disco.
+- Se elimino vulnerabilidad de command injection (CRITICO).
+
+#### 2. CORS restringido con whitelist
+- **Archivo:** `backend/src/server.js`
+- CORS ya no acepta cualquier origen (`*`).
+- Whitelist configurada: `http://localhost:5173`, `http://186.64.122.100`, `http://makuk.cl`, `http://www.makuk.cl` y variantes HTTPS.
+- Origenes permitidos se leen desde variable de entorno `CORS_ORIGINS`.
+
+#### 3. Lazy loading de rutas admin
+- **Archivo:** `src/App.jsx`
+- Todas las paginas admin (`Login`, `AdminLayout`, `Dashboard`, etc.) cargadas con `React.lazy()` + `import()`.
+- `Suspense` con fallback "Cargando..." envuelve las rutas admin.
+- Reduce el bundle publico inicial (usuarios no-admin no descargan codigo del admin).
+
+#### 4. Fix: Suspense dentro de Routes
+- **Archivo:** `src/App.jsx`
+- `<Suspense>` estaba como hijo directo de `<Routes>`, lo cual React Router no permite (solo acepta `<Route>`).
+- Causaba pantalla en blanco al cargar el sitio.
+- Solucion: mover `Suspense` al `element` de cada ruta lazy individualmente.
+
+#### 5. Tests automatizados
+- **Archivos:** `backend/tests/api.test.js`, `backend/package.json`
+- Agregado vitest + supertest como dependencias de desarrollo.
+- Tests basicos de API: health check, contenido publico, rutas protegidas sin token.
+- Script `npm test` configurado en package.json.
+
+#### 6. README reescrito
+- **Archivo:** `README.md`
+- README anterior era el template de Vite.
+- Reescrito con informacion real del proyecto: stack, estructura, instalacion, deploy, variables de entorno.
+
+#### 7. Backend .env.example
+- **Archivo:** `backend/.env.example`
+- Template de variables de entorno para facilitar setup en nuevos entornos.
+- Incluye: DB, JWT secrets, upload dir, CORS origins, puerto.
+
+#### 8. Backups automaticos en VPS
+- Configurado cron job diario en el VPS para backup de MySQL.
+- Script de backup en `/var/www/makuk/backend/backup.sh`.
+- Retencion de 7 dias de backups.
+
+#### 9. Documento de auditoria
+- **Archivo:** `AUDITORIA_MAKUK.md`
+- Documento completo con hallazgos de seguridad, severidad, estado y recomendaciones.
+- Cubre: command injection, CORS, lazy loading, tests, backups, y mas.
+
+#### 10. Popup de detalle de producto rediseñado
+- **Archivos:** `src/pages/Productos.jsx`, `src/styles/productos.css`
+- Diseño lightbox: imagen grande arriba ocupando todo el ancho.
+- Zona de info abajo dividida en dos columnas:
+  - **Columna izquierda:** nombre centrado + precios (anterior tachado / actual en negrita).
+  - **Columna derecha:** descripcion en texto justificado con ultima linea centrada (`text-align-last: center`).
+- Precios: muestra precio anterior solo si existe y es diferente al actual.
+- `formatearPrecio()` duplicado en componente `Productos` para acceso desde el popup.
+- Responsive (<=500px): columnas se apilan verticalmente, texto centrado.
+
+### Archivos modificados/creados
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `AUDITORIA_MAKUK.md` | **Nuevo** — Documento de auditoria |
+| `README.md` | Reescrito con info real del proyecto |
+| `backend/.env.example` | **Nuevo** — Template de variables de entorno |
+| `backend/tests/api.test.js` | **Nuevo** — Tests de API |
+| `backend/package.json` | Dependencias de test |
+| `backend/src/controllers/adminController.js` | Fix command injection (fs.statfs) |
+| `backend/src/server.js` | CORS con whitelist |
+| `src/App.jsx` | Lazy loading + fix Suspense en Routes |
+| `src/pages/Productos.jsx` | Popup con dos columnas, precios, formatearPrecio |
+| `src/styles/productos.css` | Estilos popup lightbox + dos columnas + responsive |
+
+### Commits de la sesion
+| Hash | Descripcion |
+|------|------------|
+| `9cc6527` | Auditoria: seguridad backend, lazy loading, tests, backups y docs |
+| `556133b` | Popup producto: diseño lightbox con imagen destacada, info en dos columnas y precios |
