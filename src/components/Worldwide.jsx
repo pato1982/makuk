@@ -19,7 +19,7 @@ function Worldwide() {
           <div className="countries-grid">
             {countries.map((pais, index) => (
               <div key={index} className="country-card">
-                <img src={pais.imagen} alt={pais.nombre} />
+                <img src={pais.imagen} alt={pais.nombre} loading="lazy" />
                 <div className="country-overlay">
                   <h4>{pais.nombre}</h4>
                   <p>{pais.descripcion}</p>

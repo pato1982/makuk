@@ -9,7 +9,7 @@ function About() {
       <div className="container">
         <div className="about-grid">
           <div className="about-image">
-            <img src={image} alt="Joya de cobre artesanal" />
+            <img src={image} alt="Joya de cobre artesanal" loading="lazy" />
           </div>
           <div className="about-content">
             <h2>{title}</h2>

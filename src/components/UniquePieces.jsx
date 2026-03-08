@@ -23,7 +23,7 @@ function UniquePieces() {
           {items.map((pieza, index) => (
             <div key={index} className="unique-card">
               <div className="unique-img">
-                <img src={pieza.imagen} alt={pieza.nombre} />
+                <img src={pieza.imagen} alt={pieza.nombre} loading="lazy" />
               </div>
               <h4>{pieza.nombre}</h4>
             </div>

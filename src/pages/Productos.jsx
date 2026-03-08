@@ -21,7 +21,7 @@ function ProductoCard({ producto, onImageClick }) {
   return (
     <div className="producto-card">
       <div className="producto-img" onClick={() => onImageClick(producto)} style={{ cursor: 'pointer' }}>
-        <img src={producto.imagen} alt={producto.nombre} />
+        <img src={producto.imagen} alt={producto.nombre} loading="lazy" />
       </div>
       <div className="producto-info">
         <h4>{producto.nombre}</h4>

@@ -33,7 +33,7 @@ function Categories() {
               >
                 <div className="category-img">
                   {getPortada(cat.slug) ? (
-                    <img src={getPortada(cat.slug)} alt={cat.nombre} />
+                    <img src={getPortada(cat.slug)} alt={cat.nombre} loading="lazy" />
                   ) : (
                     <div className="category-img-placeholder"><i className="fas fa-image"></i></div>
                   )}
