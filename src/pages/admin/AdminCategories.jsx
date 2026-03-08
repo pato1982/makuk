@@ -29,6 +29,7 @@ function AdminCategories() {
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState('');
   const [tab, setTab] = useState('tipos');
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   const [modalPos, setModalPos] = useState({ x: 0, y: 0 });
   const [productModalPos, setProductModalPos] = useState({ x: 0, y: 0 });
@@ -181,11 +182,22 @@ function AdminCategories() {
     setIsNewCategory(true);
   };
 
-  const removeItem = (index) => {
-    if (!window.confirm('¿Eliminar esta categoría?')) return;
-    setData({ ...data, items: data.items.filter((_, i) => i !== index) });
+  const requestDeleteCategory = (index, e) => {
+    e.stopPropagation();
+    setDeleteConfirm(index);
+  };
+
+  const confirmDeleteCategory = () => {
+    const cat = data.items[deleteConfirm];
+    // Eliminar también los productos de esta categoría
+    setProductsData(prev => ({
+      ...prev,
+      items: prev.items.filter(p => p.categoria !== cat.slug)
+    }));
+    setData({ ...data, items: data.items.filter((_, i) => i !== deleteConfirm) });
     setEditIndex(null);
     setIsNewCategory(false);
+    setDeleteConfirm(null);
   };
 
   const saveCategory = () => {
@@ -237,12 +249,24 @@ function AdminCategories() {
               <div className="admin-grid-4">
                 {data.items.map((item, i) => {
                   const portada = productsData.items.find(p => p.categoria === item.slug && p.destacado);
+                  const productCount = productsData.items.filter(p => p.categoria === item.slug).length;
                   return (
-                    <div key={i} className="admin-grid-card" onClick={() => openModal(i)}>
-                      {portada ? <img src={portada.imagen} alt={item.nombre} className="admin-grid-card-img" /> : null}
-                      <div className="admin-grid-card-info">
-                        <span className="admin-grid-card-name">{item.nombre}</span>
-                        {item.descripcion && <span className="admin-grid-card-slug">{item.descripcion}</span>}
+                    <div key={i} className="admin-grid-card-wrapper">
+                      <div className="admin-grid-card" onClick={() => openModal(i)}>
+                        {portada ? <img src={portada.imagen} alt={item.nombre} className="admin-grid-card-img" /> : null}
+                        <div className="admin-grid-card-info">
+                          <span className="admin-grid-card-name">{item.nombre}</span>
+                          {item.descripcion && <span className="admin-grid-card-slug">{item.descripcion}</span>}
+                          <span className="admin-grid-card-slug">{productCount} producto{productCount !== 1 ? 's' : ''}</span>
+                        </div>
+                      </div>
+                      <div className="admin-grid-card-actions">
+                        <button className="btn-card-edit" onClick={() => openModal(i)}>
+                          <i className="fas fa-edit btn-card-icon"></i><span className="btn-card-label">Editar</span>
+                        </button>
+                        <button className="btn-card-delete" onClick={(e) => requestDeleteCategory(i, e)}>
+                          <i className="fas fa-trash btn-card-icon"></i><span className="btn-card-label">Eliminar</span>
+                        </button>
                       </div>
                     </div>
                   );
@@ -382,6 +406,39 @@ function AdminCategories() {
           </div>
         </div>
       )}
+
+      {/* Popup de confirmación de eliminación */}
+      {deleteConfirm !== null && data.items[deleteConfirm] && (() => {
+        const cat = data.items[deleteConfirm];
+        const count = productsData.items.filter(p => p.categoria === cat.slug).length;
+        return (
+          <div className="admin-modal-overlay" onClick={() => setDeleteConfirm(null)}>
+            <div className="admin-delete-popup" onClick={(e) => e.stopPropagation()}>
+              <div className="admin-delete-popup-icon">
+                <i className="fas fa-exclamation-triangle"></i>
+              </div>
+              <h3 className="admin-delete-popup-title">Eliminar categoría</h3>
+              <p className="admin-delete-popup-text">
+                ¿Estás seguro de que deseas eliminar la categoría <strong>"{cat.nombre}"</strong>?
+              </p>
+              {count > 0 && (
+                <div className="admin-delete-popup-warning">
+                  <i className="fas fa-exclamation-circle"></i>
+                  <span>Se eliminarán <strong>{count} producto{count !== 1 ? 's' : ''}</strong> dentro de esta categoría. Esta acción no se puede deshacer.</span>
+                </div>
+              )}
+              <div className="admin-delete-popup-actions">
+                <button className="btn-delete-cancel" onClick={() => setDeleteConfirm(null)}>
+                  Cancelar
+                </button>
+                <button className="btn-delete-confirm" onClick={confirmDeleteCategory}>
+                  <i className="fas fa-trash"></i> Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {saveError && <div className="save-error"><i className="fas fa-exclamation-circle"></i> {saveError}</div>}
       <button className={`btn-save ${saved ? 'saved' : ''}`} onClick={handleSave}>

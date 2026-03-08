@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useCart } from '../context/CartContext';
 import { useContent } from '../context/ContentContext';
+import { getThumb } from '../utils/imageUtils';
 
 function ProductoCard({ producto, onImageClick }) {
   const [cantidad, setCantidad] = useState(1);
@@ -21,7 +22,7 @@ function ProductoCard({ producto, onImageClick }) {
   return (
     <div className="producto-card">
       <div className="producto-img" onClick={() => onImageClick(producto)} style={{ cursor: 'pointer' }}>
-        <img src={producto.imagen} alt={producto.nombre} loading="lazy" />
+        <img src={getThumb(producto.imagen)} alt={producto.nombre} loading="lazy" />
       </div>
       <div className="producto-info">
         <h4>{producto.nombre}</h4>

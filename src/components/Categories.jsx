@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
+import { getThumb } from '../utils/imageUtils';
 
 function Categories() {
   const { content } = useContent();
@@ -33,7 +34,7 @@ function Categories() {
               >
                 <div className="category-img">
                   {getPortada(cat.slug) ? (
-                    <img src={getPortada(cat.slug)} alt={cat.nombre} loading="lazy" />
+                    <img src={getThumb(getPortada(cat.slug))} alt={cat.nombre} loading="lazy" />
                   ) : (
                     <div className="category-img-placeholder"><i className="fas fa-image"></i></div>
                   )}

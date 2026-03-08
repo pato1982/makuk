@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
+import { getThumb } from '../utils/imageUtils';
 
 function UniquePieces() {
   const { content } = useContent();
@@ -23,7 +24,7 @@ function UniquePieces() {
           {items.map((pieza, index) => (
             <div key={index} className="unique-card">
               <div className="unique-img">
-                <img src={pieza.imagen} alt={pieza.nombre} loading="lazy" />
+                <img src={getThumb(pieza.imagen)} alt={pieza.nombre} loading="lazy" />
               </div>
               <h4>{pieza.nombre}</h4>
             </div>
