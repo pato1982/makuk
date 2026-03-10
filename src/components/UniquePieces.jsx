@@ -6,8 +6,6 @@ function UniquePieces() {
   const { content } = useContent();
   const { title, subtitle, items } = content.uniquePieces;
 
-  if (!items || items.length === 0) return null;
-
   return (
     <section className="unique-pieces">
       <div className="container">
@@ -20,22 +18,24 @@ function UniquePieces() {
         <div className="copper-divider center"></div>
         <p className="section-subtitle">{subtitle}</p>
 
-        <div className="unique-row">
-          {items.map((pieza, index) => (
-            <div key={index} className="unique-card">
-              <div className="unique-img">
-                <div className="unique-img-wrapper" style={{
-                  '--img-zoom': pieza.imageZoom ?? 1,
-                  '--img-tx': `${50 - (pieza.imagePosX ?? 50)}%`,
-                  '--img-ty': `${50 - (pieza.imagePosY ?? 50)}%`,
-                }}>
-                  <img src={getThumb(pieza.imagen)} alt={pieza.nombre} loading="lazy" />
+        {items && items.length > 0 && (
+          <div className="unique-row">
+            {items.map((pieza, index) => (
+              <div key={index} className="unique-card">
+                <div className="unique-img">
+                  <div className="unique-img-wrapper" style={{
+                    '--img-zoom': pieza.imageZoom ?? 1,
+                    '--img-tx': `${50 - (pieza.imagePosX ?? 50)}%`,
+                    '--img-ty': `${50 - (pieza.imagePosY ?? 50)}%`,
+                  }}>
+                    <img src={getThumb(pieza.imagen)} alt={pieza.nombre} loading="lazy" />
+                  </div>
                 </div>
+                <h4>{pieza.nombre}</h4>
               </div>
-              <h4>{pieza.nombre}</h4>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
