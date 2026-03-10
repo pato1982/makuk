@@ -406,8 +406,7 @@
 
 /* --- Admin Page --- */
 .admin-page {
-  max-width: 900px;
-  margin: 0 auto;
+  max-width: 100%;
   width: 100%;
   box-sizing: border-box;
   overflow-x: hidden;
@@ -2305,6 +2304,416 @@
   background: #a0622b;
 }
 
+/* ============================================
+   REGISTRO DE VENTAS
+   ============================================ */
+
+.ventas-layout {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.ventas-table-col {
+  flex: 3;
+  min-width: 0;
+}
+
+.ventas-detail-col {
+  flex: 2;
+  min-width: 0;
+  position: sticky;
+  top: 20px;
+}
+
+.ventas-table-wrapper {
+  overflow-x: auto;
+}
+
+.ventas-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.ventas-table thead th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #888;
+  border-bottom: 2px solid #e8e8e8;
+  white-space: nowrap;
+}
+
+.ventas-table tbody tr {
+  cursor: pointer;
+  transition: background 0.15s;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.ventas-table tbody tr:hover {
+  background: #faf6f1;
+}
+
+.ventas-table tbody tr.ventas-row-selected {
+  background: #f5ebe0;
+}
+
+.ventas-table td {
+  padding: 12px;
+  vertical-align: middle;
+}
+
+.ventas-cell-date {
+  color: #888;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.ventas-cell-order {
+  font-weight: 600;
+  color: #b87333;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.ventas-cell-customer {
+  font-weight: 500;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ventas-cell-total {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ventas-cell-status {
+  position: relative;
+}
+
+.ventas-status-wrapper {
+  position: relative;
+}
+
+.ventas-status-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  width: 120px;
+}
+
+.ventas-status-btn > i:first-child {
+  width: 14px;
+  text-align: center;
+}
+
+.ventas-status-btn > .ventas-status-chevron {
+  margin-left: auto;
+}
+
+.ventas-status-btn:hover {
+  filter: brightness(0.95);
+}
+
+.ventas-status-chevron {
+  font-size: 0.6rem;
+  margin-left: 2px;
+  opacity: 0.6;
+}
+
+.ventas-status-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  z-index: 50;
+  overflow: hidden;
+  width: 120px;
+}
+
+.ventas-status-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.ventas-status-option > i {
+  width: 14px;
+  text-align: center;
+}
+
+.ventas-status-option:hover {
+  background: #f5f5f5;
+}
+
+.ventas-status-option.active {
+  font-weight: 700;
+  background: #faf6f1;
+}
+
+.ventas-empty {
+  text-align: center;
+  padding: 3rem;
+  color: #aaa;
+}
+
+.ventas-empty i {
+  font-size: 2rem;
+  margin-bottom: 0.8rem;
+  display: block;
+}
+
+/* Header detalle: orden + estado en misma fila */
+.ventas-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.ventas-detail-header-status {
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Pestañas del detalle */
+.ventas-detail-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid #e8e8e8;
+}
+
+.ventas-detail-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  color: #888;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ventas-detail-tab:hover {
+  color: #555;
+}
+
+.ventas-detail-tab.active {
+  color: #b87333;
+  border-bottom-color: #b87333;
+}
+
+.ventas-detail-tab i {
+  font-size: 0.75rem;
+}
+
+/* Detalle de orden */
+.ventas-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ventas-detail-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.ventas-detail-section-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #888;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.ventas-detail-section-title i {
+  color: #b87333;
+  font-size: 0.78rem;
+}
+
+.ventas-detail-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.ventas-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+  border-bottom: 1px solid #f7f7f7;
+  font-size: 0.68rem;
+}
+
+.ventas-detail-row:last-child {
+  border-bottom: none;
+}
+
+.ventas-detail-label {
+  color: #888;
+  font-weight: 500;
+  font-size: 0.63rem;
+}
+
+.ventas-detail-value {
+  font-weight: 500;
+  color: #333;
+  text-align: right;
+}
+
+/* Notas de envío */
+.ventas-detail-shipping-notes {
+  font-size: 0.68rem;
+  color: #333;
+  line-height: 1.5;
+  padding: 8px 0;
+}
+
+.ventas-detail-no-notes {
+  color: #aaa;
+  font-style: italic;
+}
+
+/* Productos del detalle */
+.ventas-detail-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.ventas-detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+  border-bottom: 1px solid #f7f7f7;
+}
+
+.ventas-detail-item:last-child {
+  border-bottom: none;
+}
+
+.ventas-detail-item-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ventas-detail-item-name {
+  font-weight: 500;
+  font-size: 0.68rem;
+}
+
+.ventas-detail-item-qty {
+  font-size: 0.6rem;
+  color: #888;
+  background: #f0f0f0;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.ventas-detail-item-price {
+  font-weight: 600;
+  font-size: 0.68rem;
+  white-space: nowrap;
+}
+
+/* Totales */
+.ventas-detail-totals {
+  background: #faf6f1;
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ventas-detail-total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: #666;
+}
+
+.ventas-detail-total-final {
+  font-weight: 700;
+  font-size: 0.78rem;
+  color: #333;
+  padding-top: 6px;
+  border-top: 1px solid #e0d5c8;
+}
+
+.ventas-detail-date {
+  font-size: 0.63rem;
+  color: #aaa;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ventas-detail-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #aaa;
+}
+
+.ventas-detail-empty i {
+  font-size: 2rem;
+  margin-bottom: 0.8rem;
+  display: block;
+}
+
+.ventas-detail-empty p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
 /* --- Responsive: Tablet (700px - 1100px) --- */
 @media (max-width: 1100px) and (min-width: 700px) {
   /* Layout */
@@ -2373,6 +2782,19 @@
 
   .btn-card-icon {
     display: inline;
+  }
+
+  /* Ventas tablet */
+  .ventas-layout {
+    flex-direction: column;
+  }
+
+  .ventas-detail-col {
+    position: static;
+  }
+
+  .ventas-cell-customer {
+    display: none;
   }
 }
 
@@ -2673,5 +3095,178 @@
 
   .btn-card-icon {
     display: inline;
+  }
+
+  /* Ventas móvil */
+  .ventas-layout {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .ventas-detail-col {
+    position: static;
+  }
+
+  /* Tabla móvil */
+  .ventas-table-col,
+  .ventas-detail-col {
+    width: 100%;
+  }
+
+  .ventas-table {
+    width: 100%;
+    font-size: 0.72rem;
+    table-layout: fixed;
+  }
+
+  .ventas-cell-date {
+    font-size: 0.6rem;
+    width: 30%;
+  }
+
+  .ventas-cell-order {
+    width: 40%;
+  }
+
+  .ventas-cell-status {
+    width: 30%;
+  }
+
+  .ventas-table td {
+    padding: 7px 5px;
+  }
+
+  .ventas-table thead th {
+    padding: 7px 5px;
+    font-size: 0.6rem;
+  }
+
+  .ventas-cell-order {
+    font-size: 0.7rem;
+  }
+
+  .ventas-status-btn {
+    padding: 3px 6px;
+    font-size: 0.62rem;
+    gap: 4px;
+    width: 90px;
+  }
+
+  .ventas-status-chevron {
+    font-size: 0.5rem;
+  }
+
+  .ventas-status-menu {
+    width: 90px;
+  }
+
+  .ventas-status-option {
+    padding: 7px 10px;
+    font-size: 0.65rem;
+  }
+
+  /* Detalle: header orden + estado */
+  .ventas-detail-header-status {
+    font-size: 0.65rem;
+  }
+
+  /* Pestañas detalle */
+  .ventas-detail-tabs {
+    margin-bottom: -2px;
+  }
+
+  .ventas-detail-tab {
+    padding: 6px 10px;
+    font-size: 0.68rem;
+    gap: 4px;
+  }
+
+  .ventas-detail-tab i {
+    font-size: 0.6rem;
+  }
+
+  /* Contenido detalle */
+  .ventas-detail {
+    gap: 8px;
+  }
+
+  .ventas-detail-tabs {
+    margin-bottom: 6px;
+  }
+
+  .ventas-detail-section-title {
+    font-size: 0.58rem;
+    padding-bottom: 4px;
+  }
+
+  .ventas-detail-section-title i {
+    font-size: 0.55rem;
+  }
+
+  .ventas-detail-row {
+    padding: 2px 0;
+    font-size: 0.62rem;
+  }
+
+  .ventas-detail-label {
+    font-size: 0.57rem;
+  }
+
+  .ventas-detail-shipping-notes {
+    font-size: 0.62rem;
+    padding: 4px 0;
+  }
+
+  .ventas-detail-item {
+    padding: 2px 0;
+  }
+
+  .ventas-detail-item-name {
+    font-size: 0.62rem;
+  }
+
+  .ventas-detail-item-qty {
+    font-size: 0.52rem;
+    padding: 0 4px;
+  }
+
+  .ventas-detail-item-price {
+    font-size: 0.62rem;
+  }
+
+  .ventas-detail-totals {
+    padding: 6px 8px;
+  }
+
+  .ventas-detail-total-row {
+    font-size: 0.62rem;
+  }
+
+  .ventas-detail-total-final {
+    font-size: 0.7rem;
+  }
+
+  .ventas-detail-date {
+    font-size: 0.55rem;
+  }
+
+  .ventas-detail-empty {
+    padding: 2rem 1rem;
+  }
+
+  .ventas-detail-empty i {
+    font-size: 1.5rem;
+  }
+
+  .ventas-detail-empty p {
+    font-size: 0.75rem;
+  }
+
+  .ventas-empty i {
+    font-size: 1.5rem;
+  }
+
+  .ventas-empty p {
+    font-size: 0.75rem;
   }
 }

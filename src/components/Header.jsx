@@ -3,11 +3,13 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useContent } from '../context/ContentContext';
 import ContactModal from './ContactModal';
+import TrackingModal from './TrackingModal';
 
 function Header({ alwaysScrolled = false }) {
   const [isScrolled, setIsScrolled] = useState(alwaysScrolled);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
+  const [showTrackingModal, setShowTrackingModal] = useState(false);
   const { cantidadProductos, setShowCartModal } = useCart();
   const { content } = useContent();
   const location = useLocation();
@@ -93,6 +95,13 @@ function Header({ alwaysScrolled = false }) {
           </button>
           <button
             className="cart-icon"
+            onClick={() => setShowTrackingModal(true)}
+            aria-label="Seguimiento de orden"
+          >
+            <i className="fas fa-box-open"></i>
+          </button>
+          <button
+            className="cart-icon"
             onClick={() => navigate('/admin/login')}
             aria-label="Iniciar sesión"
           >
@@ -112,6 +121,7 @@ function Header({ alwaysScrolled = false }) {
     </header>
 
     <ContactModal show={showContactModal} onClose={() => setShowContactModal(false)} />
+    <TrackingModal show={showTrackingModal} onClose={() => setShowTrackingModal(false)} />
     </>
   );
 }
