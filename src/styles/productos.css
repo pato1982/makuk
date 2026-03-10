@@ -984,10 +984,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 3px;
+    gap: 4px;
     background: var(--cream);
-    padding: 8px;
+    padding: 10px 8px;
     min-width: 0;
     border-radius: 12px 0 0 12px;
 }
@@ -998,8 +997,9 @@
     gap: 4px;
     width: 100%;
     justify-content: center;
-    min-height: 0;
     flex: 1;
+    min-height: 0;
+    overflow: hidden;
 }
 
 .popup-arrow {

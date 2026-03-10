@@ -230,8 +230,8 @@ function Productos() {
                     src={popupProducto.imagen}
                     alt={popupProducto.nombre}
                     style={{
-                      objectPosition: `${popupPosX}% ${popupPosY}%`,
                       transform: `scale(${popupZoom})`,
+                      transformOrigin: `${popupPosX}% ${popupPosY}%`,
                     }}
                   />
                 </div>
