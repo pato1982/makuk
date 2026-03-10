@@ -1580,8 +1580,8 @@
 /* --- Grid 4 columns (categories, etc.) --- */
 .admin-grid-4 {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
 }
 
 .admin-grid-card {
