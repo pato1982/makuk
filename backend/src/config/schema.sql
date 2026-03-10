@@ -102,7 +102,10 @@ CREATE TABLE IF NOT EXISTS products (
   precio_anterior INT DEFAULT 0,
   descripcion TEXT,
   destacado TINYINT(1) DEFAULT 0,
-  sort_order INT DEFAULT 0
+  sort_order INT DEFAULT 0,
+  image_pos_x DECIMAL(5,2) DEFAULT 50.00,
+  image_pos_y DECIMAL(5,2) DEFAULT 50.00,
+  image_zoom DECIMAL(3,2) DEFAULT 1.00
 );
 
 -- ============================================

@@ -89,8 +89,8 @@ export async function updateProducts(req, res) {
     for (let i = 0; i < items.length; i++) {
       const p = items[i];
       await conn.query(
-        'INSERT INTO products (nombre, categoria, imagen, precio_actual, precio_anterior, descripcion, destacado, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [p.nombre, p.categoria, p.imagen, p.precioActual || 0, p.precioAnterior || 0, p.descripcion, p.destacado ? 1 : 0, i + 1]
+        'INSERT INTO products (nombre, categoria, imagen, precio_actual, precio_anterior, descripcion, destacado, sort_order, image_pos_x, image_pos_y, image_zoom) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [p.nombre, p.categoria, p.imagen, p.precioActual || 0, p.precioAnterior || 0, p.descripcion, p.destacado ? 1 : 0, i + 1, p.imagePosX ?? 50, p.imagePosY ?? 50, p.imageZoom ?? 1]
       );
     }
     // Sincronizar nombres de categorías si vienen
