@@ -226,14 +226,12 @@ function Productos() {
                   <i className="fas fa-chevron-left"></i>
                 </button>
                 <div className="producto-popup-img">
-                  <img
-                    src={popupProducto.imagen}
-                    alt={popupProducto.nombre}
-                    style={{
-                      transform: `scale(${popupZoom})`,
-                      transformOrigin: `${popupPosX}% ${popupPosY}%`,
-                    }}
-                  />
+                  <div className="popup-img-pan-wrapper" style={{
+                    transform: `scale(${popupZoom})`,
+                    transformOrigin: `${popupPosX}% ${popupPosY}%`,
+                  }}>
+                    <img src={popupProducto.imagen} alt={popupProducto.nombre} />
+                  </div>
                 </div>
                 <button type="button" className="popup-arrow" onClick={() => popupMoveImg('x', 5)}>
                   <i className="fas fa-chevron-right"></i>
