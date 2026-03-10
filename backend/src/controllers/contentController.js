@@ -95,7 +95,7 @@ export async function getAllContent(req, res) {
         subtitle: uniqueSection.subtitle,
         items: productRows
           .filter(p => p.categoria === 'piezas-unicas' && p.destacado === 1)
-          .map(p => ({ nombre: p.nombre, imagen: p.imagen }))
+          .map(p => ({ nombre: p.nombre, imagen: p.imagen, imagePosX: p.image_pos_x ?? 50, imagePosY: p.image_pos_y ?? 50, imageZoom: p.image_zoom ?? 1 }))
       },
       about: {
         title: about.title,

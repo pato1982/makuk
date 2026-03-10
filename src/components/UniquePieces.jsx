@@ -24,7 +24,10 @@ function UniquePieces() {
           {items.map((pieza, index) => (
             <div key={index} className="unique-card">
               <div className="unique-img">
-                <img src={getThumb(pieza.imagen)} alt={pieza.nombre} loading="lazy" />
+                <img src={getThumb(pieza.imagen)} alt={pieza.nombre} loading="lazy" style={{
+                  objectPosition: `${pieza.imagePosX ?? 50}% ${pieza.imagePosY ?? 50}%`,
+                  '--img-zoom': pieza.imageZoom ?? 1,
+                }} />
               </div>
               <h4>{pieza.nombre}</h4>
             </div>

@@ -84,6 +84,8 @@
     object-fit: cover;
     object-position: center;
     transition: transform 0.5s ease;
+    --img-zoom: 1;
+    transform: scale(var(--img-zoom));
 }
 
 .producto-info {
@@ -930,8 +932,8 @@
 .producto-popup {
     background: var(--white);
     border-radius: 12px;
-    width: 480px;
-    height: 320px;
+    width: 520px;
+    height: 380px;
     overflow: hidden;
     display: flex;
     flex-direction: row;
@@ -964,60 +966,81 @@
 
 .producto-popup-img {
     position: relative;
-    flex: 3;
+    flex: 1;
     background: var(--cream);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     min-width: 0;
-    cursor: grab;
-    user-select: none;
+    min-height: 0;
+    border-radius: 8px;
+    width: 100%;
 }
 
-.producto-popup-img:active {
-    cursor: grabbing;
+/* --- Popup image editor controls --- */
+.popup-img-editor {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    background: var(--cream);
+    padding: 8px;
+    min-width: 0;
+    border-radius: 12px 0 0 12px;
 }
 
-.popup-pan-hint-btn {
-    position: absolute;
-    top: 8px;
-    right: 8px;
+.popup-img-editor-middle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    justify-content: center;
+    min-height: 0;
+    flex: 1;
+}
+
+.popup-arrow {
+    background: rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 50%;
     width: 28px;
     height: 28px;
-    background: rgba(255, 255, 255, 0.85);
-    color: var(--dark-brown);
-    border: none;
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.75rem;
     cursor: pointer;
-    z-index: 2;
-    transition: background 0.2s;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    color: var(--dark-brown);
+    font-size: 0.65rem;
+    transition: all 0.2s;
+    flex-shrink: 0;
 }
 
-.popup-pan-hint-btn:hover {
-    background: rgba(255, 255, 255, 1);
+.popup-arrow:hover {
+    background: rgba(184, 115, 51, 0.15);
+    color: var(--copper);
+    border-color: var(--copper);
 }
 
-.popup-pan-tooltip {
-    position: absolute;
-    top: 42px;
-    right: 8px;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    font-family: 'Montserrat', sans-serif;
+.popup-zoom-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.popup-zoom-bar i {
+    color: #888;
     font-size: 0.7rem;
-    padding: 6px 10px;
-    border-radius: 6px;
-    z-index: 2;
-    max-width: 180px;
-    line-height: 1.4;
-    animation: fadeIn 0.2s ease;
-    pointer-events: none;
+}
+
+.popup-zoom-bar input[type="range"] {
+    width: 120px;
+    accent-color: var(--copper);
+    height: 4px;
 }
 
 .producto-popup-img img {
@@ -1025,7 +1048,7 @@
     height: 100%;
     object-fit: cover;
     display: block;
-    border-radius: 12px 0 0 12px;
+    border-radius: 8px;
 }
 
 .producto-popup-info {
@@ -1096,13 +1119,29 @@
         border-radius: 8px;
     }
 
+    .popup-img-editor {
+        flex: none;
+        border-radius: 8px 8px 0 0;
+        padding: 6px;
+    }
+
     .producto-popup-img {
         flex: none;
-        height: 220px;
+        height: 180px;
     }
 
     .producto-popup-img img {
-        border-radius: 8px 8px 0 0;
+        border-radius: 6px;
+    }
+
+    .popup-arrow {
+        width: 22px;
+        height: 22px;
+        font-size: 0.5rem;
+    }
+
+    .popup-zoom-bar input[type="range"] {
+        width: 100px;
     }
 
     .producto-popup-info {
