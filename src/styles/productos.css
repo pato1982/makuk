@@ -984,7 +984,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
     background: var(--cream);
     padding: 10px 8px;
     min-width: 0;
@@ -994,7 +994,7 @@
 .popup-img-editor-middle {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
     width: 100%;
     justify-content: center;
     flex: 1;
@@ -1003,25 +1003,24 @@
 }
 
 .popup-arrow {
-    background: rgba(0, 0, 0, 0.06);
-    border: 1px solid rgba(0,0,0,0.15);
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
+    background: none;
+    border: none;
+    border-radius: 0;
+    width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     color: var(--dark-brown);
-    font-size: 0.65rem;
-    transition: all 0.2s;
+    font-size: 0.7rem;
+    transition: color 0.2s;
     flex-shrink: 0;
+    padding: 0;
 }
 
 .popup-arrow:hover {
-    background: rgba(184, 115, 51, 0.15);
     color: var(--copper);
-    border-color: var(--copper);
 }
 
 .popup-zoom-bar {

@@ -7,6 +7,68 @@
 
 ---
 
+## 2026-03-08
+
+### Resumen del dia
+Optimizacion completa del sistema de imagenes: conversion automatica a WebP con sharp, generacion de thumbnails, lazy loading y popup de eliminacion de categorias. Se trabajo en rama `Imagenes_productos` que luego se mergeo a main.
+
+### Cambios realizados
+
+#### 1. Optimizacion de imagenes con sharp (backend)
+- **Archivos:** `backend/src/routes/upload.js`, `backend/package.json`
+- Se reemplazo `multer.diskStorage` por `multer.memoryStorage` para procesar la imagen en memoria antes de guardarla.
+- Se integro `sharp` para:
+  - Convertir cualquier imagen (JPG, PNG, GIF) a **WebP** automaticamente.
+  - Redimensionar a max **1200px** de ancho (imagen principal, calidad 80).
+  - Generar **thumbnail** de max **400px** de ancho (calidad 75).
+- Cada imagen subida genera dos archivos: `uuid.webp` y `uuid_thumb.webp`.
+- Se elimino la dependencia del `uploadController.js` (logica movida directamente a la ruta).
+
+#### 2. Lazy loading en imagenes publicas (frontend)
+- **Archivos:** `src/pages/Productos.jsx`, `src/components/Categories.jsx`, `src/components/UniquePieces.jsx`, `src/components/Worldwide.jsx`, `src/components/About.jsx`
+- Se agrego `loading="lazy"` a todas las etiquetas `<img>` de componentes publicos.
+- El navegador solo descarga las imagenes visibles en pantalla, el resto se carga al hacer scroll.
+
+#### 3. Thumbnails en listados (frontend)
+- **Archivo nuevo:** `src/utils/imageUtils.js`
+- Se creo la funcion `getThumb(url)` que deriva la URL del thumbnail a partir de la imagen principal (`uuid.webp` → `uuid_thumb.webp`). Para imagenes legacy (no webp) devuelve la misma URL.
+- **Archivos modificados:** `src/pages/Productos.jsx`, `src/components/Categories.jsx`, `src/components/UniquePieces.jsx`
+- Los listados de productos, categorias y piezas unicas ahora cargan el **thumbnail** (~10-15KB) en vez de la imagen completa.
+- El popup de detalle de producto sigue cargando la **imagen completa** (1200px).
+
+#### 4. Popup de eliminacion de categorias (admin)
+- **Archivos:** `src/pages/admin/AdminCategories.jsx`, `src/styles/admin.css`
+- Se agrego boton de eliminar (icono basura) en cada tarjeta de categoria en la pestana "Tipos de categorias".
+- Al hacer clic se abre un popup de confirmacion con:
+  - Icono de advertencia (triangulo amarillo).
+  - Nombre de la categoria a eliminar.
+  - Aviso destacado: se eliminaran todos los productos dentro de la categoria (muestra cantidad exacta).
+  - Botones "Cancelar" y "Eliminar".
+- Se muestra el conteo de productos en cada tarjeta de categoria.
+- Al confirmar, se eliminan la categoria y todos sus productos asociados.
+- Estilos responsive: en movil los botones se apilan verticalmente y el popup se ajusta al ancho.
+
+#### 5. Script de migracion de imagenes existentes
+- **Archivo nuevo:** `backend/src/scripts/migrate-images.js`
+- Script para convertir imagenes existentes (JPG/PNG) a WebP + generar thumbnails.
+- Actualiza las URLs en la base de datos automaticamente.
+- No borra los archivos originales por seguridad.
+- Uso: `node src/scripts/migrate-images.js` (en el VPS).
+
+#### 6. Configuracion NGINX
+- Se agrego `client_max_body_size 5M` en `/etc/nginx/sites-enabled/makuk` para permitir subida de imagenes de hasta 5MB (antes usaba el default de 1MB, causando error 413).
+
+#### 7. Limpieza de base de datos
+- Se ejecuto `TRUNCATE TABLE products` para vaciar todos los productos de prueba (11 registros).
+- Se eliminaron todas las imagenes del directorio `/var/www/makuk/uploads/` (13 archivos).
+- Auto_increment reiniciado a 1.
+
+### Rama y deploy
+- Se creo rama `Imagenes_productos`, se hicieron 2 commits y se mergeo a `main` via fast-forward.
+- Deploy completo: backend (sharp instalado, PM2 reiniciado) + frontend (build y copia a `/var/www/makuk/frontend/build/`).
+
+---
+
 ## 2026-03-01
 
 ### Resumen del dia
@@ -714,3 +776,60 @@ Auditoria completa de seguridad del backend, optimizacion del frontend con lazy 
 |------|------------|
 | `9cc6527` | Auditoria: seguridad backend, lazy loading, tests, backups y docs |
 | `556133b` | Popup producto: diseño lightbox con imagen destacada, info en dos columnas y precios |
+
+---
+
+## 2026-03-05 - Rediseno Popup de Producto
+
+### Resumen del dia
+Rediseno completo del popup de detalle de producto: layout cuadrado con dos columnas (imagen + info), imagen paneable con mouse/touch, y tooltip de ayuda para el usuario.
+
+### Cambios realizados
+
+#### 1. Popup cuadrado con dos columnas (desktop)
+- **Archivos:** `src/pages/Productos.jsx`, `src/styles/productos.css`
+- Popup cambiado de vertical (imagen arriba, info abajo) a horizontal con dos columnas.
+- Tamano fijo: 480x320px, todos los popups del mismo tamano.
+- **Columna izquierda (60%):** imagen del producto con `object-fit: cover`, ocupa todo el espacio.
+- **Columna derecha (40%):** nombre (arriba), descripcion (medio, centrada verticalmente), precios anterior y actual (abajo, separados izquierda/derecha).
+- Precio anterior tachado solo aparece si existe y es diferente al actual.
+
+#### 2. Layout movil del popup
+- **Archivos:** `src/pages/Productos.jsx`, `src/styles/productos.css`
+- En movil (<500px) el popup cambia a vertical: imagen arriba (220px de alto).
+- Debajo de la imagen: fila con nombre a la izquierda y descripcion a la derecha.
+- Precios centrados en fila inferior, antes y despues lado a lado.
+
+#### 3. Imagen paneable (drag to move)
+- **Archivo:** `src/pages/Productos.jsx`
+- Implementado sistema de paneo de imagen dentro del popup.
+- **Desktop:** click y arrastrar con el mouse (cursor grab/grabbing).
+- **Movil:** tocar y deslizar con el dedo.
+- Solo permite movimiento en el eje donde la imagen tiene recorte (horizontal si es mas ancha, vertical si es mas alta).
+- Al cerrar y reabrir el popup, la imagen siempre vuelve a su posicion original centrada (50% 50%).
+- Usa `useRef` para el estado del paneo sin causar re-renders.
+
+#### 4. Icono de ayuda con tooltip
+- **Archivos:** `src/pages/Productos.jsx`, `src/styles/productos.css`
+- Icono de manito (`fa-hand-paper`) arriba a la derecha de la imagen, boton circular blanco semitransparente.
+- Al apretar muestra tooltip oscuro con mensaje contextual:
+  - Desktop: "Haz click y arrastra para mover la imagen"
+  - Movil: "Mantene presionada la imagen y desliza para moverla"
+- Tooltip se oculta/muestra con toggle al apretar el icono.
+- Se resetea al abrir un nuevo popup.
+- Estilos: `.popup-pan-hint-btn` (boton), `.popup-pan-tooltip` (mensaje).
+
+### Archivos modificados
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `src/pages/Productos.jsx` | Popup dos columnas, pan de imagen, tooltip de ayuda |
+| `src/styles/productos.css` | Layout cuadrado, columnas, grab cursor, hint btn, tooltip, responsive |
+
+### Commits de la sesion
+| Hash | Descripcion |
+|------|------------|
+| `0dbc92f` | Popup producto: diseno cuadrado con dos columnas, imagen paneable y tooltip de ayuda |
+
+### Deploy
+- **Push:** GitHub `origin/main`
+- **VPS:** Deploy exitoso via `ssh makuk` → git pull + build + deploy

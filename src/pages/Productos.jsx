@@ -73,8 +73,8 @@ function Productos() {
   const [orden, setOrden] = useState('destacados');
   const [popupProducto, setPopupProducto] = useState(null);
   const [popupZoom, setPopupZoom] = useState(1);
-  const [popupPosX, setPopupPosX] = useState(50);
-  const [popupPosY, setPopupPosY] = useState(50);
+  const [popupPanX, setPopupPanX] = useState(0);
+  const [popupPanY, setPopupPanY] = useState(0);
 
   const formatearPrecio = (valor) => {
     return '$' + Math.round(valor).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -131,16 +131,16 @@ function Productos() {
   useEffect(() => {
     if (popupProducto) {
       setPopupZoom(popupProducto.imageZoom ?? 1);
-      setPopupPosX(popupProducto.imagePosX ?? 50);
-      setPopupPosY(popupProducto.imagePosY ?? 50);
+      setPopupPanX(0);
+      setPopupPanY(0);
     }
   }, [popupProducto]);
 
   const popupMoveImg = (axis, delta) => {
     if (axis === 'x') {
-      setPopupPosX(prev => Math.max(0, Math.min(100, prev + delta)));
+      setPopupPanX(prev => Math.max(-50, Math.min(50, prev + delta)));
     } else {
-      setPopupPosY(prev => Math.max(0, Math.min(100, prev + delta)));
+      setPopupPanY(prev => Math.max(-50, Math.min(50, prev + delta)));
     }
   };
 
@@ -227,10 +227,11 @@ function Productos() {
                 </button>
                 <div className="producto-popup-img">
                   <div className="popup-img-pan-wrapper" style={{
-                    transform: `scale(${popupZoom})`,
-                    transformOrigin: `${popupPosX}% ${popupPosY}%`,
+                    transform: `scale(${popupZoom}) translate(${popupPanX}%, ${popupPanY}%)`,
                   }}>
-                    <img src={popupProducto.imagen} alt={popupProducto.nombre} />
+                    <img src={popupProducto.imagen} alt={popupProducto.nombre} style={{
+                      objectPosition: `${popupProducto.imagePosX ?? 50}% ${popupProducto.imagePosY ?? 50}%`,
+                    }} />
                   </div>
                 </div>
                 <button type="button" className="popup-arrow" onClick={() => popupMoveImg('x', 5)}>
