@@ -7,6 +7,54 @@
 
 ---
 
+## 2026-03-10
+
+### Resumen del dia
+Correccion completa del sistema de movimiento/zoom de imagenes: migracion global de `objectPosition` a `translate()` en todas las vistas (admin, publicas, popup). Flechas simplificadas, touch drag en movil, y tarjetas admin igualadas a las publicas.
+
+### Cambios realizados
+
+#### 1. Fix flechas popup producto - cambio a translate()
+- **Archivo:** `src/pages/Productos.jsx`
+- Se corrigio el sistema de movimiento de imagen en el popup publico.
+- Se reemplazo `transform-origin` por `translate()` para evitar el bloqueo entre ejes (mover en X bloqueaba Y y viceversa).
+- El zoom ya no resetea la posicion de la imagen.
+- Al cerrar el popup, la posicion y zoom vuelven a su estado original.
+
+#### 2. Estilo flechas popup simplificado
+- **Archivo:** `src/styles/productos.css`
+- Se removio el fondo circular (`background`, `border`, `border-radius: 50%`) de las flechas del popup.
+- Ahora son solo iconos sin envoltorio visual.
+- Se redujo el gap entre flechas e imagen de 4px a 2px para acercarlas mas.
+
+#### 3. Touch drag en movil para popup producto
+- **Archivo:** `src/pages/Productos.jsx`
+- Se agrego soporte de arrastre con dedo (touch) solo en dispositivos moviles (`isMobile`).
+- Se usa `onTouchStart`, `onTouchMove`, `onTouchEnd` en el contenedor de la imagen.
+- Sensibilidad ajustada a 0.15 para movimiento suave.
+- `touchAction: none` en movil para evitar scroll del navegador al arrastrar.
+- Las flechas se mantienen disponibles en ambos modos (desktop y movil).
+
+#### 4. Migracion global de objectPosition a translate()
+- **Archivos:** `src/pages/admin/AdminCategories.jsx`, `src/pages/admin/AdminUniquePieces.jsx`, `src/components/Categories.jsx`, `src/components/UniquePieces.jsx`, `src/pages/Productos.jsx`, `src/styles/admin.css`, `src/styles/secciones.css`, `src/styles/productos.css`
+- Se elimino el uso de `objectPosition` + `transform: scale()` directamente en `<img>` en todas las vistas.
+- Se introdujeron wrapper divs con `transform: scale(zoom) translate(tx, ty)` donde `tx = 50 - imagePosX` y `ty = 50 - imagePosY`.
+- Esto resuelve el bloqueo entre ejes que ocurria con `objectPosition` (solo mueve donde hay exceso de contenido).
+- CSS variables `--img-zoom`, `--img-tx`, `--img-ty` para animaciones de hover en paginas publicas.
+- Heights responsive movidos de `img` a los wrappers correspondientes.
+
+#### 5. Tarjetas admin igualadas a pagina publica
+- **Archivo:** `src/styles/admin.css`
+- Grid de tarjetas admin cambiado de 5 columnas a 4 columnas con gap de 20px.
+- Imagen de tarjetas con `height: 180px` fijo (igual que pagina publica).
+- Tarjetas de tipo de categoria y de productos con misma proporcion visual.
+
+### Deploy
+- Commits: `e85c63b`, `b841455`, `6674929`, `13243f6`, `dba4fd3`, `4f24dd7`.
+- Deploy completo al VPS en cada commit: git pull + build + copia a `/var/www/makuk/frontend/build/`.
+
+---
+
 ## 2026-03-08
 
 ### Resumen del dia
