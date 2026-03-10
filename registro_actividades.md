@@ -7,6 +7,18 @@
 
 ---
 
+## 2026-03-10 (sesion 2)
+
+### Cambios realizados
+
+#### Fix: seccion piezas unicas no se mostraba en pagina principal
+- **Archivo:** `src/components/UniquePieces.jsx`
+- La seccion tenia un `return null` cuando no habia items destacados, lo que ocultaba toda la seccion (titulo, subtitulo, link).
+- Se cambio para que la seccion siempre se muestre (igual que Categories), y solo las tarjetas se oculten si no hay productos destacados.
+- **Nota:** los productos de piezas unicas deben tener `destacado = 1` en la BD para aparecer en el home. Se activa desde Admin → Piezas Unicas.
+
+---
+
 ## 2026-03-10
 
 ### Resumen del dia
