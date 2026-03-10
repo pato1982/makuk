@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -144,6 +144,33 @@ function Productos() {
     }
   };
 
+  // Touch drag para móvil
+  const touchRef = useRef(null);
+  const popupImgRef = useRef(null);
+
+  const handleTouchStart = useCallback((e) => {
+    if (!isMobile) return;
+    const touch = e.touches[0];
+    touchRef.current = { x: touch.clientX, y: touch.clientY };
+  }, [isMobile]);
+
+  const handleTouchMove = useCallback((e) => {
+    if (!isMobile || !touchRef.current) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const dx = touch.clientX - touchRef.current.x;
+    const dy = touch.clientY - touchRef.current.y;
+    touchRef.current = { x: touch.clientX, y: touch.clientY };
+
+    const sensitivity = 0.15;
+    setPopupPanX(prev => Math.max(-50, Math.min(50, prev + dx * sensitivity)));
+    setPopupPanY(prev => Math.max(-50, Math.min(50, prev + dy * sensitivity)));
+  }, [isMobile]);
+
+  const handleTouchEnd = useCallback(() => {
+    touchRef.current = null;
+  }, []);
+
   const titulo = categoriaFiltro === 'todos'
     ? 'Todos los Productos'
     : nombresCategorias[categoriaFiltro] || 'Productos';
@@ -225,7 +252,14 @@ function Productos() {
                 <button type="button" className="popup-arrow" onClick={() => popupMoveImg('x', -5)}>
                   <i className="fas fa-chevron-left"></i>
                 </button>
-                <div className="producto-popup-img">
+                <div
+                  className="producto-popup-img"
+                  ref={popupImgRef}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                  style={{ touchAction: isMobile ? 'none' : 'auto' }}
+                >
                   <div className="popup-img-pan-wrapper" style={{
                     transform: `scale(${popupZoom}) translate(${popupPanX}%, ${popupPanY}%)`,
                   }}>
