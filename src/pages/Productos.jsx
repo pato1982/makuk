@@ -22,10 +22,13 @@ function ProductoCard({ producto, onImageClick }) {
   return (
     <div className="producto-card">
       <div className="producto-img" onClick={() => onImageClick(producto)} style={{ cursor: 'pointer' }}>
-        <img src={getThumb(producto.imagen)} alt={producto.nombre} loading="lazy" style={{
-          objectPosition: `${producto.imagePosX ?? 50}% ${producto.imagePosY ?? 50}%`,
+        <div className="producto-img-wrapper" style={{
           '--img-zoom': producto.imageZoom ?? 1,
-        }} />
+          '--img-tx': `${50 - (producto.imagePosX ?? 50)}%`,
+          '--img-ty': `${50 - (producto.imagePosY ?? 50)}%`,
+        }}>
+          <img src={getThumb(producto.imagen)} alt={producto.nombre} loading="lazy" />
+        </div>
       </div>
       <div className="producto-info">
         <h4>{producto.nombre}</h4>
@@ -261,11 +264,9 @@ function Productos() {
                   style={{ touchAction: isMobile ? 'none' : 'auto' }}
                 >
                   <div className="popup-img-pan-wrapper" style={{
-                    transform: `scale(${popupZoom}) translate(${popupPanX}%, ${popupPanY}%)`,
+                    transform: `scale(${popupZoom}) translate(${(50 - (popupProducto.imagePosX ?? 50)) + popupPanX}%, ${(50 - (popupProducto.imagePosY ?? 50)) + popupPanY}%)`,
                   }}>
-                    <img src={popupProducto.imagen} alt={popupProducto.nombre} style={{
-                      objectPosition: `${popupProducto.imagePosX ?? 50}% ${popupProducto.imagePosY ?? 50}%`,
-                    }} />
+                    <img src={popupProducto.imagen} alt={popupProducto.nombre} />
                   </div>
                 </div>
                 <button type="button" className="popup-arrow" onClick={() => popupMoveImg('x', 5)}>

@@ -335,10 +335,11 @@ function AdminCategories() {
                       <div className="card-toggle-bar-knob"></div>
                     </div>
                     <div className="admin-grid-card">
-                      {prod.imagen && <img src={prod.imagen} alt={prod.nombre} className="admin-grid-card-img" style={{
-                        objectPosition: `${prod.imagePosX ?? 50}% ${prod.imagePosY ?? 50}%`,
-                        transform: `scale(${prod.imageZoom ?? 1})`,
-                      }} />}
+                      {prod.imagen && <div className="admin-grid-card-img-wrapper" style={{
+                        transform: `scale(${prod.imageZoom ?? 1}) translate(${50 - (prod.imagePosX ?? 50)}%, ${50 - (prod.imagePosY ?? 50)}%)`,
+                      }}>
+                        <img src={prod.imagen} alt={prod.nombre} className="admin-grid-card-img" />
+                      </div>}
                       <div className="admin-grid-card-info">
                         <span className="admin-grid-card-name">{prod.nombre}</span>
                         <span className="admin-grid-card-slug">${prod.precioActual?.toLocaleString()}</span>
@@ -432,14 +433,14 @@ function AdminCategories() {
                       </button>
                       <div className="img-editor-preview">
                         {imgUploading && <div className="img-editor-loading"><i className="fas fa-spinner fa-spin"></i></div>}
-                        <img
-                          src={getEditingProduct().imagen}
-                          alt="Preview"
-                          style={{
-                            objectPosition: `${getEditingProduct().imagePosX ?? 50}% ${getEditingProduct().imagePosY ?? 50}%`,
-                            transform: `scale(${getEditingProduct().imageZoom ?? 1})`,
-                          }}
-                        />
+                        <div className="img-editor-wrapper" style={{
+                          transform: `scale(${getEditingProduct().imageZoom ?? 1}) translate(${50 - (getEditingProduct().imagePosX ?? 50)}%, ${50 - (getEditingProduct().imagePosY ?? 50)}%)`,
+                        }}>
+                          <img
+                            src={getEditingProduct().imagen}
+                            alt="Preview"
+                          />
+                        </div>
                       </div>
                       <button type="button" className="img-editor-arrow" onClick={() => updateProduct(editProduct, 'imagePosX', Math.min(100, (getEditingProduct().imagePosX ?? 50) + 5))}>
                         <i className="fas fa-chevron-right"></i>

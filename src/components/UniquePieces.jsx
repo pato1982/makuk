@@ -24,10 +24,13 @@ function UniquePieces() {
           {items.map((pieza, index) => (
             <div key={index} className="unique-card">
               <div className="unique-img">
-                <img src={getThumb(pieza.imagen)} alt={pieza.nombre} loading="lazy" style={{
-                  objectPosition: `${pieza.imagePosX ?? 50}% ${pieza.imagePosY ?? 50}%`,
+                <div className="unique-img-wrapper" style={{
                   '--img-zoom': pieza.imageZoom ?? 1,
-                }} />
+                  '--img-tx': `${50 - (pieza.imagePosX ?? 50)}%`,
+                  '--img-ty': `${50 - (pieza.imagePosY ?? 50)}%`,
+                }}>
+                  <img src={getThumb(pieza.imagen)} alt={pieza.nombre} loading="lazy" />
+                </div>
               </div>
               <h4>{pieza.nombre}</h4>
             </div>

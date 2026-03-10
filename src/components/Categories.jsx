@@ -35,10 +35,13 @@ function Categories() {
                   {(() => {
                     const portada = getPortada(cat.slug);
                     return portada ? (
-                      <img src={getThumb(portada.imagen)} alt={cat.nombre} loading="lazy" style={{
-                        objectPosition: `${portada.imagePosX ?? 50}% ${portada.imagePosY ?? 50}%`,
+                      <div className="category-img-wrapper" style={{
                         '--img-zoom': portada.imageZoom ?? 1,
-                      }} />
+                        '--img-tx': `${50 - (portada.imagePosX ?? 50)}%`,
+                        '--img-ty': `${50 - (portada.imagePosY ?? 50)}%`,
+                      }}>
+                        <img src={getThumb(portada.imagen)} alt={cat.nombre} loading="lazy" />
+                      </div>
                     ) : (
                       <div className="category-img-placeholder"><i className="fas fa-image"></i></div>
                     );
