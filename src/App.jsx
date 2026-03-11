@@ -24,6 +24,7 @@ const AdminFooter = lazy(() => import('./pages/admin/AdminFooter'));
 const AdminProducts = lazy(() => import('./pages/admin/AdminProducts'));
 const AdminProductsPage = lazy(() => import('./pages/admin/AdminProductsPage'));
 const AdminControl = lazy(() => import('./pages/admin/AdminControl'));
+const FlowTestPage = lazy(() => import('./pages/flow/FlowTestPage'));
 
 // Importar estilos
 import './styles/variables.css';
@@ -44,6 +45,9 @@ function App() {
               {/* Public */}
               <Route path="/" element={<Home />} />
               <Route path="/productos" element={<Productos />} />
+
+              {/* Flow API Tester */}
+              <Route path="/flow-test" element={<Suspense fallback={<div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh',background:'#0f1117',color:'#e4e4e7'}}>Cargando Flow API Tester...</div>}><FlowTestPage /></Suspense>} />
 
               {/* Admin (lazy loaded) */}
                 <Route path="/admin/login" element={<Suspense fallback={<div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh'}}>Cargando...</div>}><Login /></Suspense>} />
