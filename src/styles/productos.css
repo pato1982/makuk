@@ -1396,7 +1396,7 @@
 }
 
 /* Móvil */
-@media (max-width: 500px) {
+@media (max-width: 699px) {
     .producto-popup {
         width: 92vw;
         height: auto;

@@ -828,6 +828,17 @@
   object-fit: contain;
 }
 
+.about-general-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+.about-general-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .about-image-preview {
   margin-top: 12px;
   text-align: center;
@@ -2727,7 +2738,7 @@
 
   .admin-main {
     margin-left: 0;
-    padding: 60px 12px 24px;
+    padding: 60px 30px 24px;
     width: 100%;
     box-sizing: border-box;
     overflow-x: hidden;
@@ -2784,17 +2795,121 @@
     display: inline;
   }
 
-  /* Ventas tablet */
+  /* Ventas tablet — mantener dos columnas */
   .ventas-layout {
-    flex-direction: column;
+    flex-direction: row;
+    gap: 14px;
+  }
+
+  .ventas-table-col {
+    flex: 1;
+    min-width: 0;
   }
 
   .ventas-detail-col {
-    position: static;
+    flex: 1;
+    min-width: 0;
+    position: sticky;
+    top: 20px;
   }
 
   .ventas-cell-customer {
     display: none;
+  }
+
+  .ventas-table {
+    font-size: 0.78rem;
+  }
+
+  .ventas-table thead th {
+    padding: 8px 8px;
+    font-size: 0.68rem;
+  }
+
+  .ventas-table td {
+    padding: 9px 8px;
+  }
+
+  .ventas-cell-date {
+    font-size: 0.72rem;
+  }
+
+  .ventas-cell-order {
+    font-size: 0.75rem;
+  }
+
+  .ventas-status-btn {
+    padding: 4px 8px;
+    font-size: 0.68rem;
+    width: 105px;
+  }
+
+  .ventas-detail-header-status {
+    font-size: 0.7rem;
+  }
+
+  .ventas-detail-tab {
+    padding: 7px 12px;
+    font-size: 0.72rem;
+  }
+
+  .ventas-detail-section-title {
+    font-size: 0.65rem;
+  }
+
+  .ventas-detail-row {
+    font-size: 0.7rem;
+  }
+
+  .ventas-detail-label {
+    font-size: 0.62rem;
+  }
+
+  .ventas-detail-shipping-notes {
+    font-size: 0.7rem;
+  }
+
+  .ventas-detail-item-name {
+    font-size: 0.7rem;
+  }
+
+  .ventas-detail-item-qty {
+    font-size: 0.58rem;
+  }
+
+  .ventas-detail-item-price {
+    font-size: 0.7rem;
+  }
+
+  .ventas-detail-total-row {
+    font-size: 0.7rem;
+  }
+
+  .ventas-detail-total-final {
+    font-size: 0.78rem;
+  }
+
+  .ventas-detail-date {
+    font-size: 0.62rem;
+  }
+
+  /* About: General en dos columnas */
+  .about-general-layout {
+    flex-direction: row;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .about-general-fields {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .about-image-preview {
+    flex: 1;
+    min-width: 0;
+    margin-top: 0;
+    max-height: 300px;
   }
 }
 

@@ -192,6 +192,10 @@
         height: 50vh;
     }
 
+    .hero-content {
+        margin-top: 65px;
+    }
+
     .hero-content h2 {
         font-size: 3rem;
     }

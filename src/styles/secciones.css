@@ -929,4 +929,8 @@
         gap: 0;
         padding: 30px;
     }
+
+    .testimonials {
+        margin-top: -40px;
+    }
 }

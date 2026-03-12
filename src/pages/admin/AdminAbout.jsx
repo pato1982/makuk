@@ -62,15 +62,17 @@ function AdminAbout() {
       <div className="admin-tab-content">
         {tab === 'general' && (
           <AdminCard title="General">
-            <div className="admin-row">
-              <AdminFormField label="Título" value={data.title} onChange={(v) => setData({ ...data, title: v })} />
-              <ImageUploader label="Imagen principal" value={data.image} onChange={(v) => setData({ ...data, image: v })} noPreview />
-            </div>
-            {data.image && (
-              <div className="about-image-preview">
-                <img src={data.image} alt="Preview" />
+            <div className="about-general-layout">
+              <div className="about-general-fields">
+                <AdminFormField label="Título" value={data.title} onChange={(v) => setData({ ...data, title: v })} />
+                <ImageUploader label="Imagen principal" value={data.image} onChange={(v) => setData({ ...data, image: v })} noPreview />
               </div>
-            )}
+              {data.image && (
+                <div className="about-image-preview">
+                  <img src={data.image} alt="Preview" />
+                </div>
+              )}
+            </div>
           </AdminCard>
         )}
 
