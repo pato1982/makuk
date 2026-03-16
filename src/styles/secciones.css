@@ -54,7 +54,7 @@
 }
 
 .category-img {
-    height: 180px;
+    height: 220px;
     overflow: hidden;
     background: var(--cream-dark);
     display: flex;

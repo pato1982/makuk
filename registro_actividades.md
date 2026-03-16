@@ -7,6 +7,155 @@
 
 ---
 
+## 2026-03-16
+
+### Resumen del dia
+Correccion de conexion API para desarrollo local y unificacion visual de tarjetas entre pagina publica y panel admin.
+
+### Cambios realizados
+
+#### 1. Fix conexion API en desarrollo local
+- **Archivos:** `vite.config.js`, `.env`
+- El proxy de Vite enviaba peticiones HTTP a la IP del VPS, pero NGINX redirige HTTP→HTTPS para makuk.cl, causando que la API fallara silenciosamente.
+- Se configuro proxy con HTTPS + `secure: false` + header `Host: makuk.cl`.
+- Se removio `VITE_API_URL` del `.env` para que las peticiones pasen por el proxy de Vite.
+
+#### 2. Admin: esperar datos reales antes de renderizar
+- **Archivo:** `src/pages/admin/AdminLayout.jsx`
+- Los componentes admin inicializaban `useState` con datos de `content.json` (fallback) antes de que la API respondiera, mostrando datos falsos.
+- Se agrego spinner en AdminLayout que bloquea el `<Outlet />` hasta que `contentLoading` sea false, garantizando que todos los admin se montan con datos reales de la BD.
+
+#### 3. Unificacion visual de tarjetas
+- **Archivos:** `src/styles/secciones.css`, `src/styles/admin.css`, `src/styles/productos.css`
+- Altura de imagen en tarjetas de colecciones: 180px → 220px.
+- Tarjetas admin igualadas a 220px con `object-fit: cover`.
+- Tarjetas de productos dentro de categorias: imagen 180px → 220px, grid de 4 a 5 columnas, gap de 30px a 20px.
+
+#### 4. BD: ampliar columnas de precio
+- Se cambio `precio_actual` y `precio_anterior` de `INT` a `BIGINT` en la tabla `products` para evitar errores de rango.
+
+---
+
+## 2026-03-12
+
+### Resumen del dia
+Ajustes responsive en modo tablet (700px - 1100px) para el panel de administracion y la pagina principal. Se trabajo en rama `responsive_pendientes` y se mergeo a `main`.
+
+### Breakpoints definidos
+| Modo | Rango |
+|------|-------|
+| Desktop | 1101px+ (estilos base) |
+| Tablet | 700px - 1100px |
+| Movil | 0px - 699px |
+
+### Cambios realizados
+
+#### 1. Unificacion de breakpoints
+- **Archivo:** `src/styles/productos.css`
+- Se integro el breakpoint `max-width: 500px` del popup de producto al breakpoint movil estandar `max-width: 699px`.
+- Todos los archivos CSS ahora usan exclusivamente los 3 breakpoints definidos.
+
+#### 2. Ventas admin: layout dos columnas en tablet
+- **Archivo:** `src/styles/admin.css`
+- En tablet, la seccion Registro de Ventas mantiene dos columnas (tabla izquierda + detalle derecha) en vez de apilarse como en movil.
+- Proporciones 50/50, columna de detalle sticky.
+- Tamaños de fuente ajustados para tablet.
+
+#### 3. Footer admin: campos de contacto en misma fila
+- **Archivos:** `src/pages/admin/AdminFooter.jsx`, `src/styles/admin.css`
+- Email, WhatsApp y Telefono ahora estan en la misma fila (`admin-row`) en desktop y tablet.
+- En movil se apilan verticalmente.
+
+#### 4. Admin: padding lateral en tablet
+- **Archivo:** `src/styles/admin.css`
+- Padding lateral de `.admin-main` aumentado de 12px a 30px en tablet para dar margen con los bordes.
+
+#### 5. About admin: pestaña General en dos columnas (tablet)
+- **Archivos:** `src/pages/admin/AdminAbout.jsx`, `src/styles/admin.css`
+- Nuevo layout `.about-general-layout`: en tablet muestra columna izquierda (Titulo + ImageUploader) y columna derecha (preview de la imagen).
+- En desktop y movil se mantiene apilado verticalmente.
+
+#### 6. Footer publico: mas margen en columna Colecciones (tablet)
+- **Archivo:** `src/styles/footer.css`
+- `.footer-links-col` con `padding-left: 60px` en tablet para separar de la columna izquierda.
+
+#### 7. Hero: contenido baja en tablet
+- **Archivo:** `src/styles/hero.css`
+- `.hero-content` con `margin-top: 65px` en tablet para separar el titulo de la navegacion.
+
+#### 8. Testimonios: seccion mas arriba en tablet
+- **Archivo:** `src/styles/secciones.css`
+- `.testimonials` con `margin-top: -40px` en tablet para acercar al contenido superior.
+
+### Rama y deploy
+- Rama `responsive_pendientes` creada, commit `e8f0c2b`, merge fast-forward a `main`.
+- Push a GitHub y deploy al VPS exitoso.
+
+### Archivos modificados
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `src/styles/admin.css` | Ventas tablet 2 columnas, padding lateral, about layout |
+| `src/styles/productos.css` | Breakpoint 500px integrado a 699px |
+| `src/styles/footer.css` | Margen columna links tablet |
+| `src/styles/hero.css` | Margin-top hero content tablet |
+| `src/styles/secciones.css` | Testimonios margin-top tablet |
+| `src/pages/admin/AdminAbout.jsx` | Layout dos columnas pestaña general |
+| `src/pages/admin/AdminFooter.jsx` | Campos contacto en admin-row |
+
+---
+
+## 2026-03-10 (sesion 3)
+
+### Resumen del dia
+Implementacion del sistema de Registro de Ventas en el panel admin y modal de seguimiento de orden en la pagina publica.
+
+### Cambios realizados
+
+#### 1. Pestanas en seccion Control del admin
+- **Archivo:** `src/pages/admin/AdminControl.jsx`
+- Se dividio la seccion Control en dos pestanas: **Control de Contenido** (stats, almacenamiento, estado del sistema) y **Registro de Ventas**.
+- Se usa el mismo sistema de pestanas (`admin-tabs`) que el resto del admin.
+
+#### 2. Registro de Ventas - Tabla de ordenes
+- **Archivo:** `src/pages/admin/AdminControl.jsx`, `src/styles/admin.css`
+- Layout 3/5 (tabla) + 2/5 (detalle).
+- Tabla con columnas: Fecha, Orden, Estado.
+- Estado con dropdown de 4 opciones: Pendiente, Fabricando, Enviado, Entregado (cada uno con color e icono).
+- Dropdown con ancho fijo para flechas alineadas.
+- Se cierra al hacer clic fuera.
+- Datos mock locales (sin conexion a BD aun).
+
+#### 3. Panel de detalle de orden (columna derecha)
+- Titulo muestra numero de orden a la izquierda y estado a la derecha en la misma fila.
+- Dos pestanas internas: **Cliente** y **Compra**.
+- **Cliente:** nombre, RUT, email, telefono, direccion (en dos lineas: calle + ciudad/region), direccion de despacho, detalles de envio (texto libre del cliente).
+- **Compra:** listado de productos con cantidad y precio, subtotal, IVA 19%, costo de envio, total.
+- Textos compactos para reducir altura de la columna.
+
+#### 4. Layout ancho completo
+- **Archivo:** `src/styles/admin.css`
+- Se elimino el `max-width: 900px` de `.admin-page` para que todas las secciones del admin usen el ancho completo disponible.
+
+#### 5. Modal de seguimiento de orden (pagina publica)
+- **Archivos:** `src/components/TrackingModal.jsx`, `src/components/Header.jsx`, `src/styles/productos.css`
+- Nuevo icono de caja (`fa-box-open`) en el header publico, al lado del icono de inicio de sesion.
+- Al hacer clic abre modal con campo de busqueda por numero de orden.
+- Titulo "Seguimiento de orden" a la izquierda, input + boton buscar a la derecha.
+- Si la orden existe muestra: timeline visual de 4 estados (puntos con iconos coloreados y lineas de progreso), info de la orden, productos comprados, totales (subtotal, IVA, envio, total).
+- Si no existe muestra error.
+- Reutiliza estilos del modal de contacto (`contacto-modal`).
+
+#### 6. Responsive completo
+- **Tablet (700-1100px):** layout ventas se apila verticalmente, columna cliente oculta en tabla.
+- **Movil (0-699px):** tabla con 3 columnas (fecha, orden, estado) a ancho completo con `table-layout: fixed`, textos reducidos en toda la vista, panel detalle apilado debajo. Modal de seguimiento: titulo e input apilados, timeline y textos mas pequenos.
+
+### Deploy
+- **Commit:** `82b94fb`
+- **Push:** GitHub `origin/main`
+- **VPS:** Deploy exitoso via `ssh makuk` → git pull + build + deploy
+
+---
+
 ## 2026-03-10 (sesion 2)
 
 ### Cambios realizados

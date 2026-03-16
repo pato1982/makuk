@@ -7,12 +7,16 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://186.64.122.100',
+        target: 'https://186.64.122.100',
         changeOrigin: true,
+        secure: false,
+        headers: { Host: 'makuk.cl' },
       },
       '/uploads': {
-        target: 'http://186.64.122.100',
+        target: 'https://186.64.122.100',
         changeOrigin: true,
+        secure: false,
+        headers: { Host: 'makuk.cl' },
       },
     },
   },
