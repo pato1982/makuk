@@ -10,7 +10,32 @@
 ## 2026-03-16
 
 ### Resumen del dia
-Correccion de conexion API para desarrollo local y unificacion visual de tarjetas entre pagina publica y panel admin.
+Correccion de conexion API para desarrollo local, unificacion visual de tarjetas y conexion del formulario de contacto a Gmail.
+
+### Formulario de contacto conectado a Gmail
+
+#### 1. Configuracion de correo con Nodemailer
+- **Cuenta Gmail:** cobretejido@gmail.com (envio y recepcion de consultas)
+- **Contraseña de aplicacion:** configurada en `.env` del VPS
+- **Paquete:** nodemailer instalado en el backend del VPS
+
+#### 2. Backend: nueva ruta de contacto
+- **Archivos creados:**
+  - `backend/src/controllers/contactController.js` — recibe nombre, telefono, correo y mensaje, envia email via Gmail SMTP
+  - `backend/src/routes/contact.js` — ruta `POST /api/contact`
+- **Archivo modificado:** `backend/src/server.js` — registrada ruta `/api/contact`
+
+#### 3. Frontend: modal de contacto funcional
+- **Archivo:** `src/components/ContactModal.jsx`
+  - Antes solo simulaba el envio, ahora hace POST real al backend
+  - Agregado estado de carga ("Enviando..." con spinner)
+  - Agregado manejo de errores con mensaje visible
+- **Archivo:** `src/services/api.js` — nueva funcion `sendContactForm()`
+
+#### 4. Variables de entorno en VPS (`/var/www/makuk/backend/.env`)
+- `GMAIL_USER=cobretejido@gmail.com`
+- `GMAIL_APP_PASSWORD=****` (contraseña de aplicacion de Google)
+- `CONTACT_TO_EMAIL=cobretejido@gmail.com`
 
 ### Cambios realizados
 
