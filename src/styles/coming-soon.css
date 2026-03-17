@@ -1,0 +1,248 @@
+/* ========================================
+   MAKUK - Coming Soon / En Desarrollo
+   ======================================== */
+
+.coming-soon {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, var(--charcoal) 0%, var(--dark-brown) 50%, #1a0f08 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Brillo ambiental de cobre */
+.coming-soon::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  left: -20%;
+  width: 70%;
+  height: 70%;
+  background: radial-gradient(circle, rgba(184, 115, 51, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.coming-soon::after {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  right: -15%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(218, 165, 32, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Partículas flotantes */
+.cs-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.cs-particle {
+  position: absolute;
+  bottom: -10px;
+  width: 3px;
+  height: 3px;
+  background: var(--copper-shine);
+  border-radius: 50%;
+  opacity: 0;
+  animation: particleFloat linear infinite;
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(0) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.2;
+  }
+  100% {
+    transform: translateY(-100vh) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Contenido */
+.cs-content {
+  text-align: center;
+  padding: 40px 24px;
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 1s ease, transform 1s ease;
+}
+
+.coming-soon.loaded .cs-content {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Marca */
+.cs-brand {
+  margin-bottom: 50px;
+}
+
+.cs-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3.5rem, 10vw, 6rem);
+  font-weight: 600;
+  letter-spacing: 0.35em;
+  background: linear-gradient(
+    135deg,
+    var(--copper-dark) 0%,
+    var(--copper-light) 25%,
+    var(--copper-shine) 50%,
+    var(--copper-light) 75%,
+    var(--copper-dark) 100%
+  );
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 6s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.cs-divider {
+  width: 100px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--copper-shine), transparent);
+  margin: 20px auto;
+}
+
+.cs-tagline {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(0.85rem, 2.5vw, 1.1rem);
+  font-weight: 300;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--copper-metallic);
+}
+
+/* Mensaje */
+.cs-message {
+  margin-bottom: 45px;
+}
+
+.cs-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 500;
+  color: var(--cream);
+  margin-bottom: 18px;
+}
+
+.cs-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(0.9rem, 2vw, 1.05rem);
+  font-weight: 300;
+  line-height: 1.8;
+  color: var(--copper-metallic);
+  max-width: 520px;
+  margin: 0 auto;
+  opacity: 0.85;
+}
+
+/* Ornamento decorativo */
+.cs-ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 45px;
+}
+
+.cs-line {
+  width: 50px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--copper) 50%, transparent);
+}
+
+.cs-icon {
+  color: var(--copper-shine);
+  font-size: 0.85rem;
+  opacity: 0.7;
+  animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+/* Redes sociales */
+.cs-social {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+}
+
+.cs-social a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(184, 115, 51, 0.3);
+  border-radius: 50%;
+  color: var(--copper-metallic);
+  font-size: 1.15rem;
+  transition: all 0.4s ease;
+}
+
+.cs-social a:hover {
+  border-color: var(--copper-shine);
+  color: var(--copper-shine);
+  background: rgba(184, 115, 51, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(184, 115, 51, 0.15);
+}
+
+/* Acceso admin (discreto) */
+.cs-admin-access {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: rgba(184, 115, 51, 0.15);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 10px;
+  transition: color 0.3s ease;
+  z-index: 2;
+}
+
+.cs-admin-access:hover {
+  color: rgba(184, 115, 51, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .cs-brand {
+    margin-bottom: 40px;
+  }
+
+  .cs-logo {
+    letter-spacing: 0.2em;
+  }
+
+  .cs-social a {
+    width: 44px;
+    height: 44px;
+  }
+}
