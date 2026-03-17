@@ -10,7 +10,7 @@
 ## 2026-03-17
 
 ### Resumen del dia
-Ajustes visuales en pagina de productos: botones mas compactos en desktop, tarjetas mas altas en movil y popup con imagen completa.
+Ajustes visuales en pagina de productos: botones mas compactos en desktop, tarjetas mas altas en movil, popup con imagen completa, margen titulo movil y ocultamiento del icono de seguimiento en header publico.
 
 ### Ajustes UI en tarjetas de productos
 
@@ -30,6 +30,15 @@ Ajustes visuales en pagina de productos: botones mas compactos en desktop, tarje
 - **Archivo:** `src/styles/productos.css` (media max-width: 699px)
 - Altura de imagen en popup paso de 180px a 260px
 - Cambiado `object-fit` de `cover` a `contain` para mostrar la imagen completa sin recorte
+
+#### 4. Movil: margen entre titulo y header en pagina de productos
+- **Archivo:** `src/styles/productos.css` (media max-width: 699px)
+- `padding-top` de `.productos-page` paso de 80px a 110px para separar el titulo del header
+
+#### 5. Ocultar icono de seguimiento en header publico
+- **Archivo:** `src/components/Header.jsx`
+- Se elimino el boton con icono de caja (`fa-box-open`) del header publico
+- El seguimiento de ordenes queda disponible solo desde el panel de administracion
 
 ---
 
