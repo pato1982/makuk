@@ -7,6 +7,32 @@
 
 ---
 
+## 2026-03-17
+
+### Resumen del dia
+Ajustes visuales en pagina de productos: botones mas compactos en desktop, tarjetas mas altas en movil y popup con imagen completa.
+
+### Ajustes UI en tarjetas de productos
+
+#### 1. Desktop: botones Comprar y cantidad mas compactos
+- **Archivo:** `src/styles/productos.css`
+- Altura de botones y selector de cantidad reducida de 38px a 28px
+- Botones +/- mas pequenos (ancho 24px, font 0.8rem)
+- Boton Comprar con font 0.7rem y letter-spacing reducido
+- Solo afecta modo desktop, movil y tablet sin cambios
+
+#### 2. Movil: tarjetas mas altas con imagenes mas grandes
+- **Archivo:** `src/styles/productos.css` (media max-width: 699px)
+- Altura de imagen en tarjetas paso de 105px a 140px
+- Las tarjetas se ven mas proporcionadas en pantallas pequenas
+
+#### 3. Movil: popup de producto con imagen completa
+- **Archivo:** `src/styles/productos.css` (media max-width: 699px)
+- Altura de imagen en popup paso de 180px a 260px
+- Cambiado `object-fit` de `cover` a `contain` para mostrar la imagen completa sin recorte
+
+---
+
 ## 2026-03-16
 
 ### Resumen del dia
