@@ -5,8 +5,12 @@ import { ContentProvider } from './context/ContentContext';
 import { AuthProvider } from './context/AuthContext';
 import Home from './pages/Home';
 import Productos from './pages/Productos';
+import ComingSoon from './pages/ComingSoon';
 import CartModal from './components/CartModal';
 import ConfirmModal from './components/ConfirmModal';
+
+// Cambiar a false para desactivar el modo "En Desarrollo"
+const COMING_SOON = true;
 
 // Admin (lazy loading - no se cargan en el bundle público)
 import ProtectedRoute from './components/admin/ProtectedRoute';
@@ -34,6 +38,7 @@ import './styles/secciones.css';
 import './styles/productos.css';
 import './styles/footer.css';
 import './styles/admin.css';
+import './styles/coming-soon.css';
 
 function App() {
   return (
@@ -43,8 +48,8 @@ function App() {
           <Router>
             <Routes>
               {/* Public */}
-              <Route path="/" element={<Home />} />
-              <Route path="/productos" element={<Productos />} />
+              <Route path="/" element={COMING_SOON ? <ComingSoon /> : <Home />} />
+              <Route path="/productos" element={COMING_SOON ? <ComingSoon /> : <Productos />} />
 
               {/* Flow API Tester */}
               <Route path="/flow-test" element={<Suspense fallback={<div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh',background:'#0f1117',color:'#e4e4e7'}}>Cargando Flow API Tester...</div>}><FlowTestPage /></Suspense>} />
