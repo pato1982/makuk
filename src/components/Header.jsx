@@ -95,13 +95,6 @@ function Header({ alwaysScrolled = false }) {
           </button>
           <button
             className="cart-icon"
-            onClick={() => setShowTrackingModal(true)}
-            aria-label="Seguimiento de orden"
-          >
-            <i className="fas fa-box-open"></i>
-          </button>
-          <button
-            className="cart-icon"
             onClick={() => navigate('/admin/login')}
             aria-label="Iniciar sesión"
           >
