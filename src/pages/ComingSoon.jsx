@@ -1,15 +1,38 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { loginApi } from '../services/api';
 import '../styles/coming-soon.css';
 
 function ComingSoon() {
-  const navigate = useNavigate();
   const [loaded, setLoaded] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const emailRef = useRef(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoaded(true), 100);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (showLogin && emailRef.current) {
+      emailRef.current.focus();
+    }
+  }, [showLogin]);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      await loginApi(email, password);
+      sessionStorage.setItem('makuk_site_unlocked', 'true');
+      window.location.reload();
+    } catch {
+      // Credenciales incorrectas: cerrar sin aviso
+      setShowLogin(false);
+      setEmail('');
+      setPassword('');
+    }
+  };
 
   return (
     <div className={`coming-soon ${loaded ? 'loaded' : ''}`}>
@@ -47,10 +70,10 @@ function ComingSoon() {
         </div>
 
         <div className="cs-social">
-          <a href="https://www.instagram.com/makuk.cl" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+          <a href="https://www.instagram.com/invites/contact/?i=1kcr0azttpohv&utm_content=1fwlfjd" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
             <i className="fab fa-instagram" />
           </a>
-          <a href="mailto:contacto@makuk.cl" aria-label="Email">
+          <a href="mailto:makukcobre@gmail.com" aria-label="Email">
             <i className="fas fa-envelope" />
           </a>
         </div>
@@ -59,11 +82,35 @@ function ComingSoon() {
       {/* Acceso admin discreto */}
       <button
         className="cs-admin-access"
-        onClick={() => navigate('/admin/login')}
+        onClick={() => setShowLogin(!showLogin)}
         aria-label="Acceso administrador"
       >
         <i className="fas fa-lock" />
       </button>
+
+      {/* Mini login oculto */}
+      {showLogin && (
+        <form className="cs-login-form" onSubmit={handleLogin}>
+          <input
+            ref={emailRef}
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button type="submit">
+            <i className="fas fa-arrow-right" />
+          </button>
+        </form>
+      )}
     </div>
   );
 }
