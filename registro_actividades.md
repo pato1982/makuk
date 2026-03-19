@@ -7,6 +7,22 @@
 
 ---
 
+## 2026-03-19
+
+### Tarjetas de productos en panel admin (pestaña Subir productos)
+
+#### 1. Imagen con zoom no tapa el nombre del producto
+- **Archivo:** `src/styles/admin.css`
+- El `transform: scale()` del zoom hacía que la imagen creciera visualmente y tapara el título debajo
+- Se agregó `position: relative`, `z-index: 1` y `background: #fff` a `.admin-grid-card-info` para que el nombre y precio siempre queden visibles por encima de la imagen
+
+#### 2. Tarjetas un poco más altas con margen imagen-título
+- **Archivo:** `src/styles/admin.css`
+- Altura de imagen en tarjetas de 220px a 240px (`.admin-grid-card-img-wrapper` y `.admin-grid-card-img`)
+- Padding de `.admin-grid-card-info` de 15px a 18px vertical para dar espacio entre imagen y nombre
+
+---
+
 ## 2026-03-17
 
 ### Resumen del dia

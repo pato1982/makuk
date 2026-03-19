@@ -1610,25 +1610,28 @@
 
 .admin-grid-card-img-wrapper {
   width: 100%;
-  height: 220px;
+  height: 240px;
   overflow: hidden;
   background: #f5f0eb;
 }
 
 .admin-grid-card-img {
   width: 100%;
-  height: 220px;
+  height: 240px;
   object-fit: cover;
   object-position: center;
   display: block;
 }
 
 .admin-grid-card-info {
-  padding: 15px;
+  padding: 18px 15px;
   text-align: center;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  position: relative;
+  z-index: 1;
+  background: #fff;
 }
 
 .admin-grid-card-name {
