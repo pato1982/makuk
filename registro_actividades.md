@@ -7,6 +7,353 @@
 
 ---
 
+## 2026-03-19
+
+### Tarjetas de productos en panel admin (pestaña Subir productos)
+
+#### 1. Imagen con zoom no tapa el nombre del producto
+- **Archivo:** `src/styles/admin.css`
+- El `transform: scale()` del zoom hacía que la imagen creciera visualmente y tapara el título debajo
+- Se agregó `position: relative`, `z-index: 1` y `background: #fff` a `.admin-grid-card-info` para que el nombre y precio siempre queden visibles por encima de la imagen
+
+#### 2. Tarjetas un poco más altas con margen imagen-título
+- **Archivo:** `src/styles/admin.css`
+- Altura de imagen en tarjetas de 220px a 240px (`.admin-grid-card-img-wrapper` y `.admin-grid-card-img`)
+- Padding de `.admin-grid-card-info` de 15px a 18px vertical para dar espacio entre imagen y nombre
+
+---
+
+## 2026-03-17
+
+### Resumen del dia
+Ajustes visuales en pagina de productos: botones mas compactos en desktop, tarjetas mas altas en movil, popup con imagen completa, margen titulo movil y ocultamiento del icono de seguimiento en header publico.
+
+### Ajustes UI en tarjetas de productos
+
+#### 1. Desktop: botones Comprar y cantidad mas compactos
+- **Archivo:** `src/styles/productos.css`
+- Altura de botones y selector de cantidad reducida de 38px a 28px
+- Botones +/- mas pequenos (ancho 24px, font 0.8rem)
+- Boton Comprar con font 0.7rem y letter-spacing reducido
+- Solo afecta modo desktop, movil y tablet sin cambios
+
+#### 2. Movil: tarjetas mas altas con imagenes mas grandes
+- **Archivo:** `src/styles/productos.css` (media max-width: 699px)
+- Altura de imagen en tarjetas paso de 105px a 140px
+- Las tarjetas se ven mas proporcionadas en pantallas pequenas
+
+#### 3. Movil: popup de producto con imagen completa
+- **Archivo:** `src/styles/productos.css` (media max-width: 699px)
+- Altura de imagen en popup paso de 180px a 260px
+- Cambiado `object-fit` de `cover` a `contain` para mostrar la imagen completa sin recorte
+
+#### 4. Movil: margen entre titulo y header en pagina de productos
+- **Archivo:** `src/styles/productos.css` (media max-width: 699px)
+- `padding-top` de `.productos-page` paso de 80px a 110px para separar el titulo del header
+
+#### 5. Ocultar icono de seguimiento en header publico
+- **Archivo:** `src/components/Header.jsx`
+- Se elimino el boton con icono de caja (`fa-box-open`) del header publico
+- El seguimiento de ordenes queda disponible solo desde el panel de administracion
+
+---
+
+## 2026-03-16
+
+### Resumen del dia
+Correccion de conexion API para desarrollo local, unificacion visual de tarjetas y conexion del formulario de contacto a Gmail.
+
+### Formulario de contacto conectado a Gmail
+
+#### 1. Configuracion de correo con Nodemailer
+- **Cuenta Gmail:** cobretejido@gmail.com (envio y recepcion de consultas)
+- **Contraseña de aplicacion:** configurada en `.env` del VPS
+- **Paquete:** nodemailer instalado en el backend del VPS
+
+#### 2. Backend: nueva ruta de contacto
+- **Archivos creados:**
+  - `backend/src/controllers/contactController.js` — recibe nombre, telefono, correo y mensaje, envia email via Gmail SMTP
+  - `backend/src/routes/contact.js` — ruta `POST /api/contact`
+- **Archivo modificado:** `backend/src/server.js` — registrada ruta `/api/contact`
+
+#### 3. Frontend: modal de contacto funcional
+- **Archivo:** `src/components/ContactModal.jsx`
+  - Antes solo simulaba el envio, ahora hace POST real al backend
+  - Agregado estado de carga ("Enviando..." con spinner)
+  - Agregado manejo de errores con mensaje visible
+- **Archivo:** `src/services/api.js` — nueva funcion `sendContactForm()`
+
+#### 4. Variables de entorno en VPS (`/var/www/makuk/backend/.env`)
+- `GMAIL_USER=cobretejido@gmail.com`
+- `GMAIL_APP_PASSWORD=****` (contraseña de aplicacion de Google)
+- `CONTACT_TO_EMAIL=cobretejido@gmail.com`
+
+### Cambios realizados
+
+#### 1. Fix conexion API en desarrollo local
+- **Archivos:** `vite.config.js`, `.env`
+- El proxy de Vite enviaba peticiones HTTP a la IP del VPS, pero NGINX redirige HTTP→HTTPS para makuk.cl, causando que la API fallara silenciosamente.
+- Se configuro proxy con HTTPS + `secure: false` + header `Host: makuk.cl`.
+- Se removio `VITE_API_URL` del `.env` para que las peticiones pasen por el proxy de Vite.
+
+#### 2. Admin: esperar datos reales antes de renderizar
+- **Archivo:** `src/pages/admin/AdminLayout.jsx`
+- Los componentes admin inicializaban `useState` con datos de `content.json` (fallback) antes de que la API respondiera, mostrando datos falsos.
+- Se agrego spinner en AdminLayout que bloquea el `<Outlet />` hasta que `contentLoading` sea false, garantizando que todos los admin se montan con datos reales de la BD.
+
+#### 3. Unificacion visual de tarjetas
+- **Archivos:** `src/styles/secciones.css`, `src/styles/admin.css`, `src/styles/productos.css`
+- Altura de imagen en tarjetas de colecciones: 180px → 220px.
+- Tarjetas admin igualadas a 220px con `object-fit: cover`.
+- Tarjetas de productos dentro de categorias: imagen 180px → 220px, grid de 4 a 5 columnas, gap de 30px a 20px.
+
+#### 4. BD: ampliar columnas de precio
+- Se cambio `precio_actual` y `precio_anterior` de `INT` a `BIGINT` en la tabla `products` para evitar errores de rango.
+
+---
+
+## 2026-03-12
+
+### Resumen del dia
+Ajustes responsive en modo tablet (700px - 1100px) para el panel de administracion y la pagina principal. Se trabajo en rama `responsive_pendientes` y se mergeo a `main`.
+
+### Breakpoints definidos
+| Modo | Rango |
+|------|-------|
+| Desktop | 1101px+ (estilos base) |
+| Tablet | 700px - 1100px |
+| Movil | 0px - 699px |
+
+### Cambios realizados
+
+#### 1. Unificacion de breakpoints
+- **Archivo:** `src/styles/productos.css`
+- Se integro el breakpoint `max-width: 500px` del popup de producto al breakpoint movil estandar `max-width: 699px`.
+- Todos los archivos CSS ahora usan exclusivamente los 3 breakpoints definidos.
+
+#### 2. Ventas admin: layout dos columnas en tablet
+- **Archivo:** `src/styles/admin.css`
+- En tablet, la seccion Registro de Ventas mantiene dos columnas (tabla izquierda + detalle derecha) en vez de apilarse como en movil.
+- Proporciones 50/50, columna de detalle sticky.
+- Tamaños de fuente ajustados para tablet.
+
+#### 3. Footer admin: campos de contacto en misma fila
+- **Archivos:** `src/pages/admin/AdminFooter.jsx`, `src/styles/admin.css`
+- Email, WhatsApp y Telefono ahora estan en la misma fila (`admin-row`) en desktop y tablet.
+- En movil se apilan verticalmente.
+
+#### 4. Admin: padding lateral en tablet
+- **Archivo:** `src/styles/admin.css`
+- Padding lateral de `.admin-main` aumentado de 12px a 30px en tablet para dar margen con los bordes.
+
+#### 5. About admin: pestaña General en dos columnas (tablet)
+- **Archivos:** `src/pages/admin/AdminAbout.jsx`, `src/styles/admin.css`
+- Nuevo layout `.about-general-layout`: en tablet muestra columna izquierda (Titulo + ImageUploader) y columna derecha (preview de la imagen).
+- En desktop y movil se mantiene apilado verticalmente.
+
+#### 6. Footer publico: mas margen en columna Colecciones (tablet)
+- **Archivo:** `src/styles/footer.css`
+- `.footer-links-col` con `padding-left: 60px` en tablet para separar de la columna izquierda.
+
+#### 7. Hero: contenido baja en tablet
+- **Archivo:** `src/styles/hero.css`
+- `.hero-content` con `margin-top: 65px` en tablet para separar el titulo de la navegacion.
+
+#### 8. Testimonios: seccion mas arriba en tablet
+- **Archivo:** `src/styles/secciones.css`
+- `.testimonials` con `margin-top: -40px` en tablet para acercar al contenido superior.
+
+### Rama y deploy
+- Rama `responsive_pendientes` creada, commit `e8f0c2b`, merge fast-forward a `main`.
+- Push a GitHub y deploy al VPS exitoso.
+
+### Archivos modificados
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `src/styles/admin.css` | Ventas tablet 2 columnas, padding lateral, about layout |
+| `src/styles/productos.css` | Breakpoint 500px integrado a 699px |
+| `src/styles/footer.css` | Margen columna links tablet |
+| `src/styles/hero.css` | Margin-top hero content tablet |
+| `src/styles/secciones.css` | Testimonios margin-top tablet |
+| `src/pages/admin/AdminAbout.jsx` | Layout dos columnas pestaña general |
+| `src/pages/admin/AdminFooter.jsx` | Campos contacto en admin-row |
+
+---
+
+## 2026-03-10 (sesion 3)
+
+### Resumen del dia
+Implementacion del sistema de Registro de Ventas en el panel admin y modal de seguimiento de orden en la pagina publica.
+
+### Cambios realizados
+
+#### 1. Pestanas en seccion Control del admin
+- **Archivo:** `src/pages/admin/AdminControl.jsx`
+- Se dividio la seccion Control en dos pestanas: **Control de Contenido** (stats, almacenamiento, estado del sistema) y **Registro de Ventas**.
+- Se usa el mismo sistema de pestanas (`admin-tabs`) que el resto del admin.
+
+#### 2. Registro de Ventas - Tabla de ordenes
+- **Archivo:** `src/pages/admin/AdminControl.jsx`, `src/styles/admin.css`
+- Layout 3/5 (tabla) + 2/5 (detalle).
+- Tabla con columnas: Fecha, Orden, Estado.
+- Estado con dropdown de 4 opciones: Pendiente, Fabricando, Enviado, Entregado (cada uno con color e icono).
+- Dropdown con ancho fijo para flechas alineadas.
+- Se cierra al hacer clic fuera.
+- Datos mock locales (sin conexion a BD aun).
+
+#### 3. Panel de detalle de orden (columna derecha)
+- Titulo muestra numero de orden a la izquierda y estado a la derecha en la misma fila.
+- Dos pestanas internas: **Cliente** y **Compra**.
+- **Cliente:** nombre, RUT, email, telefono, direccion (en dos lineas: calle + ciudad/region), direccion de despacho, detalles de envio (texto libre del cliente).
+- **Compra:** listado de productos con cantidad y precio, subtotal, IVA 19%, costo de envio, total.
+- Textos compactos para reducir altura de la columna.
+
+#### 4. Layout ancho completo
+- **Archivo:** `src/styles/admin.css`
+- Se elimino el `max-width: 900px` de `.admin-page` para que todas las secciones del admin usen el ancho completo disponible.
+
+#### 5. Modal de seguimiento de orden (pagina publica)
+- **Archivos:** `src/components/TrackingModal.jsx`, `src/components/Header.jsx`, `src/styles/productos.css`
+- Nuevo icono de caja (`fa-box-open`) en el header publico, al lado del icono de inicio de sesion.
+- Al hacer clic abre modal con campo de busqueda por numero de orden.
+- Titulo "Seguimiento de orden" a la izquierda, input + boton buscar a la derecha.
+- Si la orden existe muestra: timeline visual de 4 estados (puntos con iconos coloreados y lineas de progreso), info de la orden, productos comprados, totales (subtotal, IVA, envio, total).
+- Si no existe muestra error.
+- Reutiliza estilos del modal de contacto (`contacto-modal`).
+
+#### 6. Responsive completo
+- **Tablet (700-1100px):** layout ventas se apila verticalmente, columna cliente oculta en tabla.
+- **Movil (0-699px):** tabla con 3 columnas (fecha, orden, estado) a ancho completo con `table-layout: fixed`, textos reducidos en toda la vista, panel detalle apilado debajo. Modal de seguimiento: titulo e input apilados, timeline y textos mas pequenos.
+
+### Deploy
+- **Commit:** `82b94fb`
+- **Push:** GitHub `origin/main`
+- **VPS:** Deploy exitoso via `ssh makuk` → git pull + build + deploy
+
+---
+
+## 2026-03-10 (sesion 2)
+
+### Cambios realizados
+
+#### Fix: seccion piezas unicas no se mostraba en pagina principal
+- **Archivo:** `src/components/UniquePieces.jsx`
+- La seccion tenia un `return null` cuando no habia items destacados, lo que ocultaba toda la seccion (titulo, subtitulo, link).
+- Se cambio para que la seccion siempre se muestre (igual que Categories), y solo las tarjetas se oculten si no hay productos destacados.
+- **Nota:** los productos de piezas unicas deben tener `destacado = 1` en la BD para aparecer en el home. Se activa desde Admin → Piezas Unicas.
+
+---
+
+## 2026-03-10
+
+### Resumen del dia
+Correccion completa del sistema de movimiento/zoom de imagenes: migracion global de `objectPosition` a `translate()` en todas las vistas (admin, publicas, popup). Flechas simplificadas, touch drag en movil, y tarjetas admin igualadas a las publicas.
+
+### Cambios realizados
+
+#### 1. Fix flechas popup producto - cambio a translate()
+- **Archivo:** `src/pages/Productos.jsx`
+- Se corrigio el sistema de movimiento de imagen en el popup publico.
+- Se reemplazo `transform-origin` por `translate()` para evitar el bloqueo entre ejes (mover en X bloqueaba Y y viceversa).
+- El zoom ya no resetea la posicion de la imagen.
+- Al cerrar el popup, la posicion y zoom vuelven a su estado original.
+
+#### 2. Estilo flechas popup simplificado
+- **Archivo:** `src/styles/productos.css`
+- Se removio el fondo circular (`background`, `border`, `border-radius: 50%`) de las flechas del popup.
+- Ahora son solo iconos sin envoltorio visual.
+- Se redujo el gap entre flechas e imagen de 4px a 2px para acercarlas mas.
+
+#### 3. Touch drag en movil para popup producto
+- **Archivo:** `src/pages/Productos.jsx`
+- Se agrego soporte de arrastre con dedo (touch) solo en dispositivos moviles (`isMobile`).
+- Se usa `onTouchStart`, `onTouchMove`, `onTouchEnd` en el contenedor de la imagen.
+- Sensibilidad ajustada a 0.15 para movimiento suave.
+- `touchAction: none` en movil para evitar scroll del navegador al arrastrar.
+- Las flechas se mantienen disponibles en ambos modos (desktop y movil).
+
+#### 4. Migracion global de objectPosition a translate()
+- **Archivos:** `src/pages/admin/AdminCategories.jsx`, `src/pages/admin/AdminUniquePieces.jsx`, `src/components/Categories.jsx`, `src/components/UniquePieces.jsx`, `src/pages/Productos.jsx`, `src/styles/admin.css`, `src/styles/secciones.css`, `src/styles/productos.css`
+- Se elimino el uso de `objectPosition` + `transform: scale()` directamente en `<img>` en todas las vistas.
+- Se introdujeron wrapper divs con `transform: scale(zoom) translate(tx, ty)` donde `tx = 50 - imagePosX` y `ty = 50 - imagePosY`.
+- Esto resuelve el bloqueo entre ejes que ocurria con `objectPosition` (solo mueve donde hay exceso de contenido).
+- CSS variables `--img-zoom`, `--img-tx`, `--img-ty` para animaciones de hover en paginas publicas.
+- Heights responsive movidos de `img` a los wrappers correspondientes.
+
+#### 5. Tarjetas admin igualadas a pagina publica
+- **Archivo:** `src/styles/admin.css`
+- Grid de tarjetas admin cambiado de 5 columnas a 4 columnas con gap de 20px.
+- Imagen de tarjetas con `height: 180px` fijo (igual que pagina publica).
+- Tarjetas de tipo de categoria y de productos con misma proporcion visual.
+
+### Deploy
+- Commits: `e85c63b`, `b841455`, `6674929`, `13243f6`, `dba4fd3`, `4f24dd7`.
+- Deploy completo al VPS en cada commit: git pull + build + copia a `/var/www/makuk/frontend/build/`.
+
+---
+
+## 2026-03-08
+
+### Resumen del dia
+Optimizacion completa del sistema de imagenes: conversion automatica a WebP con sharp, generacion de thumbnails, lazy loading y popup de eliminacion de categorias. Se trabajo en rama `Imagenes_productos` que luego se mergeo a main.
+
+### Cambios realizados
+
+#### 1. Optimizacion de imagenes con sharp (backend)
+- **Archivos:** `backend/src/routes/upload.js`, `backend/package.json`
+- Se reemplazo `multer.diskStorage` por `multer.memoryStorage` para procesar la imagen en memoria antes de guardarla.
+- Se integro `sharp` para:
+  - Convertir cualquier imagen (JPG, PNG, GIF) a **WebP** automaticamente.
+  - Redimensionar a max **1200px** de ancho (imagen principal, calidad 80).
+  - Generar **thumbnail** de max **400px** de ancho (calidad 75).
+- Cada imagen subida genera dos archivos: `uuid.webp` y `uuid_thumb.webp`.
+- Se elimino la dependencia del `uploadController.js` (logica movida directamente a la ruta).
+
+#### 2. Lazy loading en imagenes publicas (frontend)
+- **Archivos:** `src/pages/Productos.jsx`, `src/components/Categories.jsx`, `src/components/UniquePieces.jsx`, `src/components/Worldwide.jsx`, `src/components/About.jsx`
+- Se agrego `loading="lazy"` a todas las etiquetas `<img>` de componentes publicos.
+- El navegador solo descarga las imagenes visibles en pantalla, el resto se carga al hacer scroll.
+
+#### 3. Thumbnails en listados (frontend)
+- **Archivo nuevo:** `src/utils/imageUtils.js`
+- Se creo la funcion `getThumb(url)` que deriva la URL del thumbnail a partir de la imagen principal (`uuid.webp` → `uuid_thumb.webp`). Para imagenes legacy (no webp) devuelve la misma URL.
+- **Archivos modificados:** `src/pages/Productos.jsx`, `src/components/Categories.jsx`, `src/components/UniquePieces.jsx`
+- Los listados de productos, categorias y piezas unicas ahora cargan el **thumbnail** (~10-15KB) en vez de la imagen completa.
+- El popup de detalle de producto sigue cargando la **imagen completa** (1200px).
+
+#### 4. Popup de eliminacion de categorias (admin)
+- **Archivos:** `src/pages/admin/AdminCategories.jsx`, `src/styles/admin.css`
+- Se agrego boton de eliminar (icono basura) en cada tarjeta de categoria en la pestana "Tipos de categorias".
+- Al hacer clic se abre un popup de confirmacion con:
+  - Icono de advertencia (triangulo amarillo).
+  - Nombre de la categoria a eliminar.
+  - Aviso destacado: se eliminaran todos los productos dentro de la categoria (muestra cantidad exacta).
+  - Botones "Cancelar" y "Eliminar".
+- Se muestra el conteo de productos en cada tarjeta de categoria.
+- Al confirmar, se eliminan la categoria y todos sus productos asociados.
+- Estilos responsive: en movil los botones se apilan verticalmente y el popup se ajusta al ancho.
+
+#### 5. Script de migracion de imagenes existentes
+- **Archivo nuevo:** `backend/src/scripts/migrate-images.js`
+- Script para convertir imagenes existentes (JPG/PNG) a WebP + generar thumbnails.
+- Actualiza las URLs en la base de datos automaticamente.
+- No borra los archivos originales por seguridad.
+- Uso: `node src/scripts/migrate-images.js` (en el VPS).
+
+#### 6. Configuracion NGINX
+- Se agrego `client_max_body_size 5M` en `/etc/nginx/sites-enabled/makuk` para permitir subida de imagenes de hasta 5MB (antes usaba el default de 1MB, causando error 413).
+
+#### 7. Limpieza de base de datos
+- Se ejecuto `TRUNCATE TABLE products` para vaciar todos los productos de prueba (11 registros).
+- Se eliminaron todas las imagenes del directorio `/var/www/makuk/uploads/` (13 archivos).
+- Auto_increment reiniciado a 1.
+
+### Rama y deploy
+- Se creo rama `Imagenes_productos`, se hicieron 2 commits y se mergeo a `main` via fast-forward.
+- Deploy completo: backend (sharp instalado, PM2 reiniciado) + frontend (build y copia a `/var/www/makuk/frontend/build/`).
+
+---
+
 ## 2026-03-01
 
 ### Resumen del dia
@@ -714,3 +1061,60 @@ Auditoria completa de seguridad del backend, optimizacion del frontend con lazy 
 |------|------------|
 | `9cc6527` | Auditoria: seguridad backend, lazy loading, tests, backups y docs |
 | `556133b` | Popup producto: diseño lightbox con imagen destacada, info en dos columnas y precios |
+
+---
+
+## 2026-03-05 - Rediseno Popup de Producto
+
+### Resumen del dia
+Rediseno completo del popup de detalle de producto: layout cuadrado con dos columnas (imagen + info), imagen paneable con mouse/touch, y tooltip de ayuda para el usuario.
+
+### Cambios realizados
+
+#### 1. Popup cuadrado con dos columnas (desktop)
+- **Archivos:** `src/pages/Productos.jsx`, `src/styles/productos.css`
+- Popup cambiado de vertical (imagen arriba, info abajo) a horizontal con dos columnas.
+- Tamano fijo: 480x320px, todos los popups del mismo tamano.
+- **Columna izquierda (60%):** imagen del producto con `object-fit: cover`, ocupa todo el espacio.
+- **Columna derecha (40%):** nombre (arriba), descripcion (medio, centrada verticalmente), precios anterior y actual (abajo, separados izquierda/derecha).
+- Precio anterior tachado solo aparece si existe y es diferente al actual.
+
+#### 2. Layout movil del popup
+- **Archivos:** `src/pages/Productos.jsx`, `src/styles/productos.css`
+- En movil (<500px) el popup cambia a vertical: imagen arriba (220px de alto).
+- Debajo de la imagen: fila con nombre a la izquierda y descripcion a la derecha.
+- Precios centrados en fila inferior, antes y despues lado a lado.
+
+#### 3. Imagen paneable (drag to move)
+- **Archivo:** `src/pages/Productos.jsx`
+- Implementado sistema de paneo de imagen dentro del popup.
+- **Desktop:** click y arrastrar con el mouse (cursor grab/grabbing).
+- **Movil:** tocar y deslizar con el dedo.
+- Solo permite movimiento en el eje donde la imagen tiene recorte (horizontal si es mas ancha, vertical si es mas alta).
+- Al cerrar y reabrir el popup, la imagen siempre vuelve a su posicion original centrada (50% 50%).
+- Usa `useRef` para el estado del paneo sin causar re-renders.
+
+#### 4. Icono de ayuda con tooltip
+- **Archivos:** `src/pages/Productos.jsx`, `src/styles/productos.css`
+- Icono de manito (`fa-hand-paper`) arriba a la derecha de la imagen, boton circular blanco semitransparente.
+- Al apretar muestra tooltip oscuro con mensaje contextual:
+  - Desktop: "Haz click y arrastra para mover la imagen"
+  - Movil: "Mantene presionada la imagen y desliza para moverla"
+- Tooltip se oculta/muestra con toggle al apretar el icono.
+- Se resetea al abrir un nuevo popup.
+- Estilos: `.popup-pan-hint-btn` (boton), `.popup-pan-tooltip` (mensaje).
+
+### Archivos modificados
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `src/pages/Productos.jsx` | Popup dos columnas, pan de imagen, tooltip de ayuda |
+| `src/styles/productos.css` | Layout cuadrado, columnas, grab cursor, hint btn, tooltip, responsive |
+
+### Commits de la sesion
+| Hash | Descripcion |
+|------|------------|
+| `0dbc92f` | Popup producto: diseno cuadrado con dos columnas, imagen paneable y tooltip de ayuda |
+
+### Deploy
+- **Push:** GitHub `origin/main`
+- **VPS:** Deploy exitoso via `ssh makuk` → git pull + build + deploy

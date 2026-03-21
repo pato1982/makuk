@@ -38,8 +38,8 @@ function AdminFooter() {
       </AdminCard>
 
       <AdminCard title="Contacto">
-        <AdminFormField label="Email" type="email" value={data.email} onChange={(v) => setData({ ...data, email: v })} />
-        <div className="admin-row admin-row-phone">
+        <div className="admin-row admin-row-contact">
+          <AdminFormField label="Email" type="email" value={data.email} onChange={(v) => setData({ ...data, email: v })} />
           <AdminFormField label={<>WhatsApp <span className="label-hint">(número)</span></>} value={data.whatsappNumber} onChange={(v) => setData({ ...data, whatsappNumber: v })} />
           <AdminFormField label="Teléfono" value={data.whatsappDisplay} onChange={(v) => setData({ ...data, whatsappDisplay: v })} />
         </div>

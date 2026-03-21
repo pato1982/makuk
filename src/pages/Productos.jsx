@@ -22,7 +22,13 @@ function ProductoCard({ producto, onImageClick }) {
   return (
     <div className="producto-card">
       <div className="producto-img" onClick={() => onImageClick(producto)} style={{ cursor: 'pointer' }}>
-        <img src={getThumb(producto.imagen)} alt={producto.nombre} loading="lazy" />
+        <div className="producto-img-wrapper" style={{
+          '--img-zoom': producto.imageZoom ?? 1,
+          '--img-tx': `${50 - (producto.imagePosX ?? 50)}%`,
+          '--img-ty': `${50 - (producto.imagePosY ?? 50)}%`,
+        }}>
+          <img src={getThumb(producto.imagen)} alt={producto.nombre} loading="lazy" />
+        </div>
       </div>
       <div className="producto-info">
         <h4>{producto.nombre}</h4>
@@ -69,7 +75,9 @@ function Productos() {
   const [categoriaFiltro, setCategoriaFiltro] = useState(categoriaURL || 'todos');
   const [orden, setOrden] = useState('destacados');
   const [popupProducto, setPopupProducto] = useState(null);
-  const [showPanTip, setShowPanTip] = useState(false);
+  const [popupZoom, setPopupZoom] = useState(1);
+  const [popupPanX, setPopupPanX] = useState(0);
+  const [popupPanY, setPopupPanY] = useState(0);
 
   const formatearPrecio = (valor) => {
     return '$' + Math.round(valor).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -123,54 +131,48 @@ function Productos() {
     return filas;
   }, [productosFiltrados]);
 
-  // Pan de imagen en popup
-  const imgContainerRef = useRef(null);
-  const imgRef = useRef(null);
-  const panState = useRef({ dragging: false, startX: 0, startY: 0, posX: 50, posY: 50 });
-
-  const handlePanStart = useCallback((clientX, clientY) => {
-    panState.current.dragging = true;
-    panState.current.startX = clientX;
-    panState.current.startY = clientY;
-  }, []);
-
-  const handlePanMove = useCallback((clientX, clientY) => {
-    if (!panState.current.dragging || !imgRef.current || !imgContainerRef.current) return;
-    const img = imgRef.current;
-    const container = imgContainerRef.current;
-    const natW = img.naturalWidth, natH = img.naturalHeight;
-    const contW = container.offsetWidth, contH = container.offsetHeight;
-    const scaleX = natW / contW, scaleY = natH / contH;
-    const dx = clientX - panState.current.startX;
-    const dy = clientY - panState.current.startY;
-    // Solo permitir pan en el eje que se recorta
-    let newX = panState.current.posX;
-    let newY = panState.current.posY;
-    if (scaleX > scaleY) {
-      newX = panState.current.posX - (dx / contW) * 100;
-    } else {
-      newY = panState.current.posY - (dy / contH) * 100;
-    }
-    newX = Math.max(0, Math.min(100, newX));
-    newY = Math.max(0, Math.min(100, newY));
-    img.style.objectPosition = `${newX}% ${newY}%`;
-    panState.current.startX = clientX;
-    panState.current.startY = clientY;
-    panState.current.posX = newX;
-    panState.current.posY = newY;
-  }, []);
-
-  const handlePanEnd = useCallback(() => {
-    panState.current.dragging = false;
-  }, []);
-
   useEffect(() => {
     if (popupProducto) {
-      panState.current = { dragging: false, startX: 0, startY: 0, posX: 50, posY: 50 };
-      setShowPanTip(false);
-      if (imgRef.current) imgRef.current.style.objectPosition = '50% 50%';
+      setPopupZoom(popupProducto.imageZoom ?? 1);
+      setPopupPanX(0);
+      setPopupPanY(0);
     }
   }, [popupProducto]);
+
+  const popupMoveImg = (axis, delta) => {
+    if (axis === 'x') {
+      setPopupPanX(prev => Math.max(-50, Math.min(50, prev + delta)));
+    } else {
+      setPopupPanY(prev => Math.max(-50, Math.min(50, prev + delta)));
+    }
+  };
+
+  // Touch drag para móvil
+  const touchRef = useRef(null);
+  const popupImgRef = useRef(null);
+
+  const handleTouchStart = useCallback((e) => {
+    if (!isMobile) return;
+    const touch = e.touches[0];
+    touchRef.current = { x: touch.clientX, y: touch.clientY };
+  }, [isMobile]);
+
+  const handleTouchMove = useCallback((e) => {
+    if (!isMobile || !touchRef.current) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const dx = touch.clientX - touchRef.current.x;
+    const dy = touch.clientY - touchRef.current.y;
+    touchRef.current = { x: touch.clientX, y: touch.clientY };
+
+    const sensitivity = 0.15;
+    setPopupPanX(prev => Math.max(-50, Math.min(50, prev + dx * sensitivity)));
+    setPopupPanY(prev => Math.max(-50, Math.min(50, prev + dy * sensitivity)));
+  }, [isMobile]);
+
+  const handleTouchEnd = useCallback(() => {
+    touchRef.current = null;
+  }, []);
 
   const titulo = categoriaFiltro === 'todos'
     ? 'Todos los Productos'
@@ -245,31 +247,47 @@ function Productos() {
             <button className="producto-popup-close" onClick={() => setPopupProducto(null)}>
               <i className="fas fa-times"></i>
             </button>
-            <div
-              className="producto-popup-img"
-              ref={imgContainerRef}
-              onMouseDown={(e) => { e.preventDefault(); handlePanStart(e.clientX, e.clientY); }}
-              onMouseMove={(e) => handlePanMove(e.clientX, e.clientY)}
-              onMouseUp={handlePanEnd}
-              onMouseLeave={handlePanEnd}
-              onTouchStart={(e) => handlePanStart(e.touches[0].clientX, e.touches[0].clientY)}
-              onTouchMove={(e) => { e.preventDefault(); handlePanMove(e.touches[0].clientX, e.touches[0].clientY); }}
-              onTouchEnd={handlePanEnd}
-            >
-              <img ref={imgRef} src={popupProducto.imagen} alt={popupProducto.nombre} />
-              <button
-                className="popup-pan-hint-btn"
-                onClick={(e) => { e.stopPropagation(); setShowPanTip(!showPanTip); }}
-              >
-                <i className="fas fa-hand-paper"></i>
+            <div className="popup-img-editor">
+              <button type="button" className="popup-arrow popup-arrow-top" onClick={() => popupMoveImg('y', -5)}>
+                <i className="fas fa-chevron-up"></i>
               </button>
-              {showPanTip && (
-                <div className="popup-pan-tooltip">
-                  {isMobile
-                    ? 'Mantene presionada la imagen y desliza para moverla'
-                    : 'Haz click y arrastra para mover la imagen'}
+              <div className="popup-img-editor-middle">
+                <button type="button" className="popup-arrow" onClick={() => popupMoveImg('x', -5)}>
+                  <i className="fas fa-chevron-left"></i>
+                </button>
+                <div
+                  className="producto-popup-img"
+                  ref={popupImgRef}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                  style={{ touchAction: isMobile ? 'none' : 'auto' }}
+                >
+                  <div className="popup-img-pan-wrapper" style={{
+                    transform: `scale(${popupZoom}) translate(${(50 - (popupProducto.imagePosX ?? 50)) + popupPanX}%, ${(50 - (popupProducto.imagePosY ?? 50)) + popupPanY}%)`,
+                  }}>
+                    <img src={popupProducto.imagen} alt={popupProducto.nombre} />
+                  </div>
                 </div>
-              )}
+                <button type="button" className="popup-arrow" onClick={() => popupMoveImg('x', 5)}>
+                  <i className="fas fa-chevron-right"></i>
+                </button>
+              </div>
+              <button type="button" className="popup-arrow popup-arrow-bottom" onClick={() => popupMoveImg('y', 5)}>
+                <i className="fas fa-chevron-down"></i>
+              </button>
+              <div className="popup-zoom-bar">
+                <i className="fas fa-search-minus"></i>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="3"
+                  step="0.05"
+                  value={popupZoom}
+                  onChange={(e) => setPopupZoom(parseFloat(e.target.value))}
+                />
+                <i className="fas fa-search-plus"></i>
+              </div>
             </div>
             <div className="producto-popup-info">
               <div className="producto-popup-nombre-desc-row">

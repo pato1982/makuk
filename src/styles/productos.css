@@ -56,8 +56,8 @@
 
 .productos-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 30px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
 }
 
 .producto-card {
@@ -66,6 +66,8 @@
     overflow: hidden;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
     transition: all 0.4s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 .producto-img {
@@ -75,25 +77,43 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 180px;
+    height: 220px;
+}
+
+.producto-img-wrapper {
+    width: 100%;
+    height: 100%;
+    --img-zoom: 1;
+    --img-tx: 0%;
+    --img-ty: 0%;
+    transition: transform 0.5s ease;
+    transform: scale(var(--img-zoom)) translate(var(--img-tx), var(--img-ty));
 }
 
 .producto-img img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center;
-    transition: transform 0.5s ease;
+    display: block;
 }
 
 .producto-info {
     padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .producto-info h4 {
     font-size: 1.1rem;
     color: var(--dark-brown);
     margin-bottom: 10px;
+    min-height: 2.4em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .producto-precios {
@@ -127,7 +147,7 @@
     display: flex;
     align-items: center;
     flex: 0 0 auto;
-    height: 38px;
+    height: 28px;
     border: 1px solid var(--copper);
     border-radius: 5px;
     overflow: hidden;
@@ -135,12 +155,12 @@
 }
 
 .cantidad-btn {
-    width: 30px;
+    width: 24px;
     height: 100%;
     border: none;
     background: var(--copper);
     color: var(--cream);
-    font-size: 1rem;
+    font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -151,27 +171,27 @@
 }
 
 .cantidad-numero {
-    width: 30px;
+    width: 22px;
     text-align: center;
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.9rem;
+    font-size: 0.75rem;
     font-weight: 500;
     color: var(--dark-brown);
 }
 
 .btn-comprar {
     flex: 1;
-    height: 38px;
-    padding: 0 10px;
+    height: 28px;
+    padding: 0 6px;
     background: linear-gradient(135deg, var(--copper) 0%, var(--copper-dark) 100%);
     color: var(--cream);
     border: none;
     border-radius: 5px;
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.85rem;
+    font-size: 0.7rem;
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -582,7 +602,7 @@
 /* Responsive Productos */
 @media (max-width: 699px) {
     .productos-page {
-        padding-top: 80px;
+        padding-top: 110px;
         padding-bottom: 40px;
     }
 
@@ -619,11 +639,11 @@
     }
 
     .producto-img {
-        height: 105px !important;
+        height: 140px !important;
     }
 
-    .producto-img img {
-        height: 105px !important;
+    .producto-img-wrapper {
+        height: 140px !important;
     }
 
     .producto-info {
@@ -634,6 +654,7 @@
     .producto-info h4 {
         font-size: 0.65rem !important;
         margin-bottom: 4px !important;
+        min-height: 2.4em;
     }
 
     .producto-precios {
@@ -689,7 +710,7 @@
         gap: 20px;
     }
 
-    .producto-img img {
+    .producto-img-wrapper {
         height: 180px;
     }
 
@@ -910,6 +931,282 @@
 }
 
 /* ========================================
+   Modal Seguimiento de Orden
+   ======================================== */
+
+.tracking-modal-content {
+    max-width: 520px;
+}
+
+.tracking-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.tracking-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.tracking-input-row {
+    display: flex;
+    gap: 6px;
+}
+
+.tracking-input-row input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.tracking-input-row input:focus {
+    border-color: #b87333;
+}
+
+.tracking-input-row button {
+    padding: 8px 14px;
+    background: #b87333;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.tracking-input-row button:hover {
+    background: #a0622b;
+}
+
+.tracking-error {
+    color: #e05555;
+    font-size: 0.75rem;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tracking-result {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Timeline */
+.tracking-timeline {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    padding: 0 4px;
+}
+
+.tracking-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    flex: 1;
+}
+
+.tracking-step-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    position: relative;
+    z-index: 2;
+}
+
+.tracking-step-label {
+    font-size: 0.62rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.tracking-step-line {
+    position: absolute;
+    top: 14px;
+    left: calc(50% + 16px);
+    width: calc(100% - 32px);
+    height: 2px;
+    z-index: 1;
+}
+
+/* Info orden */
+.tracking-order-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: #faf6f1;
+    border-radius: 8px;
+    padding: 8px 12px;
+}
+
+.tracking-order-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    font-size: 0.73rem;
+    border-bottom: 1px solid #efe8df;
+}
+
+.tracking-order-row:last-child {
+    border-bottom: none;
+}
+
+.tracking-order-row span:first-child {
+    color: #888;
+    font-weight: 500;
+}
+
+.tracking-order-number {
+    font-weight: 700;
+    color: #b87333;
+}
+
+/* Productos */
+.tracking-products h4 {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #888;
+    margin: 0 0 6px;
+}
+
+.tracking-product-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    font-size: 0.73rem;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.tracking-product-row:last-child {
+    border-bottom: none;
+}
+
+.tracking-product-row small {
+    color: #aaa;
+    margin-left: 4px;
+}
+
+/* Totales */
+.tracking-totals {
+    background: #faf6f1;
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.tracking-total-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.73rem;
+    color: #666;
+}
+
+.tracking-total-final {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #333;
+    padding-top: 6px;
+    border-top: 1px solid #e0d5c8;
+}
+
+@media (max-width: 699px) {
+    .tracking-modal-content {
+        max-width: 95%;
+        padding: 20px 16px;
+    }
+
+    .tracking-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .tracking-title {
+        font-size: 0.95rem;
+    }
+
+    .tracking-input-row {
+        width: 100%;
+    }
+
+    .tracking-input-row input {
+        font-size: 0.8rem;
+        padding: 8px 10px;
+    }
+
+    .tracking-input-row button {
+        padding: 8px 12px;
+        font-size: 0.78rem;
+    }
+
+    .tracking-step-dot {
+        width: 26px;
+        height: 26px;
+        font-size: 0.6rem;
+    }
+
+    .tracking-step-label {
+        font-size: 0.58rem;
+    }
+
+    .tracking-step-line {
+        top: 13px;
+        left: calc(50% + 15px);
+        width: calc(100% - 30px);
+    }
+
+    .tracking-order-row {
+        font-size: 0.72rem;
+    }
+
+    .tracking-products h4 {
+        font-size: 0.65rem;
+    }
+
+    .tracking-product-row {
+        font-size: 0.72rem;
+    }
+
+    .tracking-total-row {
+        font-size: 0.72rem;
+    }
+
+    .tracking-total-final {
+        font-size: 0.82rem;
+    }
+}
+
+/* ========================================
    Popup detalle de producto
    ======================================== */
 
@@ -930,8 +1227,8 @@
 .producto-popup {
     background: var(--white);
     border-radius: 12px;
-    width: 480px;
-    height: 320px;
+    width: 520px;
+    height: 380px;
     overflow: hidden;
     display: flex;
     flex-direction: row;
@@ -964,60 +1261,85 @@
 
 .producto-popup-img {
     position: relative;
-    flex: 3;
+    flex: 1;
     background: var(--cream);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     min-width: 0;
-    cursor: grab;
-    user-select: none;
+    min-height: 0;
+    border-radius: 8px;
+    width: 100%;
 }
 
-.producto-popup-img:active {
-    cursor: grabbing;
+/* --- Popup image editor controls --- */
+.popup-img-editor {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    background: var(--cream);
+    padding: 10px 8px;
+    min-width: 0;
+    border-radius: 12px 0 0 12px;
 }
 
-.popup-pan-hint-btn {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 28px;
-    height: 28px;
-    background: rgba(255, 255, 255, 0.85);
-    color: var(--dark-brown);
+.popup-img-editor-middle {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+    justify-content: center;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.popup-arrow {
+    background: none;
     border: none;
-    border-radius: 50%;
+    border-radius: 0;
+    width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.75rem;
     cursor: pointer;
-    z-index: 2;
-    transition: background 0.2s;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-}
-
-.popup-pan-hint-btn:hover {
-    background: rgba(255, 255, 255, 1);
-}
-
-.popup-pan-tooltip {
-    position: absolute;
-    top: 42px;
-    right: 8px;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    font-family: 'Montserrat', sans-serif;
+    color: var(--dark-brown);
     font-size: 0.7rem;
-    padding: 6px 10px;
-    border-radius: 6px;
-    z-index: 2;
-    max-width: 180px;
-    line-height: 1.4;
-    animation: fadeIn 0.2s ease;
-    pointer-events: none;
+    transition: color 0.2s;
+    flex-shrink: 0;
+    padding: 0;
+}
+
+.popup-arrow:hover {
+    color: var(--copper);
+}
+
+.popup-zoom-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.popup-zoom-bar i {
+    color: #888;
+    font-size: 0.7rem;
+}
+
+.popup-zoom-bar input[type="range"] {
+    width: 120px;
+    accent-color: var(--copper);
+    height: 4px;
+}
+
+.popup-img-pan-wrapper {
+    width: 100%;
+    height: 100%;
 }
 
 .producto-popup-img img {
@@ -1025,7 +1347,6 @@
     height: 100%;
     object-fit: cover;
     display: block;
-    border-radius: 12px 0 0 12px;
 }
 
 .producto-popup-info {
@@ -1087,7 +1408,7 @@
 }
 
 /* Móvil */
-@media (max-width: 500px) {
+@media (max-width: 699px) {
     .producto-popup {
         width: 92vw;
         height: auto;
@@ -1096,13 +1417,30 @@
         border-radius: 8px;
     }
 
+    .popup-img-editor {
+        flex: none;
+        border-radius: 8px 8px 0 0;
+        padding: 6px;
+    }
+
     .producto-popup-img {
         flex: none;
-        height: 220px;
+        height: 260px;
     }
 
     .producto-popup-img img {
-        border-radius: 8px 8px 0 0;
+        border-radius: 6px;
+        object-fit: contain;
+    }
+
+    .popup-arrow {
+        width: 22px;
+        height: 22px;
+        font-size: 0.5rem;
+    }
+
+    .popup-zoom-bar input[type="range"] {
+        width: 100px;
     }
 
     .producto-popup-info {

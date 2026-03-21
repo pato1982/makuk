@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useContent } from '../../context/ContentContext';
 
 
 const navItems = [
@@ -17,6 +18,7 @@ const navItems = [
 
 function AdminLayout() {
   const { logout } = useAuth();
+  const { contentLoading } = useContent();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -65,7 +67,13 @@ function AdminLayout() {
       {sidebarOpen && <div className="admin-overlay" onClick={() => setSidebarOpen(false)}></div>}
 
       <main className="admin-main">
-        <Outlet />
+        {contentLoading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+            <i className="fas fa-spinner fa-spin" style={{ fontSize: '2rem', color: '#b87333' }}></i>
+          </div>
+        ) : (
+          <Outlet />
+        )}
       </main>
     </div>
   );

@@ -27,25 +27,10 @@ function AdminHeader() {
     }
   };
 
-  const updateNavItem = (index, field, value) => {
-    const items = [...data.navItems];
-    items[index] = { ...items[index], [field]: value };
-    setData({ ...data, navItems: items });
-  };
-
-  const addNavItem = () => {
-    setData({ ...data, navItems: [...data.navItems, { label: 'Nuevo', sectionId: 'inicio' }] });
-  };
-
-  const removeNavItem = (index) => {
-    const items = data.navItems.filter((_, i) => i !== index);
-    setData({ ...data, navItems: items });
-  };
-
   return (
     <div className="admin-page">
       <h1 className="admin-page-title">Header</h1>
-      <p className="admin-page-subtitle">Logo, tagline, banner, intro y navegación</p>
+      <p className="admin-page-subtitle">Logo, tagline, banner e intro</p>
 
       <div className="admin-tabs">
         <button className={`admin-tab ${tab === 'identidad' ? 'active' : ''}`} onClick={() => setTab('identidad')}>
@@ -53,9 +38,6 @@ function AdminHeader() {
         </button>
         <button className={`admin-tab ${tab === 'intro' ? 'active' : ''}`} onClick={() => setTab('intro')}>
           <i className="fas fa-align-left"></i> Intro
-        </button>
-        <button className={`admin-tab ${tab === 'navegacion' ? 'active' : ''}`} onClick={() => setTab('navegacion')}>
-          <i className="fas fa-bars"></i> Navegación
         </button>
       </div>
 
@@ -86,35 +68,6 @@ function AdminHeader() {
           </div>
         )}
 
-        {tab === 'navegacion' && (
-          <div className="admin-card">
-            {data.navItems.map((item, i) => (
-              <div key={i} className="admin-inline-group">
-                <AdminFormField label={`Item ${i + 1} - Nombre visible`} value={item.label} onChange={(v) => updateNavItem(i, 'label', v)} helpText="(Texto que aparece en el menú)" />
-                <AdminFormField
-                  label="Destino"
-                  type="select"
-                  value={item.sectionId}
-                  onChange={(v) => updateNavItem(i, 'sectionId', v)}
-                  options={[
-                    { value: 'inicio', label: 'Inicio (banner principal)' },
-                    { value: 'categorias', label: 'Colecciones' },
-                    { value: 'nosotros', label: 'Nosotros' },
-                    { value: 'mundial', label: 'Presencia Global' },
-                    { value: 'contacto', label: 'Contacto / Footer' },
-                  ]}
-                  helpText="(Sección a la que lleva al hacer click)"
-                />
-                <button type="button" className="btn-delete-inline" onClick={() => removeNavItem(i)}>
-                  <i className="fas fa-trash"></i>
-                </button>
-              </div>
-            ))}
-            <button type="button" className="btn-add-item" onClick={addNavItem}>
-              <i className="fas fa-plus"></i> Agregar item
-            </button>
-          </div>
-        )}
       </div>
 
       {saveError && <div className="save-error"><i className="fas fa-exclamation-circle"></i> {saveError}</div>}

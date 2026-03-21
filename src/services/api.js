@@ -152,6 +152,15 @@ export async function getAdminStats() {
   return apiFetch('/api/admin/stats');
 }
 
+// --- Contacto ---
+
+export async function sendContactForm(data) {
+  return apiFetch('/api/contact', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
 // --- Upload ---
 
 export async function uploadImage(file) {

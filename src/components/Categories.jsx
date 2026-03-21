@@ -8,8 +8,7 @@ function Categories() {
   const productos = content.products.items;
 
   const getPortada = (slug) => {
-    const destacado = productos.find(p => p.categoria === slug && p.destacado);
-    return destacado?.imagen || null;
+    return productos.find(p => p.categoria === slug && p.destacado) || null;
   };
 
   const filas = [];
@@ -33,11 +32,20 @@ function Categories() {
                 className="category-card"
               >
                 <div className="category-img">
-                  {getPortada(cat.slug) ? (
-                    <img src={getThumb(getPortada(cat.slug))} alt={cat.nombre} loading="lazy" />
-                  ) : (
-                    <div className="category-img-placeholder"><i className="fas fa-image"></i></div>
-                  )}
+                  {(() => {
+                    const portada = getPortada(cat.slug);
+                    return portada ? (
+                      <div className="category-img-wrapper" style={{
+                        '--img-zoom': portada.imageZoom ?? 1,
+                        '--img-tx': `${50 - (portada.imagePosX ?? 50)}%`,
+                        '--img-ty': `${50 - (portada.imagePosY ?? 50)}%`,
+                      }}>
+                        <img src={getThumb(portada.imagen)} alt={cat.nombre} loading="lazy" />
+                      </div>
+                    ) : (
+                      <div className="category-img-placeholder"><i className="fas fa-image"></i></div>
+                    );
+                  })()}
                 </div>
                 <div className="category-info">
                   <h4>{cat.nombre}</h4>

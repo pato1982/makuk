@@ -205,4 +205,8 @@
         grid-template-columns: repeat(3, 1fr);
         gap: 25px;
     }
+
+    .footer-links-col {
+        padding-left: 60px;
+    }
 }

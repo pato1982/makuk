@@ -216,7 +216,7 @@
 .cs-admin-access {
   position: absolute;
   bottom: 20px;
-  right: 20px;
+  left: 20px;
   background: none;
   border: none;
   color: rgba(184, 115, 51, 0.15);
@@ -229,6 +229,61 @@
 
 .cs-admin-access:hover {
   color: rgba(184, 115, 51, 0.5);
+}
+
+/* Mini login form */
+.cs-login-form {
+  position: absolute;
+  bottom: 50px;
+  left: 20px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 3;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cs-login-form input {
+  background: rgba(30, 20, 15, 0.9);
+  border: 1px solid rgba(184, 115, 51, 0.3);
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: var(--cream);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.8rem;
+  width: 150px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.cs-login-form input:focus {
+  border-color: var(--copper-shine);
+}
+
+.cs-login-form input::placeholder {
+  color: rgba(184, 115, 51, 0.4);
+}
+
+.cs-login-form button {
+  background: rgba(184, 115, 51, 0.2);
+  border: 1px solid rgba(184, 115, 51, 0.3);
+  border-radius: 6px;
+  color: var(--copper-metallic);
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+}
+
+.cs-login-form button:hover {
+  background: rgba(184, 115, 51, 0.35);
+  border-color: var(--copper-shine);
+  color: var(--copper-shine);
 }
 
 /* Responsive */
@@ -244,5 +299,15 @@
   .cs-social a {
     width: 44px;
     height: 44px;
+  }
+
+  .cs-login-form {
+    flex-direction: column;
+    left: 10px;
+    bottom: 45px;
+  }
+
+  .cs-login-form input {
+    width: 130px;
   }
 }

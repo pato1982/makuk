@@ -3,6 +3,7 @@ import { useContent } from '../../context/ContentContext';
 import AdminFormField from '../../components/admin/AdminFormField';
 import AdminCard from '../../components/admin/AdminCard';
 import ImageUploader from '../../components/admin/ImageUploader';
+import { uploadImage } from '../../services/api';
 
 function AdminCategories() {
   const { content, updateSection } = useContent();
@@ -26,8 +27,8 @@ function AdminCategories() {
   const [selectedCategory, setSelectedCategory] = useState(data.items.length > 0 ? data.items[0].slug : '');
   const [editProduct, setEditProduct] = useState(null);
   const [isNewProduct, setIsNewProduct] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [saveError, setSaveError] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [modalError, setModalError] = useState('');
   const [tab, setTab] = useState('tipos');
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
@@ -35,9 +36,12 @@ function AdminCategories() {
   const [productModalPos, setProductModalPos] = useState({ x: 0, y: 0 });
   const dragging = useRef(false);
   const dragOffset = useRef({ x: 0, y: 0 });
+  const imgInputRef = useRef(null);
+  const [imgUploading, setImgUploading] = useState(false);
 
   const openModal = (index) => {
     setModalPos({ x: 0, y: 0 });
+    setModalError('');
     setEditIndex(index);
     setIsNewCategory(false);
   };
@@ -61,24 +65,7 @@ function AdminCategories() {
     document.addEventListener('mouseup', handleDragEnd);
   }, [modalPos]);
 
-  const handleSave = async () => {
-    setSaveError('');
-    const nombres = {};
-    data.items.forEach(cat => { nombres[cat.slug] = cat.nombre; });
-    if (productsData.nombresCategorias['piezas-unicas']) {
-      nombres['piezas-unicas'] = productsData.nombresCategorias['piezas-unicas'];
-    }
-    const updatedProducts = { ...productsData, nombresCategorias: nombres };
-    try {
-      await updateSection('categories', data);
-      await updateSection('products', updatedProducts);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
-    } catch {
-      setSaveError('Error al guardar. Intenta de nuevo.');
-    }
-  };
-
+  const formatearPrecio = (valor) => '$' + Math.round(valor).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
   const filteredProducts = productsData.items.filter(p => p.categoria === selectedCategory);
 
@@ -88,6 +75,26 @@ function AdminCategories() {
 
   const handleChangeTab = (newTab) => {
     setTab(newTab);
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file || !editProduct) return;
+    setImgUploading(true);
+    try {
+      const { url } = await uploadImage(file);
+      setProductsData(prev => ({
+        ...prev,
+        items: prev.items.map(p => p.id === editProduct
+          ? { ...p, imagen: url, imagePosX: 50, imagePosY: 50, imageZoom: 1 }
+          : p)
+      }));
+    } catch {
+      // error silencioso
+    } finally {
+      setImgUploading(false);
+      e.target.value = '';
+    }
   };
 
   const addProduct = () => {
@@ -100,9 +107,13 @@ function AdminCategories() {
       precioActual: 0,
       precioAnterior: 0,
       destacado: false,
-      descripcion: ''
+      descripcion: '',
+      imagePosX: 50,
+      imagePosY: 50,
+      imageZoom: 1
     };
     setProductsData({ ...productsData, items: [...productsData.items, newProduct] });
+    setModalError('');
     setEditProduct(newProduct.id);
     setIsNewProduct(true);
   };
@@ -114,10 +125,12 @@ function AdminCategories() {
     }));
   };
 
-  const removeProduct = (id) => {
+  const removeProduct = async (id) => {
     if (!window.confirm('¿Eliminar este producto?')) return;
-    setProductsData({ ...productsData, items: productsData.items.filter(p => p.id !== id) });
+    const newData = { ...productsData, items: productsData.items.filter(p => p.id !== id) };
+    setProductsData(newData);
     setEditProduct(null);
+    try { await updateSection('products', newData); } catch { /* silencioso */ }
   };
 
   const cancelProduct = () => {
@@ -128,19 +141,30 @@ function AdminCategories() {
     setIsNewProduct(false);
   };
 
-  const saveProduct = () => {
-    setEditProduct(null);
-    setIsNewProduct(false);
+  const saveProduct = async () => {
+    setSaving(true);
+    setModalError('');
+    try {
+      await updateSection('products', productsData);
+      setEditProduct(null);
+      setIsNewProduct(false);
+    } catch {
+      setModalError('Error al guardar. Intenta de nuevo.');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const toggleDestacado = (id) => {
+  const toggleDestacado = async (id) => {
     const prod = productsData.items.find(p => p.id === id);
     const items = productsData.items.map(p => {
       if (p.id === id) return { ...p, destacado: !prod.destacado };
       if (!prod.destacado && p.categoria === prod.categoria && p.destacado) return { ...p, destacado: false };
       return p;
     });
-    setProductsData({ ...productsData, items });
+    const newData = { ...productsData, items };
+    setProductsData(newData);
+    try { await updateSection('products', newData); } catch { /* silencioso */ }
   };
 
   const getEditingProduct = () => productsData.items.find(p => p.id === editProduct);
@@ -187,22 +211,41 @@ function AdminCategories() {
     setDeleteConfirm(index);
   };
 
-  const confirmDeleteCategory = () => {
+  const confirmDeleteCategory = async () => {
     const cat = data.items[deleteConfirm];
-    // Eliminar también los productos de esta categoría
-    setProductsData(prev => ({
-      ...prev,
-      items: prev.items.filter(p => p.categoria !== cat.slug)
-    }));
-    setData({ ...data, items: data.items.filter((_, i) => i !== deleteConfirm) });
+    const newData = { ...data, items: data.items.filter((_, i) => i !== deleteConfirm) };
+    const newProductsData = { ...productsData, items: productsData.items.filter(p => p.categoria !== cat.slug) };
+    setData(newData);
+    setProductsData(newProductsData);
     setEditIndex(null);
     setIsNewCategory(false);
     setDeleteConfirm(null);
+    try {
+      await updateSection('categories', newData);
+      await updateSection('products', newProductsData);
+    } catch { /* silencioso */ }
   };
 
-  const saveCategory = () => {
-    setEditIndex(null);
-    setIsNewCategory(false);
+  const saveCategory = async () => {
+    setSaving(true);
+    setModalError('');
+    const nombres = {};
+    data.items.forEach(cat => { nombres[cat.slug] = cat.nombre; });
+    if (productsData.nombresCategorias['piezas-unicas']) {
+      nombres['piezas-unicas'] = productsData.nombresCategorias['piezas-unicas'];
+    }
+    const updatedProducts = { ...productsData, nombresCategorias: nombres };
+    try {
+      await updateSection('categories', data);
+      await updateSection('products', updatedProducts);
+      setProductsData(updatedProducts);
+      setEditIndex(null);
+      setIsNewCategory(false);
+    } catch {
+      setModalError('Error al guardar. Intenta de nuevo.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const cancelCategory = () => {
@@ -252,12 +295,20 @@ function AdminCategories() {
                   const productCount = productsData.items.filter(p => p.categoria === item.slug).length;
                   return (
                     <div key={i} className="admin-grid-card-wrapper">
-                      <div className="admin-grid-card" onClick={() => openModal(i)}>
-                        {portada ? <img src={portada.imagen} alt={item.nombre} className="admin-grid-card-img" /> : null}
-                        <div className="admin-grid-card-info">
-                          <span className="admin-grid-card-name">{item.nombre}</span>
-                          {item.descripcion && <span className="admin-grid-card-slug">{item.descripcion}</span>}
-                          <span className="admin-grid-card-slug">{productCount} producto{productCount !== 1 ? 's' : ''}</span>
+                      <div className="producto-card" onClick={() => openModal(i)}>
+                        <div className="producto-img">
+                          <div className="producto-img-wrapper" style={{
+                            '--img-zoom': portada?.imageZoom ?? 1,
+                            '--img-tx': `${50 - (portada?.imagePosX ?? 50)}%`,
+                            '--img-ty': `${50 - (portada?.imagePosY ?? 50)}%`,
+                          }}>
+                            {portada ? <img src={portada.imagen} alt={item.nombre} /> : null}
+                          </div>
+                        </div>
+                        <div className="producto-info">
+                          <h4>{item.nombre}</h4>
+                          {item.descripcion && <p className="precio-anterior" style={{ textDecoration: 'none' }}>{item.descripcion}</p>}
+                          <span className="precio-actual" style={{ fontSize: '0.8rem' }}>{productCount} producto{productCount !== 1 ? 's' : ''}</span>
                         </div>
                       </div>
                       <div className="admin-grid-card-actions">
@@ -308,15 +359,26 @@ function AdminCategories() {
                     >
                       <div className="card-toggle-bar-knob"></div>
                     </div>
-                    <div className="admin-grid-card">
-                      {prod.imagen && <img src={prod.imagen} alt={prod.nombre} className="admin-grid-card-img" />}
-                      <div className="admin-grid-card-info">
-                        <span className="admin-grid-card-name">{prod.nombre}</span>
-                        <span className="admin-grid-card-slug">${prod.precioActual?.toLocaleString()}</span>
+                    <div className="producto-card">
+                      <div className="producto-img">
+                        <div className="producto-img-wrapper" style={{
+                          '--img-zoom': prod.imageZoom ?? 1,
+                          '--img-tx': `${50 - (prod.imagePosX ?? 50)}%`,
+                          '--img-ty': `${50 - (prod.imagePosY ?? 50)}%`,
+                        }}>
+                          {prod.imagen && <img src={prod.imagen} alt={prod.nombre} />}
+                        </div>
+                      </div>
+                      <div className="producto-info">
+                        <h4>{prod.nombre}</h4>
+                        <div className="producto-precios">
+                          <span className="precio-actual">{formatearPrecio(prod.precioActual)}</span>
+                          {prod.precioAnterior > 0 && <span className="precio-anterior">{formatearPrecio(prod.precioAnterior)}</span>}
+                        </div>
                       </div>
                     </div>
                     <div className="admin-grid-card-actions">
-                      <button className="btn-card-edit" onClick={() => { setProductModalPos({ x: 0, y: 0 }); setIsNewProduct(false); setEditProduct(prod.id); }}>
+                      <button className="btn-card-edit" onClick={() => { setProductModalPos({ x: 0, y: 0 }); setModalError(''); setIsNewProduct(false); setEditProduct(prod.id); }}>
                         <i className="fas fa-edit btn-card-icon"></i><span className="btn-card-label">Editar</span>
                       </button>
                       <button className="btn-card-delete" onClick={() => removeProduct(prod.id)}>
@@ -366,11 +428,12 @@ function AdminCategories() {
               </button>
             </div>
 
+            {modalError && <div className="save-error" style={{ marginBottom: '8px' }}><i className="fas fa-exclamation-circle"></i> {modalError}</div>}
             <div className="admin-modal-footer-center">
-              <button type="button" className="btn-save-modal" onClick={saveCategory}>
-                <i className="fas fa-check"></i> Guardar
+              <button type="button" className="btn-save-modal" onClick={saveCategory} disabled={saving}>
+                {saving ? <><i className="fas fa-spinner fa-spin"></i> Guardando...</> : <><i className="fas fa-check"></i> Guardar</>}
               </button>
-              <button type="button" className="btn-modal-cancel" onClick={cancelCategory}>
+              <button type="button" className="btn-modal-cancel" onClick={cancelCategory} disabled={saving}>
                 Cancelar
               </button>
             </div>
@@ -389,17 +452,74 @@ function AdminCategories() {
 
             <AdminFormField label="Nombre del producto" value={getEditingProduct().nombre} onChange={(v) => updateProduct(editProduct, 'nombre', v)} />
             <AdminFormField label="Descripción" type="textarea" rows={1} value={getEditingProduct().descripcion} onChange={(v) => updateProduct(editProduct, 'descripcion', v)} />
-            <ImageUploader label="Imagen" value={getEditingProduct().imagen} onChange={(v) => updateProduct(editProduct, 'imagen', v)} compact />
+            <div className="admin-field">
+              <label>Imagen</label>
+              {getEditingProduct().imagen ? (
+                <div className="img-editor">
+                  <div className="img-editor-body">
+                    <button type="button" className="img-editor-arrow" onClick={() => updateProduct(editProduct, 'imagePosY', Math.max(0, (getEditingProduct().imagePosY ?? 50) - 5))}>
+                      <i className="fas fa-chevron-up"></i>
+                    </button>
+                    <div className="img-editor-middle">
+                      <button type="button" className="img-editor-arrow" onClick={() => updateProduct(editProduct, 'imagePosX', Math.max(0, (getEditingProduct().imagePosX ?? 50) - 5))}>
+                        <i className="fas fa-chevron-left"></i>
+                      </button>
+                      <div className="img-editor-preview">
+                        {imgUploading && <div className="img-editor-loading"><i className="fas fa-spinner fa-spin"></i></div>}
+                        <div className="img-editor-wrapper" style={{
+                          transform: `scale(${getEditingProduct().imageZoom ?? 1}) translate(${50 - (getEditingProduct().imagePosX ?? 50)}%, ${50 - (getEditingProduct().imagePosY ?? 50)}%)`,
+                        }}>
+                          <img
+                            src={getEditingProduct().imagen}
+                            alt="Preview"
+                          />
+                        </div>
+                      </div>
+                      <button type="button" className="img-editor-arrow" onClick={() => updateProduct(editProduct, 'imagePosX', Math.min(100, (getEditingProduct().imagePosX ?? 50) + 5))}>
+                        <i className="fas fa-chevron-right"></i>
+                      </button>
+                    </div>
+                    <button type="button" className="img-editor-arrow" onClick={() => updateProduct(editProduct, 'imagePosY', Math.min(100, (getEditingProduct().imagePosY ?? 50) + 5))}>
+                      <i className="fas fa-chevron-down"></i>
+                    </button>
+                  </div>
+                  <div className="img-editor-zoom">
+                    <i className="fas fa-search-minus"></i>
+                    <input
+                      type="range"
+                      min="0.5"
+                      max="2"
+                      step="0.05"
+                      value={getEditingProduct().imageZoom ?? 1}
+                      onChange={(e) => updateProduct(editProduct, 'imageZoom', parseFloat(e.target.value))}
+                    />
+                    <i className="fas fa-search-plus"></i>
+                  </div>
+                  <button type="button" className="img-editor-change" onClick={() => imgInputRef.current.click()}>
+                    <i className="fas fa-camera"></i> Cambiar imagen
+                  </button>
+                  <input ref={imgInputRef} type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
+                </div>
+              ) : (
+                <ImageUploader value="" onChange={(v) => {
+                  updateProduct(editProduct, 'imagen', v);
+                  updateProduct(editProduct, 'imagePosX', 50);
+                  updateProduct(editProduct, 'imagePosY', 50);
+                  updateProduct(editProduct, 'imageZoom', 1);
+                }} compact />
+              )}
+            </div>
             <div className="admin-row">
               <AdminFormField label="Precio actual" type="number" value={getEditingProduct().precioActual} onChange={(v) => updateProduct(editProduct, 'precioActual', Number(v))} />
               <AdminFormField label="Precio anterior" type="number" value={getEditingProduct().precioAnterior} onChange={(v) => updateProduct(editProduct, 'precioAnterior', Number(v))} />
             </div>
 
+            {modalError && <div className="save-error" style={{ marginBottom: '8px' }}><i className="fas fa-exclamation-circle"></i> {modalError}</div>}
             <div className="admin-modal-footer-center">
-              <button type="button" className="btn-save-modal" onClick={saveProduct}>
-                <i className="fas fa-check"></i> Guardar
+              <button type="button" className="btn-save-modal" onClick={saveProduct} disabled={saving}>
+                {saving ? <><i className="fas fa-spinner fa-spin"></i> Guardando...</> : <><i className="fas fa-check"></i> Guardar</>}
               </button>
-              <button type="button" className="btn-modal-cancel" onClick={cancelProduct}>
+              <button type="button" className="btn-modal-cancel" onClick={cancelProduct} disabled={saving}>
                 Cancelar
               </button>
             </div>
@@ -440,10 +560,6 @@ function AdminCategories() {
         );
       })()}
 
-      {saveError && <div className="save-error"><i className="fas fa-exclamation-circle"></i> {saveError}</div>}
-      <button className={`btn-save ${saved ? 'saved' : ''}`} onClick={handleSave}>
-        {saved ? <><i className="fas fa-check"></i> Guardado</> : <><i className="fas fa-save"></i> Guardar cambios</>}
-      </button>
     </div>
   );
 }
