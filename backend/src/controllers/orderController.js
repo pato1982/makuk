@@ -152,8 +152,8 @@ export async function createOrder(req, res) {
     // Generar ID de orden del comercio
     const commerceOrder = generateCommerceOrder();
 
-    // URLs de callback (apuntan al VPS público)
-    const baseUrl = process.env.PUBLIC_URL || 'http://186.64.122.100';
+    // URLs de callback (apuntan al dominio público vía Nginx)
+    const baseUrl = process.env.FRONTEND_URL || 'https://makuk.cl';
     const urlConfirmation = `${baseUrl}/api/orders/confirm`;
     const urlReturn = `${baseUrl}/api/orders/return`;
 
