@@ -29,6 +29,8 @@ const AdminProducts = lazy(() => import('./pages/admin/AdminProducts'));
 const AdminProductsPage = lazy(() => import('./pages/admin/AdminProductsPage'));
 const AdminControl = lazy(() => import('./pages/admin/AdminControl'));
 const FlowTestPage = lazy(() => import('./pages/flow/FlowTestPage'));
+const CheckoutPage = lazy(() => import('./pages/CheckoutPage'));
+const PaymentResultPage = lazy(() => import('./pages/PaymentResultPage'));
 
 // Importar estilos
 import './styles/variables.css';
@@ -39,6 +41,7 @@ import './styles/productos.css';
 import './styles/footer.css';
 import './styles/admin.css';
 import './styles/coming-soon.css';
+import './styles/checkout.css';
 
 function App() {
   return (
@@ -50,6 +53,10 @@ function App() {
               {/* Public */}
               <Route path="/" element={COMING_SOON ? <ComingSoon /> : <Home />} />
               <Route path="/productos" element={COMING_SOON ? <ComingSoon /> : <Productos />} />
+
+              {/* Checkout */}
+              <Route path="/checkout" element={<Suspense fallback={<div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh',background:'#0f1117',color:'#b87333'}}>Cargando...</div>}><CheckoutPage /></Suspense>} />
+              <Route path="/payment-result" element={<Suspense fallback={<div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh',background:'#0f1117',color:'#b87333'}}>Cargando...</div>}><PaymentResultPage /></Suspense>} />
 
               {/* Flow API Tester */}
               <Route path="/flow-test" element={<Suspense fallback={<div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh',background:'#0f1117',color:'#e4e4e7'}}>Cargando Flow API Tester...</div>}><FlowTestPage /></Suspense>} />

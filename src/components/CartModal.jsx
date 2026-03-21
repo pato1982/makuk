@@ -1,6 +1,8 @@
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 
 function CartModal() {
+  const navigate = useNavigate();
   const {
     carrito,
     showCartModal,
@@ -97,7 +99,7 @@ function CartModal() {
             <button className="btn-vaciar-carrito" onClick={handleVaciar}>
               <i className="fas fa-trash-alt"></i> Vaciar carrito
             </button>
-            <button className="btn-finalizar-compra" onClick={() => alert('Funcionalidad de checkout próximamente disponible.')}>
+            <button className="btn-finalizar-compra" onClick={() => { setShowCartModal(false); navigate('/checkout'); }}>
               Finalizar compra <i className="fas fa-arrow-right"></i>
             </button>
           </div>

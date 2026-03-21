@@ -1,0 +1,588 @@
+import crypto from 'crypto';
+import pool from '../config/db.js';
+import { sendOrderConfirmationEmails } from '../utils/emailService.js';
+
+// ============================================
+// FLOW API HELPERS (server-side)
+// ============================================
+
+function getFlowBaseUrl() {
+  const env = process.env.FLOW_ENV || 'sandbox';
+  return env === 'production'
+    ? 'https://www.flow.cl/api'
+    : 'https://sandbox.flow.cl/api';
+}
+
+function signParams(params, secretKey) {
+  const keys = Object.keys(params).sort();
+  const toSign = keys.map(k => k + params[k]).join('');
+  return crypto.createHmac('sha256', secretKey).update(toSign).digest('hex');
+}
+
+function cleanParams(params) {
+  return Object.fromEntries(
+    Object.entries(params).filter(([, v]) => v !== '' && v !== null && v !== undefined)
+  );
+}
+
+async function flowPost(endpoint, params) {
+  const apiKey = process.env.FLOW_API_KEY;
+  const secretKey = process.env.FLOW_SECRET_KEY;
+
+  if (!apiKey || !secretKey) {
+    throw new Error('Flow credentials not configured (FLOW_API_KEY / FLOW_SECRET_KEY)');
+  }
+
+  const allParams = cleanParams({ ...params, apiKey });
+  allParams.s = signParams(allParams, secretKey);
+
+  const body = new URLSearchParams(allParams).toString();
+  const url = `${getFlowBaseUrl()}${endpoint}`;
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body,
+  });
+
+  const data = await res.json();
+  return { ok: res.ok, status: res.status, data };
+}
+
+async function flowGet(endpoint, params) {
+  const apiKey = process.env.FLOW_API_KEY;
+  const secretKey = process.env.FLOW_SECRET_KEY;
+
+  if (!apiKey || !secretKey) {
+    throw new Error('Flow credentials not configured');
+  }
+
+  const allParams = cleanParams({ ...params, apiKey });
+  allParams.s = signParams(allParams, secretKey);
+
+  const qs = new URLSearchParams(allParams).toString();
+  const url = `${getFlowBaseUrl()}${endpoint}?${qs}`;
+
+  const res = await fetch(url, { method: 'GET' });
+  const data = await res.json();
+  return { ok: res.ok, status: res.status, data };
+}
+
+// ============================================
+// HELPERS
+// ============================================
+
+function generateCommerceOrder() {
+  const now = new Date();
+  const date = now.toISOString().slice(0, 10).replace(/-/g, '');
+  const rand = Math.random().toString(36).substring(2, 8).toUpperCase();
+  return `MKK-${date}-${rand}`;
+}
+
+async function logStatusChange(conn, orderId, prevStatus, newStatus, source, flowResponse, ip, details) {
+  await conn.execute(
+    `INSERT INTO order_status_log (order_id, previous_status, new_status, source, flow_response, request_ip, details)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [orderId, prevStatus, newStatus, source, flowResponse ? JSON.stringify(flowResponse) : null, ip, details]
+  );
+}
+
+// ============================================
+// FASE 1: CREAR ORDEN + LLAMAR A FLOW
+// POST /api/orders
+// ============================================
+
+export async function createOrder(req, res) {
+  const conn = await pool.getConnection();
+
+  try {
+    const { customer, items } = req.body;
+
+    // Validar datos del cliente
+    if (!customer?.name || !customer?.email) {
+      return res.status(400).json({ error: 'Nombre y email del cliente son requeridos' });
+    }
+    if (!items?.length) {
+      return res.status(400).json({ error: 'El carrito está vacío' });
+    }
+
+    await conn.beginTransaction();
+
+    // Calcular totales
+    let subtotal = 0;
+    const orderItems = [];
+
+    for (const item of items) {
+      // Buscar producto en DB para snapshot (categoría, imagen)
+      // Si se envía productId, usar ese; si no, buscar por nombre + precio
+      let product = null;
+      if (item.productId) {
+        const [rows] = await conn.execute(
+          'SELECT id, nombre, categoria, imagen, precio_actual FROM products WHERE id = ? LIMIT 1',
+          [item.productId]
+        );
+        product = rows[0] || null;
+      } else {
+        const [rows] = await conn.execute(
+          'SELECT id, nombre, categoria, imagen, precio_actual FROM products WHERE nombre = ? AND precio_actual = ? LIMIT 1',
+          [item.nombre, item.precioUnitario]
+        );
+        product = rows[0] || null;
+      }
+
+      // Siempre usar el precio del carrito (es lo que el cliente vio)
+      const unitPrice = item.precioUnitario;
+      const lineTotal = unitPrice * item.cantidad;
+      subtotal += lineTotal;
+
+      orderItems.push({
+        product_id: product?.id || null,
+        product_name: item.nombre,
+        product_category: product?.categoria || null,
+        product_image: product?.imagen || null,
+        unit_price: unitPrice,
+        quantity: item.cantidad,
+        line_total: lineTotal,
+      });
+    }
+
+    const iva = Math.round(subtotal * 0.19);
+    const total = subtotal + iva;
+
+    // Generar ID de orden del comercio
+    const commerceOrder = generateCommerceOrder();
+
+    // URLs de callback (apuntan al VPS público)
+    const baseUrl = process.env.PUBLIC_URL || 'http://186.64.122.100';
+    const urlConfirmation = `${baseUrl}/api/orders/confirm`;
+    const urlReturn = `${baseUrl}/api/orders/return`;
+
+    // Crear orden en DB con estado pending
+    const [orderResult] = await conn.execute(
+      `INSERT INTO orders (commerce_order, customer_name, customer_email, customer_phone,
+        subtotal, iva, total, url_confirmation, url_return, ip_address, user_agent)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        commerceOrder, customer.name, customer.email, customer.phone || null,
+        subtotal, iva, total, urlConfirmation, urlReturn,
+        req.ip, req.get('user-agent'),
+      ]
+    );
+
+    const orderId = orderResult.insertId;
+
+    // Insertar items
+    for (const item of orderItems) {
+      await conn.execute(
+        `INSERT INTO order_items (order_id, product_id, product_name, product_category, product_image,
+          unit_price, quantity, line_total)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [orderId, item.product_id, item.product_name, item.product_category, item.product_image,
+          item.unit_price, item.quantity, item.line_total]
+      );
+    }
+
+    // Log de creación
+    await logStatusChange(conn, orderId, null, 'pending', 'system', null, req.ip, 'Orden creada');
+
+    // Llamar a Flow /payment/create
+    const flowParams = {
+      commerceOrder,
+      subject: `Compra Makuk - ${commerceOrder}`,
+      amount: total,
+      email: customer.email,
+      currency: 'CLP',
+      urlConfirmation,
+      urlReturn,
+    };
+
+    const flowResult = await flowPost('/payment/create', flowParams);
+
+    if (!flowResult.ok || !flowResult.data?.token) {
+      // Flow rechazó la solicitud
+      await conn.execute(
+        `UPDATE orders SET status = 'error', flow_create_response = ? WHERE id = ?`,
+        [JSON.stringify(flowResult.data), orderId]
+      );
+      await logStatusChange(conn, orderId, 'pending', 'error', 'system', flowResult.data, req.ip,
+        `Flow rechazó /payment/create: ${flowResult.data?.message || JSON.stringify(flowResult.data)}`);
+      await conn.commit();
+
+      return res.status(502).json({
+        error: 'Error al crear la orden en Flow',
+        details: flowResult.data,
+        commerceOrder,
+      });
+    }
+
+    // Guardar datos de Flow
+    const { token, url, flowOrder } = flowResult.data;
+    const checkoutUrl = `${url}?token=${token}`;
+
+    await conn.execute(
+      `UPDATE orders SET flow_token = ?, flow_order = ?, checkout_url = ?,
+        flow_create_response = ?, status = 'processing' WHERE id = ?`,
+      [token, flowOrder, checkoutUrl, JSON.stringify(flowResult.data), orderId]
+    );
+    await logStatusChange(conn, orderId, 'pending', 'processing', 'system', flowResult.data, req.ip,
+      `Flow order creada: token=${token}, flowOrder=${flowOrder}`);
+
+    await conn.commit();
+
+    // Retornar al frontend
+    res.json({
+      success: true,
+      commerceOrder,
+      checkoutUrl,
+      token,
+      flowOrder,
+      total,
+    });
+
+  } catch (err) {
+    await conn.rollback();
+    console.error('Error creating order:', err);
+    res.status(500).json({ error: 'Error interno al crear la orden', details: err.message });
+  } finally {
+    conn.release();
+  }
+}
+
+// ============================================
+// FASE 2: WEBHOOK DE CONFIRMACIÓN
+// POST /api/orders/confirm
+// Flow envía POST con token en el body
+// ============================================
+
+export async function handleConfirmation(req, res) {
+  const conn = await pool.getConnection();
+
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ error: 'Token requerido' });
+    }
+
+    // Buscar orden por token
+    const [orders] = await conn.execute(
+      'SELECT * FROM orders WHERE flow_token = ? LIMIT 1',
+      [token]
+    );
+
+    if (!orders.length) {
+      console.warn(`Webhook: orden no encontrada para token ${token}`);
+      return res.status(200).send('OK'); // Siempre responder 200 a Flow
+    }
+
+    const order = orders[0];
+
+    // Consultar estado en Flow
+    const statusResult = await flowGet('/payment/getStatus', { token });
+
+    if (!statusResult.ok) {
+      await logStatusChange(conn, order.id, order.status, order.status, 'webhook', statusResult.data, req.ip,
+        `Error consultando getStatus: ${statusResult.status}`);
+      return res.status(200).send('OK');
+    }
+
+    const flowData = statusResult.data;
+    const flowStatus = flowData.status; // 1=pending, 2=paid, 3=rejected, 4=cancelled
+
+    // Mapear estado Flow → estado interno
+    let newStatus = order.status;
+    if (flowStatus === 2) newStatus = 'paid';
+    else if (flowStatus === 3) newStatus = 'rejected';
+    else if (flowStatus === 4) newStatus = 'cancelled';
+
+    await conn.beginTransaction();
+
+    // Actualizar orden
+    await conn.execute(
+      `UPDATE orders SET
+        status = ?, flow_status = ?, flow_confirm_response = ?, confirmed_at = NOW(),
+        payment_method = ?, paid_at = ?, payer_email = ?, transaction_id = ?
+       WHERE id = ?`,
+      [
+        newStatus,
+        flowStatus,
+        JSON.stringify(flowData),
+        flowData.paymentData?.media || null,
+        flowStatus === 2 ? new Date(flowData.paymentData?.date || Date.now()) : null,
+        flowData.payer || null,
+        flowData.paymentData?.transferDate || null,
+        order.id,
+      ]
+    );
+
+    await logStatusChange(conn, order.id, order.status, newStatus, 'webhook', flowData, req.ip,
+      `Confirmación Flow: status=${flowStatus}, method=${flowData.paymentData?.media || 'N/A'}`);
+
+    await conn.commit();
+
+    // Enviar emails de confirmación si el pago fue exitoso
+    if (newStatus === 'paid') {
+      // Obtener items de la orden para el email
+      const [orderItems] = await pool.execute(
+        'SELECT * FROM order_items WHERE order_id = ? ORDER BY id',
+        [order.id]
+      );
+
+      // Construir objeto orden actualizado con datos del pago
+      const updatedOrder = {
+        ...order,
+        status: newStatus,
+        payment_method: flowData.paymentData?.media || null,
+        paid_at: flowData.paymentData?.date || new Date(),
+      };
+
+      // Enviar emails (no bloquea la respuesta a Flow)
+      sendOrderConfirmationEmails(updatedOrder, orderItems)
+        .then(r => console.log('Emails enviados:', r))
+        .catch(e => console.error('Error enviando emails:', e));
+    }
+
+    // Siempre responder 200 a Flow
+    res.status(200).send('OK');
+
+  } catch (err) {
+    await conn.rollback();
+    console.error('Error in confirmation webhook:', err);
+    res.status(200).send('OK'); // Aun con error, responder 200
+  } finally {
+    conn.release();
+  }
+}
+
+// ============================================
+// FASE 3: RETORNO DEL CLIENTE
+// POST /api/orders/return (Flow envía POST)
+// Redirige al frontend con el commerceOrder
+// ============================================
+
+export async function handleReturn(req, res) {
+  const conn = await pool.getConnection();
+
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.redirect('/payment-result?error=no_token');
+    }
+
+    // Buscar orden
+    const [orders] = await conn.execute(
+      'SELECT * FROM orders WHERE flow_token = ? LIMIT 1',
+      [token]
+    );
+
+    if (!orders.length) {
+      return res.redirect('/payment-result?error=order_not_found');
+    }
+
+    const order = orders[0];
+
+    // Consultar estado actualizado en Flow
+    const statusResult = await flowGet('/payment/getStatus', { token });
+
+    if (statusResult.ok) {
+      const flowData = statusResult.data;
+      const flowStatus = flowData.status;
+
+      let newStatus = order.status;
+      if (flowStatus === 2) newStatus = 'paid';
+      else if (flowStatus === 3) newStatus = 'rejected';
+      else if (flowStatus === 4) newStatus = 'cancelled';
+
+      await conn.beginTransaction();
+
+      await conn.execute(
+        `UPDATE orders SET
+          flow_return_response = ?, returned_at = NOW(),
+          status = ?, flow_status = ?,
+          payment_method = COALESCE(payment_method, ?),
+          paid_at = COALESCE(paid_at, ?),
+          payer_email = COALESCE(payer_email, ?)
+         WHERE id = ?`,
+        [
+          JSON.stringify(flowData),
+          newStatus,
+          flowStatus,
+          flowData.paymentData?.media || null,
+          flowStatus === 2 ? new Date(flowData.paymentData?.date || Date.now()) : null,
+          flowData.payer || null,
+          order.id,
+        ]
+      );
+
+      await logStatusChange(conn, order.id, order.status, newStatus, 'return', flowData, req.ip,
+        `Cliente retornó: status=${flowStatus}`);
+
+      await conn.commit();
+    }
+
+    // Redirigir al frontend con el ID de la orden
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5174';
+    res.redirect(`${frontendUrl}/payment-result?order=${order.commerce_order}`);
+
+  } catch (err) {
+    await conn.rollback();
+    console.error('Error in return handler:', err);
+    res.redirect('/payment-result?error=internal');
+  } finally {
+    conn.release();
+  }
+}
+
+// ============================================
+// CONSULTAR ORDEN
+// GET /api/orders/:commerceOrder
+// ============================================
+
+export async function getOrder(req, res) {
+  try {
+    const { commerceOrder } = req.params;
+
+    const [orders] = await pool.execute(
+      'SELECT * FROM orders WHERE commerce_order = ? LIMIT 1',
+      [commerceOrder]
+    );
+
+    if (!orders.length) {
+      return res.status(404).json({ error: 'Orden no encontrada' });
+    }
+
+    const order = orders[0];
+
+    // Obtener items
+    const [items] = await pool.execute(
+      'SELECT * FROM order_items WHERE order_id = ? ORDER BY id',
+      [order.id]
+    );
+
+    // Obtener log de estados
+    const [statusLog] = await pool.execute(
+      'SELECT * FROM order_status_log WHERE order_id = ? ORDER BY created_at',
+      [order.id]
+    );
+
+    // Parsear JSON fields
+    const parseJson = (val) => {
+      if (!val) return null;
+      if (typeof val === 'object') return val;
+      try { return JSON.parse(val); } catch { return val; }
+    };
+
+    res.json({
+      ...order,
+      flow_create_response: parseJson(order.flow_create_response),
+      flow_confirm_response: parseJson(order.flow_confirm_response),
+      flow_return_response: parseJson(order.flow_return_response),
+      items,
+      statusLog,
+    });
+
+  } catch (err) {
+    console.error('Error fetching order:', err);
+    res.status(500).json({ error: 'Error al consultar la orden' });
+  }
+}
+
+// ============================================
+// ADMIN: LISTAR ÓRDENES
+// GET /api/admin/orders
+// ============================================
+
+export async function getAdminOrders(req, res) {
+  try {
+    const limit = Math.min(parseInt(req.query.limit) || 50, 200);
+    const offset = parseInt(req.query.offset) || 0;
+    const status = req.query.status || null;
+
+    let query = `
+      SELECT o.id, o.commerce_order, o.customer_name, o.customer_email, o.customer_phone,
+             o.subtotal, o.iva, o.total, o.status, o.flow_status, o.payment_method,
+             o.flow_order, o.created_at, o.paid_at,
+             (SELECT COUNT(*) FROM order_items WHERE order_id = o.id) AS item_count
+      FROM orders o
+    `;
+    const params = [];
+
+    if (status) {
+      query += ' WHERE o.status = ?';
+      params.push(status);
+    }
+
+    query += ` ORDER BY o.created_at DESC LIMIT ${limit} OFFSET ${offset}`;
+
+    const [orders] = await pool.execute(query, params);
+
+    let countQuery = 'SELECT COUNT(*) AS total FROM orders';
+    const countParams = [];
+    if (status) {
+      countQuery += ' WHERE status = ?';
+      countParams.push(status);
+    }
+    const [countResult] = await pool.execute(countQuery, countParams);
+
+    res.json({
+      orders,
+      total: countResult[0].total,
+      limit,
+      offset,
+    });
+  } catch (err) {
+    console.error('Error fetching admin orders:', err);
+    res.status(500).json({ error: 'Error al consultar las órdenes' });
+  }
+}
+
+// ============================================
+// ADMIN: DETALLE DE ORDEN
+// GET /api/admin/orders/:commerceOrder
+// ============================================
+
+export async function getAdminOrderDetail(req, res) {
+  try {
+    const { commerceOrder } = req.params;
+
+    const [orders] = await pool.execute(
+      'SELECT * FROM orders WHERE commerce_order = ? LIMIT 1',
+      [commerceOrder]
+    );
+
+    if (!orders.length) {
+      return res.status(404).json({ error: 'Orden no encontrada' });
+    }
+
+    const order = orders[0];
+
+    const [items] = await pool.execute(
+      'SELECT * FROM order_items WHERE order_id = ? ORDER BY id',
+      [order.id]
+    );
+
+    const [statusLog] = await pool.execute(
+      'SELECT * FROM order_status_log WHERE order_id = ? ORDER BY created_at',
+      [order.id]
+    );
+
+    const parseJson = (val) => {
+      if (!val) return null;
+      if (typeof val === 'object') return val;
+      try { return JSON.parse(val); } catch { return val; }
+    };
+
+    res.json({
+      ...order,
+      flow_create_response: parseJson(order.flow_create_response),
+      flow_confirm_response: parseJson(order.flow_confirm_response),
+      flow_return_response: parseJson(order.flow_return_response),
+      items,
+      statusLog,
+    });
+  } catch (err) {
+    console.error('Error fetching admin order detail:', err);
+    res.status(500).json({ error: 'Error al consultar la orden' });
+  }
+}

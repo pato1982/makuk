@@ -152,6 +152,15 @@ export async function getAdminStats() {
   return apiFetch('/api/admin/stats');
 }
 
+export async function getAdminOrders(params = {}) {
+  const qs = new URLSearchParams(params).toString();
+  return apiFetch(`/api/admin/orders${qs ? '?' + qs : ''}`);
+}
+
+export async function getAdminOrderDetail(commerceOrder) {
+  return apiFetch(`/api/admin/orders/${encodeURIComponent(commerceOrder)}`);
+}
+
 // --- Contacto ---
 
 export async function sendContactForm(data) {
