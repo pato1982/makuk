@@ -1590,68 +1590,51 @@
 /* --- Grid 4 columns (categories, etc.) --- */
 .admin-grid-4 {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
 }
 
-.admin-grid-card {
-  background: #fff;
-  border-radius: 0 0 8px 8px;
-  overflow: hidden;
-  cursor: pointer;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-  transition: all 0.4s ease;
+/* Admin cards: tarjetas compactas con imagen proporcional */
+.admin-grid-4 .producto-card {
+  border-radius: 0 0 6px 6px;
 }
 
-.admin-grid-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(184, 115, 51, 0.2);
+.admin-grid-4 .producto-img {
+  height: 180px;
 }
 
-.admin-grid-card-img-wrapper {
-  width: 100%;
-  height: 240px;
-  overflow: hidden;
-  background: #f5f0eb;
+.admin-grid-4 .producto-info {
+  padding: 8px 6px;
+  justify-content: flex-start;
 }
 
-.admin-grid-card-img {
-  width: 100%;
-  height: 240px;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-}
-
-.admin-grid-card-info {
-  padding: 18px 15px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  position: relative;
-  z-index: 1;
-  background: #fff;
-}
-
-.admin-grid-card-name {
-  font-weight: 600;
-  font-size: 0.85rem;
-  color: #333;
-}
-
-.admin-grid-card-slug {
+.admin-grid-4 .producto-info h4 {
   font-size: 0.75rem;
-  color: #999;
+  margin-bottom: 4px;
+  min-height: 0;
+  -webkit-line-clamp: 1;
+}
+
+.admin-grid-4 .producto-precios {
+  gap: 6px;
+}
+
+.admin-grid-4 .precio-actual {
+  font-size: 0.8rem;
+}
+
+.admin-grid-4 .precio-anterior {
+  font-size: 0.65rem;
 }
 
 .admin-grid-card-add {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 220px;
+  min-height: 120px;
   border: 2px dashed #ccc;
-  border-radius: 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
 }
 
 .admin-grid-card-add:hover {
@@ -1663,14 +1646,15 @@
   flex-direction: column;
 }
 
-.admin-grid-card-wrapper .admin-grid-card {
-  flex: 1;
+/* Ocultar acciones de compra en admin */
+.admin-grid-card-wrapper .producto-acciones {
+  display: none !important;
 }
 
 .admin-grid-card-actions {
   display: flex;
-  gap: 6px;
-  margin-top: 6px;
+  gap: 4px;
+  margin-top: 4px;
   justify-content: center;
 }
 
@@ -2779,6 +2763,10 @@
     grid-template-columns: repeat(3, 1fr);
   }
 
+  .admin-grid-4 .producto-img {
+    height: 160px;
+  }
+
   /* Testimonials grid */
   .testimonials-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -3047,6 +3035,15 @@
   /* Grid */
   .admin-grid-4 {
     grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .admin-grid-4 .producto-img {
+    height: 140px;
+  }
+
+  .admin-grid-card-add {
+    border-radius: 5px;
   }
 
   /* Steps: grid de 2 columnas */

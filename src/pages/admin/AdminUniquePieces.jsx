@@ -155,7 +155,7 @@ function AdminUniquePieces() {
           </div>
           {uniqueProducts.map((prod) => (
             <div key={prod.id} className="admin-grid-card-wrapper">
-              <div className="admin-grid-card" style={{ position: 'relative' }}>
+              <div className="producto-card" style={{ position: 'relative' }}>
                 <div
                   className={`card-page-toggle ${prod.destacado ? 'active' : ''}`}
                   onClick={(e) => { e.stopPropagation(); toggleDestacado(prod.id); }}
@@ -163,13 +163,17 @@ function AdminUniquePieces() {
                 >
                   <div className="card-page-toggle-knob"></div>
                 </div>
-                {prod.imagen && <div className="admin-grid-card-img-wrapper" style={{
-                  transform: `scale(${prod.imageZoom ?? 1}) translate(${50 - (prod.imagePosX ?? 50)}%, ${50 - (prod.imagePosY ?? 50)}%)`,
-                }}>
-                  <img src={prod.imagen} alt={prod.nombre} className="admin-grid-card-img" />
-                </div>}
-                <div className="admin-grid-card-info">
-                  <span className="admin-grid-card-name">{prod.nombre}</span>
+                <div className="producto-img">
+                  <div className="producto-img-wrapper" style={{
+                    '--img-zoom': prod.imageZoom ?? 1,
+                    '--img-tx': `${50 - (prod.imagePosX ?? 50)}%`,
+                    '--img-ty': `${50 - (prod.imagePosY ?? 50)}%`,
+                  }}>
+                    {prod.imagen && <img src={prod.imagen} alt={prod.nombre} />}
+                  </div>
+                </div>
+                <div className="producto-info">
+                  <h4>{prod.nombre}</h4>
                 </div>
               </div>
               <div className="admin-grid-card-actions">
