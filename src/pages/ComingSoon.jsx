@@ -77,6 +77,8 @@ function ComingSoon() {
             <i className="fas fa-envelope" />
           </a>
         </div>
+
+        <p className="cs-credit">Diseñado por CH</p>
       </div>
 
       {/* Acceso admin discreto */}
