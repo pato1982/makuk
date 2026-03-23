@@ -21,8 +21,8 @@ function AdminUniquePieces() {
           nombre: piece.nombre,
           categoria: 'piezas-unicas',
           imagen: piece.imagen,
-          precioActual: 0,
-          precioAnterior: 0,
+          precioActual: '',
+          precioAnterior: '',
           destacado: true,
           descripcion: ''
         });
@@ -94,8 +94,8 @@ function AdminUniquePieces() {
       nombre: 'Nuevo Producto',
       categoria: 'piezas-unicas',
       imagen: '',
-      precioActual: 0,
-      precioAnterior: 0,
+      precioActual: '',
+      precioAnterior: '',
       destacado: false,
       descripcion: '',
       imagePosX: 50,

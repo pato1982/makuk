@@ -1227,8 +1227,8 @@
 .producto-popup {
     background: var(--white);
     border-radius: 12px;
-    width: 520px;
-    height: 380px;
+    width: 780px;
+    height: 520px;
     overflow: hidden;
     display: flex;
     flex-direction: row;
@@ -1275,7 +1275,7 @@
 
 /* --- Popup image editor controls --- */
 .popup-img-editor {
-    flex: 3;
+    flex: 4;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1350,7 +1350,7 @@
 }
 
 .producto-popup-info {
-    flex: 2;
+    flex: 1.5;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -1451,37 +1451,40 @@
 
     .producto-popup-nombre-desc-row {
         display: flex;
-        flex-direction: row;
-        gap: 10px;
-        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+        align-items: center;
         margin-bottom: 10px;
         flex: none;
     }
 
     .producto-popup-nombre {
-        font-size: 1rem;
-        text-align: left;
+        font-size: 1.05rem;
+        text-align: center;
         flex-shrink: 0;
     }
 
     .producto-popup-desc {
-        font-size: 0.72rem;
-        text-align: left;
-        text-align-last: left;
+        font-size: 0.75rem;
+        text-align: center;
+        text-align-last: center;
         padding: 0;
         display: block;
+        line-height: 1.5;
     }
 
     .producto-popup-precios {
         justify-content: center;
-        gap: 12px;
+        gap: 16px;
+        margin-top: 6px;
     }
 
     .producto-popup-precios .precio-anterior {
-        font-size: 0.8rem;
+        font-size: 0.85rem;
+        order: -1;
     }
 
     .producto-popup-precios .precio-actual {
-        font-size: 0.95rem;
+        font-size: 1rem;
     }
 }

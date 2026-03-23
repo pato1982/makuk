@@ -38,8 +38,8 @@ function AdminProducts() {
         nombre: 'Nuevo Producto',
         categoria: 'pulseras',
         imagen: '',
-        precioActual: 0,
-        precioAnterior: 0,
+        precioActual: '',
+        precioAnterior: '',
         destacado: false,
         descripcion: 'Descripción del producto'
       }]

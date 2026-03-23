@@ -7,6 +7,50 @@
 
 ---
 
+## 2026-03-22
+
+### Popup producto mas grande en desktop + precios vacios por defecto + layout movil popup
+- **Popup desktop agrandado:** el popup de detalle de producto paso de 520x380px a 780x520px. Columna de imagen mas ancha (flex 4 vs 3), columna de info mas angosta (flex 1.5 vs 2).
+- **Precios vacios por defecto:** al crear un producto nuevo en admin (categorias, piezas unicas, subir productos), los campos de precio ahora aparecen vacios en vez de mostrar 0.
+- **Layout movil popup:** en movil el popup ahora muestra nombre centrado debajo de la imagen, descripcion centrada debajo del nombre, y precios debajo (anterior a la izquierda tachado, actual a la derecha con separacion).
+
+### Archivos modificados
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `src/styles/productos.css` | Popup desktop mas grande (780x520), flex imagen/info ajustado, layout movil popup vertical |
+| `src/pages/admin/AdminCategories.jsx` | Precio por defecto vacio en vez de 0 |
+| `src/pages/admin/AdminProducts.jsx` | Precio por defecto vacio en vez de 0 |
+| `src/pages/admin/AdminUniquePieces.jsx` | Precio por defecto vacio en vez de 0 |
+
+---
+
+## 2026-03-20
+
+### Guardado inmediato en modales + tarjetas admin = tarjetas publicas
+- **Guardado inmediato:** el boton "Guardar cambios" del fondo de la pagina fue eliminado. Ahora cada modal (producto y categoria) guarda directamente a la API al presionar "Guardar", con spinner y mensaje de error si falla.
+- Toggle de destacado y eliminacion de productos/categorias tambien guardan inmediatamente a la base de datos.
+- **Tarjetas admin = tarjetas publicas:** las tarjetas de Categorias y Piezas Unicas en el panel admin ahora usan las mismas clases CSS `.producto-card` de la pagina publica (`.producto-img`, `.producto-info`, `.precio-actual`, `.precio-anterior`), garantizando aspecto visual identico.
+- Grid admin: 5 columnas compactas (gap 10px), imagen 180px, info con padding reducido (8px 6px), titulo 0.75rem en 1 linea, precios compactos.
+- Responsive: tablet 3 cols / imagen 160px, mobile 2 cols / imagen 140px.
+
+### Archivos modificados
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `src/pages/admin/AdminCategories.jsx` | Tarjetas usan `.producto-card`, guardado inmediato en modales, elimino boton fondo |
+| `src/pages/admin/AdminUniquePieces.jsx` | Tarjetas usan `.producto-card` |
+| `src/styles/admin.css` | Estilos admin-grid adaptados a producto-card, responsive compacto |
+
+### Commits de la sesion
+| Hash | Descripcion |
+|------|------------|
+| `f8af11f` | Admin: tarjetas usan clases producto-card + guardado inmediato en modal |
+
+### Deploy
+- **Push:** GitHub `origin/main`
+- **VPS:** Deploy exitoso via `ssh makuk` → git pull + build + deploy
+
+---
+
 ## 2026-03-19
 
 ### Tarjetas de productos en panel admin (pestaña Subir productos)
