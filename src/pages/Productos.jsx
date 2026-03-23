@@ -33,8 +33,12 @@ function ProductoCard({ producto, onImageClick }) {
       <div className="producto-info">
         <h4>{producto.nombre}</h4>
         <div className="producto-precios">
-          <span className="precio-actual">{formatearPrecio(producto.precioActual)}</span>
-          <span className="precio-anterior">{formatearPrecio(producto.precioAnterior)}</span>
+          {producto.precioActual > 0 && (
+            <span className="precio-actual">{formatearPrecio(producto.precioActual)}</span>
+          )}
+          {producto.precioAnterior > 0 && producto.precioAnterior !== producto.precioActual && (
+            <span className="precio-anterior">{formatearPrecio(producto.precioAnterior)}</span>
+          )}
         </div>
         <div className="producto-acciones">
           <div className="cantidad-selector">
@@ -297,10 +301,12 @@ function Productos() {
                 )}
               </div>
               <div className="producto-popup-precios">
-                {popupProducto.precioAnterior && popupProducto.precioAnterior !== popupProducto.precioActual && (
+                {popupProducto.precioAnterior > 0 && popupProducto.precioAnterior !== popupProducto.precioActual && (
                   <span className="precio-anterior">{formatearPrecio(popupProducto.precioAnterior)}</span>
                 )}
-                <span className="precio-actual">{formatearPrecio(popupProducto.precioActual)}</span>
+                {popupProducto.precioActual > 0 && (
+                  <span className="precio-actual">{formatearPrecio(popupProducto.precioActual)}</span>
+                )}
               </div>
             </div>
           </div>
