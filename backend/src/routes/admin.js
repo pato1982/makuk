@@ -7,7 +7,7 @@ import {
   updateTestimonials, updateFooter, updateProductsPage,
   getStats
 } from '../controllers/adminController.js';
-import { getAdminOrders, getAdminOrderDetail } from '../controllers/orderController.js';
+import { getAdminOrders, getAdminOrderDetail, updateAdminOrderStatus } from '../controllers/orderController.js';
 
 const router = Router();
 
@@ -31,5 +31,6 @@ router.get('/stats', getStats);
 // Órdenes de venta
 router.get('/orders', getAdminOrders);
 router.get('/orders/:commerceOrder', getAdminOrderDetail);
+router.put('/orders/:commerceOrder/status', updateAdminOrderStatus);
 
 export default router;

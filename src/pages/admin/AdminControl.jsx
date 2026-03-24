@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getAdminStats, getAdminOrders, getAdminOrderDetail } from '../../services/api';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { getAdminStats, getAdminOrders, getAdminOrderDetail, updateOrderAdminStatus } from '../../services/api';
 import AdminCard from '../../components/admin/AdminCard';
 
 const FLOW_STATUSES = {
@@ -10,6 +10,18 @@ const FLOW_STATUSES = {
   pending:    { label: 'Pendiente',  icon: 'fa-clock',             color: '#e8a862' },
   error:      { label: 'Error',      icon: 'fa-exclamation-circle', color: '#e05555' },
 };
+
+const ADMIN_STATUSES = [
+  { value: 'en_proceso',   label: 'En proceso',   icon: 'fa-spinner',      color: '#5b9bd5', bg: 'rgba(91,155,213,0.1)' },
+  { value: 'produciendo',  label: 'Produciendo',   icon: 'fa-cog',          color: '#e8a862', bg: 'rgba(232,168,98,0.1)' },
+  { value: 'enviado',      label: 'Enviado',       icon: 'fa-truck',        color: '#9b59b6', bg: 'rgba(155,89,182,0.1)' },
+  { value: 'entregado',    label: 'Entregado',     icon: 'fa-check-circle', color: '#4caf50', bg: 'rgba(76,175,80,0.1)' },
+  { value: 'cancelado',    label: 'Cancelado',     icon: 'fa-ban',          color: '#888',    bg: 'rgba(136,136,136,0.1)' },
+];
+
+function getAdminStatusInfo(status) {
+  return ADMIN_STATUSES.find(s => s.value === status) || ADMIN_STATUSES[0];
+}
 
 function getStatusInfo(status) {
   return FLOW_STATUSES[status] || { label: status || 'Desconocido', icon: 'fa-question-circle', color: '#888' };
@@ -44,6 +56,34 @@ function AdminControl() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailTab, setDetailTab] = useState('info');
+  const [openStatusMenu, setOpenStatusMenu] = useState(null);
+  const statusMenuRef = useRef(null);
+
+  // Cerrar menú al hacer clic fuera
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (statusMenuRef.current && !statusMenuRef.current.contains(e.target)) {
+        setOpenStatusMenu(null);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleAdminStatusChange = async (commerceOrder, newStatus) => {
+    setOpenStatusMenu(null);
+    try {
+      await updateOrderAdminStatus(commerceOrder, newStatus);
+      setOrders(prev => prev.map(o =>
+        o.commerce_order === commerceOrder ? { ...o, admin_status: newStatus } : o
+      ));
+      if (selectedOrder?.commerce_order === commerceOrder) {
+        setSelectedOrder(prev => ({ ...prev, admin_status: newStatus }));
+      }
+    } catch (err) {
+      console.error('Error actualizando estado:', err);
+    }
+  };
 
   // Load stats
   useEffect(() => {
@@ -224,8 +264,9 @@ function AdminControl() {
                 </thead>
                 <tbody>
                   {orders.map(order => {
-                    const st = getStatusInfo(order.status);
+                    const adminSt = getAdminStatusInfo(order.admin_status);
                     const isSelected = selectedOrder?.commerce_order === order.commerce_order;
+                    const isMenuOpen = openStatusMenu === order.commerce_order;
 
                     return (
                       <tr
@@ -237,9 +278,37 @@ function AdminControl() {
                         <td className="ventas-cell-order">{order.commerce_order}</td>
                         <td className="ventas-cell-total">{formatPrice(order.total)}</td>
                         <td className="ventas-cell-status">
-                          <span className="ventas-status-badge" style={{ color: st.color }}>
-                            <i className={`fas ${st.icon}`}></i> {st.label}
-                          </span>
+                          <div className="ventas-status-wrapper" ref={isMenuOpen ? statusMenuRef : null}>
+                            <button
+                              className="ventas-status-btn"
+                              style={{ color: adminSt.color, borderColor: adminSt.color, background: adminSt.bg }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenStatusMenu(isMenuOpen ? null : order.commerce_order);
+                              }}
+                            >
+                              <i className={`fas ${adminSt.icon}`}></i>
+                              {adminSt.label}
+                              <i className="fas fa-chevron-down ventas-status-chevron"></i>
+                            </button>
+                            {isMenuOpen && (
+                              <div className="ventas-status-menu">
+                                {ADMIN_STATUSES.map(st => (
+                                  <button
+                                    key={st.value}
+                                    className={`ventas-status-option${order.admin_status === st.value ? ' active' : ''}`}
+                                    style={{ color: st.color }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleAdminStatusChange(order.commerce_order, st.value);
+                                    }}
+                                  >
+                                    <i className={`fas ${st.icon}`}></i> {st.label}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );
@@ -265,14 +334,14 @@ function AdminControl() {
               </div>
             </AdminCard>
           ) : selectedOrder ? (() => {
-            const st = getStatusInfo(selectedOrder.status);
+            const adminSt = getAdminStatusInfo(selectedOrder.admin_status);
 
             return (
               <AdminCard title={
                 <span className="ventas-detail-header">
                   <span>{selectedOrder.commerce_order}</span>
-                  <span className="ventas-detail-header-status" style={{ color: st.color }}>
-                    <i className={`fas ${st.icon}`}></i> {st.label}
+                  <span className="ventas-detail-header-status" style={{ color: adminSt.color }}>
+                    <i className={`fas ${adminSt.icon}`}></i> {adminSt.label}
                   </span>
                 </span>
               }>

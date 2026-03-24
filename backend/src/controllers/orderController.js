@@ -501,7 +501,7 @@ export async function getAdminOrders(req, res) {
 
     let query = `
       SELECT o.id, o.commerce_order, o.customer_name, o.customer_email, o.customer_phone,
-             o.subtotal, o.iva, o.total, o.status, o.flow_status, o.payment_method,
+             o.subtotal, o.iva, o.total, o.status, o.admin_status, o.flow_status, o.payment_method,
              o.flow_order, o.created_at, o.paid_at,
              (SELECT COUNT(*) FROM order_items WHERE order_id = o.id) AS item_count
       FROM orders o
@@ -534,6 +534,61 @@ export async function getAdminOrders(req, res) {
   } catch (err) {
     console.error('Error fetching admin orders:', err);
     res.status(500).json({ error: 'Error al consultar las órdenes' });
+  }
+}
+
+// ============================================
+// ADMIN: DETALLE DE ORDEN
+// GET /api/admin/orders/:commerceOrder
+// ============================================
+
+// ============================================
+// ADMIN: ACTUALIZAR ESTADO ADMINISTRATIVO
+// PUT /api/admin/orders/:commerceOrder/status
+// ============================================
+
+export async function updateAdminOrderStatus(req, res) {
+  const conn = await pool.getConnection();
+  try {
+    const { commerceOrder } = req.params;
+    const { admin_status } = req.body;
+
+    const allowed = ['en_proceso', 'cancelado', 'produciendo', 'enviado', 'entregado'];
+    if (!allowed.includes(admin_status)) {
+      return res.status(400).json({ error: `Estado inválido. Permitidos: ${allowed.join(', ')}` });
+    }
+
+    const [orders] = await conn.execute(
+      'SELECT id, admin_status FROM orders WHERE commerce_order = ? LIMIT 1',
+      [commerceOrder]
+    );
+
+    if (!orders.length) {
+      return res.status(404).json({ error: 'Orden no encontrada' });
+    }
+
+    const order = orders[0];
+    const prevStatus = order.admin_status;
+
+    await conn.beginTransaction();
+
+    await conn.execute(
+      'UPDATE orders SET admin_status = ? WHERE id = ?',
+      [admin_status, order.id]
+    );
+
+    await logStatusChange(conn, order.id, prevStatus || 'null', admin_status, 'admin', null, req.ip,
+      `Admin cambió estado a: ${admin_status}`);
+
+    await conn.commit();
+
+    res.json({ message: 'Estado actualizado', admin_status });
+  } catch (err) {
+    await conn.rollback();
+    console.error('Error updating admin status:', err);
+    res.status(500).json({ error: 'Error al actualizar el estado' });
+  } finally {
+    conn.release();
   }
 }
 

@@ -7,6 +7,59 @@
 
 ---
 
+## 2026-03-24
+
+### Dropdown de estado administrativo en Registro de Ventas
+- **Columna Estado:** La columna "Estado" en la tabla de órdenes ahora es un botón clickeable que despliega un menú dropdown.
+- **5 estados disponibles:** En proceso (azul), Produciendo (naranja), Enviado (púrpura), Entregado (verde), Cancelado (gris).
+- **Colores e iconos:** Cada estado tiene su propio color, fondo e icono FontAwesome tanto en el botón como en el menú.
+- **Persistencia:** Al seleccionar un estado se guarda en la BD vía nuevo endpoint `PUT /api/admin/orders/:id/status`.
+- **Campo `admin_status`:** Nueva columna en la tabla `orders` separada del estado de pago de Flow.
+- **Detalle de orden:** El panel derecho también muestra el estado administrativo actualizado.
+- **Migración:** `migration-002-admin-status.sql` para agregar la columna.
+
+### Archivos modificados (estado administrativo)
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `src/pages/admin/AdminControl.jsx` | Dropdown de estados con menú desplegable, lógica de actualización |
+| `src/services/api.js` | Nueva función `updateOrderAdminStatus` |
+| `backend/src/controllers/orderController.js` | Nuevo endpoint `updateAdminOrderStatus`, `admin_status` en SELECT |
+| `backend/src/routes/admin.js` | Ruta `PUT /orders/:commerceOrder/status` |
+| `backend/src/config/migration-001-orders.sql` | Columna `admin_status` en esquema de referencia |
+| `backend/src/config/migration-002-admin-status.sql` | Migración ALTER TABLE para agregar `admin_status` |
+
+---
+
+### Guardado inmediato desde modal en Piezas Únicas
+- **Modal Guardar:** El botón "Guardar" dentro del modal de agregar/editar producto ahora guarda directamente al servidor y BD, en vez de solo cerrar el modal.
+- **Eliminar producto:** Al confirmar eliminación, se guarda inmediatamente en el servidor.
+- **Toggle destacado:** Al activar/desactivar la visibilidad en página principal, se guarda inmediatamente.
+- **Botón "Guardar textos":** Nuevo botón independiente dentro de la tarjeta de textos para guardar título/subtítulo.
+- **Eliminado:** Botón "Guardar cambios" general del fondo de la página.
+- **UX:** Botones se deshabilitan durante el guardado con spinner "Guardando...".
+
+### Centrado de tarjetas con filas incompletas
+- **Desktop:** Tarjetas de categorías y piezas únicas usan `flex: 0 1` + `max-width` en vez de `width` fijo, permitiendo que `justify-content: center` las centre cuando la fila no está completa.
+- **Tablet:** Mismo ajuste para piezas únicas (3 por fila).
+- **Móvil:** Mismo ajuste para piezas únicas (2 por fila).
+
+### Archivos modificados
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `src/pages/admin/AdminUniquePieces.jsx` | Guardado inmediato desde modal, eliminar y toggle. Botón guardar textos. Eliminado botón general. |
+| `src/styles/secciones.css` | `flex: 0 1` + `max-width` en `.category-card` y `.unique-card` (desktop, tablet, móvil). |
+
+### Commits de la sesión
+| Hash | Descripción |
+|------|------------|
+| `558dea6` | Guardar productos desde modal en piezas únicas, centrar tarjetas incompletas |
+
+### Deploy
+- **Push:** GitHub `origin/main`
+- **VPS:** Deploy exitoso via `ssh makuk` → git pull + build + deploy
+
+---
+
 ## 2026-03-23
 
 ### Centrar tarjetas de piezas únicas y layout móvil 2x2

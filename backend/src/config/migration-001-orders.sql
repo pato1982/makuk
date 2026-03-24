@@ -38,6 +38,8 @@ CREATE TABLE IF NOT EXISTS orders (
   -- === ESTADO DEL PAGO ===
   status ENUM('pending', 'processing', 'paid', 'rejected', 'cancelled', 'error')
     DEFAULT 'pending' COMMENT 'Estado interno de la orden',
+  admin_status ENUM('en_proceso', 'cancelado', 'produciendo', 'enviado', 'entregado')
+    DEFAULT 'en_proceso' COMMENT 'Estado administrativo de la orden (gestión interna)',
   flow_status INT NULL COMMENT 'Código de estado Flow: 1=pending, 2=paid, 3=rejected, 4=cancelled',
   payment_method VARCHAR(50) NULL COMMENT 'Método de pago usado (webpay, servipag, multicaja, etc.)',
 

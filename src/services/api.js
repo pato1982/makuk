@@ -161,6 +161,13 @@ export async function getAdminOrderDetail(commerceOrder) {
   return apiFetch(`/api/admin/orders/${encodeURIComponent(commerceOrder)}`);
 }
 
+export async function updateOrderAdminStatus(commerceOrder, admin_status) {
+  return apiFetch(`/api/admin/orders/${encodeURIComponent(commerceOrder)}/status`, {
+    method: 'PUT',
+    body: JSON.stringify({ admin_status }),
+  });
+}
+
 // --- Contacto ---
 
 export async function sendContactForm(data) {
