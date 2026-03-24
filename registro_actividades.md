@@ -7,7 +7,56 @@
 
 ---
 
+## 2026-03-23
+
+### Centrar tarjetas de piezas únicas y layout móvil 2x2
+- **Desktop:** Sección "Piezas Únicas" ahora usa flexbox con centrado. Si se seleccionan menos de 5 tarjetas, se centran automáticamente en vez de quedar alineadas a la izquierda.
+- **Móvil (< 700px):** Solo se muestran las primeras 2 tarjetas de piezas únicas (las demás se ocultan con CSS `nth-child(n+3)`), centradas con separación de 12px. Se eliminó el scroll horizontal.
+- **Tablet (700px-1100px):** Se muestran 3 por fila centradas, sin scroll horizontal.
+
+### Centrar categorías "Nuestras Colecciones" en desktop
+- **Desktop:** Sección de categorías ahora usa flexbox con centrado. Si hay menos de 5 categorías por fila, se centran automáticamente. Al agregar más se van acomodando hasta llenar las 5 por fila.
+- **Móvil:** Sin cambios, se mantiene el scroll horizontal existente.
+
+### Archivos modificados
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `src/styles/secciones.css` | Flexbox centrado en `.unique-row`, `.unique-card`, `.categories-row`, `.category-card`. Ocultar tarjetas 3+ en móvil para piezas únicas. |
+
+### Commits de la sesión
+| Hash | Descripción |
+|------|------------|
+| `8a51912` | Centrar tarjetas de piezas únicas cuando hay menos de 5, layout móvil 2x2 |
+| `cade131` | Mostrar solo 2 piezas únicas en móvil, centrar categorías con menos de 5 |
+
+### Deploy
+- **Push:** GitHub `origin/main`
+- **VPS:** Deploy exitoso via `ssh makuk` → git pull + build + deploy
+
+---
+
 ## 2026-03-22
+
+### Ocultar precios en 0 en tarjetas y popups de productos
+- **Tarjetas de producto:** si `precioActual` es 0, no se muestra el precio actual. Si `precioAnterior` es 0, no se muestra el precio anterior (tachado).
+- **Popup de detalle:** misma logica aplicada. Ambos precios se ocultan cuando son 0.
+- Aplica tanto para productos de categorias como piezas unicas (misma pagina de productos).
+
+### Archivos modificados
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `src/pages/Productos.jsx` | Condicional `> 0` para mostrar precioActual y precioAnterior en tarjetas y popup |
+
+### Commits de la sesion
+| Hash | Descripcion |
+|------|------------|
+| `f6a7d01` | Ocultar precios en 0 en tarjetas y popups de productos |
+
+### Deploy
+- **Push:** GitHub `origin/main`
+- **VPS:** Deploy exitoso via `ssh makuk` → git pull + build + deploy
+
+---
 
 ### Popup producto mas grande en desktop + precios vacios por defecto + layout movil popup
 - **Popup desktop agrandado:** el popup de detalle de producto paso de 520x380px a 780x520px. Columna de imagen mas ancha (flex 4 vs 3), columna de info mas angosta (flex 1.5 vs 2).
@@ -21,6 +70,15 @@
 | `src/pages/admin/AdminCategories.jsx` | Precio por defecto vacio en vez de 0 |
 | `src/pages/admin/AdminProducts.jsx` | Precio por defecto vacio en vez de 0 |
 | `src/pages/admin/AdminUniquePieces.jsx` | Precio por defecto vacio en vez de 0 |
+
+### Commits de la sesion
+| Hash | Descripcion |
+|------|------------|
+| `23ef75d` | Popup producto mas grande en desktop, precios vacios por defecto, layout movil popup vertical |
+
+### Deploy
+- **Push:** GitHub `origin/main`
+- **VPS:** Deploy exitoso via `ssh makuk` → git pull + build + deploy
 
 ---
 
