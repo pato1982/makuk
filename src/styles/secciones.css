@@ -33,13 +33,16 @@
 }
 
 .categories-row {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 25px;
     margin-bottom: 25px;
 }
 
 .category-card {
+    width: calc((100% - 100px) / 5);
+    min-width: 180px;
     background: var(--white);
     border-radius: 0 0 8px 8px;
     overflow: hidden;
@@ -634,6 +637,10 @@
         width: calc(50% - 8px);
         min-width: unset;
         max-width: calc(50% - 8px);
+    }
+
+    .unique-card:nth-child(n+3) {
+        display: none;
     }
 
     .unique-img {
