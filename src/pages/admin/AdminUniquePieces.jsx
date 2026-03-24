@@ -33,16 +33,36 @@ function AdminUniquePieces() {
   const [editProduct, setEditProduct] = useState(null);
   const [isNewProduct, setIsNewProduct] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [savedTexts, setSavedTexts] = useState(false);
   const [saveError, setSaveError] = useState('');
   const [showLimitPopup, setShowLimitPopup] = useState(false);
+  const [savingProduct, setSavingProduct] = useState(false);
+  const [savingTexts, setSavingTexts] = useState(false);
   const imgInputRef = useRef(null);
   const [imgUploading, setImgUploading] = useState(false);
 
   const uniqueProducts = productsData.items.filter(p => p.categoria === 'piezas-unicas');
   const selectedCount = uniqueProducts.filter(p => p.destacado).length;
 
-  const handleSave = async () => {
+  const handleSaveTexts = async () => {
     setSaveError('');
+    setSavingTexts(true);
+    try {
+      const selectedProducts = productsData.items.filter(p => p.categoria === 'piezas-unicas' && p.destacado);
+      const newItems = selectedProducts.map(p => ({ nombre: p.nombre, imagen: p.imagen }));
+      await updateSection('uniquePieces', { ...data, items: newItems });
+      setSavedTexts(true);
+      setTimeout(() => setSavedTexts(false), 2000);
+    } catch {
+      setSaveError('Error al guardar textos. Intenta de nuevo.');
+    } finally {
+      setSavingTexts(false);
+    }
+  };
+
+  const handleSaveProduct = async () => {
+    setSaveError('');
+    setSavingProduct(true);
     const selectedProducts = productsData.items.filter(p => p.categoria === 'piezas-unicas' && p.destacado);
     const newItems = selectedProducts.map(p => ({ nombre: p.nombre, imagen: p.imagen }));
     try {
@@ -52,19 +72,34 @@ function AdminUniquePieces() {
       ]);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
+      setEditProduct(null);
+      setIsNewProduct(false);
     } catch {
       setSaveError('Error al guardar. Intenta de nuevo.');
+    } finally {
+      setSavingProduct(false);
     }
   };
 
-  const toggleDestacado = (id) => {
+  const toggleDestacado = async (id) => {
     const prod = productsData.items.find(p => p.id === id);
     if (!prod.destacado && selectedCount >= 5) {
       setShowLimitPopup(true);
       return;
     }
     const items = productsData.items.map(p => p.id === id ? { ...p, destacado: !p.destacado } : p);
-    setProductsData({ ...productsData, items });
+    const newProductsData = { ...productsData, items };
+    setProductsData(newProductsData);
+    try {
+      const selectedProducts = items.filter(p => p.categoria === 'piezas-unicas' && p.destacado);
+      const newItems = selectedProducts.map(p => ({ nombre: p.nombre, imagen: p.imagen }));
+      await Promise.all([
+        updateSection('uniquePieces', { ...data, items: newItems }),
+        updateSection('products', newProductsData),
+      ]);
+    } catch {
+      setSaveError('Error al actualizar. Intenta de nuevo.');
+    }
   };
 
   const handleImageUpload = async (e) => {
@@ -114,11 +149,22 @@ function AdminUniquePieces() {
     }));
   };
 
-  const removeProduct = (id) => {
+  const removeProduct = async (id) => {
     if (!window.confirm('¿Eliminar este producto?')) return;
-    setProductsData({ ...productsData, items: productsData.items.filter(p => p.id !== id) });
+    const newProductsData = { ...productsData, items: productsData.items.filter(p => p.id !== id) };
+    setProductsData(newProductsData);
     setEditProduct(null);
     setIsNewProduct(false);
+    try {
+      const selectedProducts = newProductsData.items.filter(p => p.categoria === 'piezas-unicas' && p.destacado);
+      const newItems = selectedProducts.map(p => ({ nombre: p.nombre, imagen: p.imagen }));
+      await Promise.all([
+        updateSection('uniquePieces', { ...data, items: newItems }),
+        updateSection('products', newProductsData),
+      ]);
+    } catch {
+      setSaveError('Error al eliminar. Intenta de nuevo.');
+    }
   };
 
   const cancelProduct = () => {
@@ -130,8 +176,7 @@ function AdminUniquePieces() {
   };
 
   const saveProduct = () => {
-    setEditProduct(null);
-    setIsNewProduct(false);
+    handleSaveProduct();
   };
 
   const getEditingProduct = () => productsData.items.find(p => p.id === editProduct);
@@ -145,6 +190,11 @@ function AdminUniquePieces() {
         <div className="admin-row">
           <AdminFormField label="Título" value={data.title} onChange={(v) => setData({ ...data, title: v })} />
           <AdminFormField label="Subtítulo" value={data.subtitle} onChange={(v) => setData({ ...data, subtitle: v })} />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
+          <button className={`btn-save ${savedTexts ? 'saved' : ''}`} onClick={handleSaveTexts} disabled={savingTexts} style={{ position: 'relative' }}>
+            {savingTexts ? <><i className="fas fa-spinner fa-spin"></i> Guardando...</> : savedTexts ? <><i className="fas fa-check"></i> Guardado</> : <><i className="fas fa-save"></i> Guardar textos</>}
+          </button>
         </div>
       </AdminCard>
 
@@ -263,10 +313,10 @@ function AdminUniquePieces() {
             </div>
 
             <div className="admin-modal-footer-center">
-              <button type="button" className="btn-save-modal" onClick={saveProduct}>
-                <i className="fas fa-check"></i> Guardar
+              <button type="button" className="btn-save-modal" onClick={saveProduct} disabled={savingProduct}>
+                {savingProduct ? <><i className="fas fa-spinner fa-spin"></i> Guardando...</> : <><i className="fas fa-check"></i> Guardar</>}
               </button>
-              <button type="button" className="btn-modal-cancel" onClick={cancelProduct}>
+              <button type="button" className="btn-modal-cancel" onClick={cancelProduct} disabled={savingProduct}>
                 Cancelar
               </button>
             </div>
@@ -289,9 +339,6 @@ function AdminUniquePieces() {
       )}
 
       {saveError && <div className="save-error"><i className="fas fa-exclamation-circle"></i> {saveError}</div>}
-      <button className={`btn-save ${saved ? 'saved' : ''}`} onClick={handleSave}>
-        {saved ? <><i className="fas fa-check"></i> Guardado</> : <><i className="fas fa-save"></i> Guardar cambios</>}
-      </button>
     </div>
   );
 }

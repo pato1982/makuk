@@ -41,7 +41,8 @@
 }
 
 .category-card {
-    width: calc((100% - 100px) / 5);
+    flex: 0 1 calc((100% - 100px) / 5);
+    max-width: calc((100% - 100px) / 5);
     min-width: 180px;
     background: var(--white);
     border-radius: 0 0 8px 8px;
@@ -238,7 +239,8 @@
 
 .unique-card {
     text-align: center;
-    width: calc((100% - 100px) / 5);
+    flex: 0 1 calc((100% - 100px) / 5);
+    max-width: calc((100% - 100px) / 5);
     min-width: 150px;
 }
 
@@ -634,7 +636,7 @@
     }
 
     .unique-card {
-        width: calc(50% - 8px);
+        flex: 0 1 calc(50% - 8px);
         min-width: unset;
         max-width: calc(50% - 8px);
     }
@@ -873,7 +875,8 @@
     }
 
     .unique-card {
-        width: calc(33.33% - 12px);
+        flex: 0 1 calc(33.33% - 12px);
+        max-width: calc(33.33% - 12px);
         min-width: unset;
     }
 
