@@ -226,14 +226,17 @@
 }
 
 .unique-row {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 25px;
     margin-top: 40px;
 }
 
 .unique-card {
     text-align: center;
+    width: calc((100% - 100px) / 5);
+    min-width: 150px;
 }
 
 .unique-img {
@@ -620,18 +623,17 @@
 
     .unique-row {
         display: flex;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        gap: 10px;
-        padding-bottom: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
         margin-top: 20px;
-        -webkit-overflow-scrolling: touch;
+        overflow-x: visible;
     }
 
     .unique-card {
-        flex: 0 0 42%;
-        min-width: 42%;
-        scroll-snap-align: start;
+        width: calc(50% - 8px);
+        min-width: unset;
+        max-width: calc(50% - 8px);
     }
 
     .unique-img {
@@ -858,16 +860,14 @@
 
     .unique-row {
         display: flex;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
+        flex-wrap: wrap;
+        justify-content: center;
         gap: 15px;
-        padding-bottom: 15px;
     }
 
     .unique-card {
-        flex: 0 0 28%;
-        min-width: 28%;
-        scroll-snap-align: start;
+        width: calc(33.33% - 12px);
+        min-width: unset;
     }
 
     .unique-img-wrapper {
