@@ -1300,36 +1300,68 @@
     border-radius: 12px 0 0 12px;
 }
 
-.popup-img-editor-middle {
+/* --- Carrusel de imágenes --- */
+.popup-carousel {
     display: flex;
     align-items: center;
-    gap: 2px;
     width: 100%;
-    justify-content: center;
     flex: 1;
     min-height: 0;
     overflow: hidden;
+    position: relative;
 }
 
-.popup-arrow {
-    background: none;
+.carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.45);
+    color: white;
     border: none;
-    border-radius: 0;
-    width: 20px;
-    height: 20px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: var(--dark-brown);
-    font-size: 0.7rem;
-    transition: color 0.2s;
-    flex-shrink: 0;
-    padding: 0;
+    font-size: 0.8rem;
+    z-index: 2;
+    transition: background 0.2s;
 }
 
-.popup-arrow:hover {
-    color: var(--copper);
+.carousel-arrow:hover {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.carousel-arrow-left {
+    left: 8px;
+}
+
+.carousel-arrow-right {
+    right: 8px;
+}
+
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.carousel-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--copper);
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.2s;
+}
+
+.carousel-dot.active {
+    background: var(--copper);
 }
 
 .popup-zoom-bar {
@@ -1447,10 +1479,27 @@
         object-fit: contain;
     }
 
-    .popup-arrow {
-        width: 22px;
-        height: 22px;
-        font-size: 0.5rem;
+    .carousel-arrow {
+        width: 28px;
+        height: 28px;
+        font-size: 0.7rem;
+    }
+
+    .carousel-arrow-left {
+        left: 4px;
+    }
+
+    .carousel-arrow-right {
+        right: 4px;
+    }
+
+    .carousel-dots {
+        gap: 6px;
+    }
+
+    .carousel-dot {
+        width: 8px;
+        height: 8px;
     }
 
     .popup-zoom-bar input[type="range"] {

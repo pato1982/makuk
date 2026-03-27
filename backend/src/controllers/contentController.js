@@ -154,6 +154,8 @@ export async function getAllContent(req, res) {
           nombre: p.nombre,
           categoria: p.categoria,
           imagen: p.imagen,
+          imagen2: p.imagen_2 || '',
+          imagen3: p.imagen_3 || '',
           precioActual: p.precio_actual,
           precioAnterior: p.precio_anterior,
           descripcion: p.descripcion,

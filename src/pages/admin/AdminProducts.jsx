@@ -38,6 +38,8 @@ function AdminProducts() {
         nombre: 'Nuevo Producto',
         categoria: 'pulseras',
         imagen: '',
+        imagen2: '',
+        imagen3: '',
         precioActual: '',
         precioAnterior: '',
         destacado: false,
@@ -96,7 +98,11 @@ function AdminProducts() {
                   <div className="admin-list-item-body">
                     <AdminFormField label="Nombre" value={item.nombre} onChange={(v) => updateItem(origIdx, 'nombre', v)} />
                     <AdminFormField label="Categoría" type="select" value={item.categoria} onChange={(v) => updateItem(origIdx, 'categoria', v)} options={categoryOptions} />
-                    <ImageUploader label="Imagen" value={item.imagen} onChange={(v) => updateItem(origIdx, 'imagen', v)} />
+                    <ImageUploader label="Imagen principal (tarjeta)" value={item.imagen} onChange={(v) => updateItem(origIdx, 'imagen', v)} />
+                    <div className="admin-row admin-row-images">
+                      <ImageUploader label="Imagen 2" value={item.imagen2 || ''} onChange={(v) => updateItem(origIdx, 'imagen2', v)} compact />
+                      <ImageUploader label="Imagen 3" value={item.imagen3 || ''} onChange={(v) => updateItem(origIdx, 'imagen3', v)} compact />
+                    </div>
                     <div className="admin-row">
                       <AdminFormField label="Precio actual" type="number" value={item.precioActual} onChange={(v) => updateItem(origIdx, 'precioActual', v)} />
                       <AdminFormField label="Precio anterior" type="number" value={item.precioAnterior} onChange={(v) => updateItem(origIdx, 'precioAnterior', v)} />

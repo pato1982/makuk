@@ -84,6 +84,7 @@ function Productos() {
   const [categoriaFiltro, setCategoriaFiltro] = useState(categoriaURL || 'todos');
   const [orden, setOrden] = useState('destacados');
   const [popupProducto, setPopupProducto] = useState(null);
+  const [popupImgIndex, setPopupImgIndex] = useState(0);
   const [popupZoom, setPopupZoom] = useState(1);
   const [popupPanX, setPopupPanX] = useState(0);
   const [popupPanY, setPopupPanY] = useState(0);
@@ -140,8 +141,15 @@ function Productos() {
     return filas;
   }, [productosFiltrados]);
 
+  // Armar array de imágenes disponibles para el carrusel
+  const popupImagenes = useMemo(() => {
+    if (!popupProducto) return [];
+    return [popupProducto.imagen, popupProducto.imagen2, popupProducto.imagen3].filter(Boolean);
+  }, [popupProducto]);
+
   useEffect(() => {
     if (popupProducto) {
+      setPopupImgIndex(0);
       setPopupZoom(popupProducto.imageZoom ?? 1);
       setPopupPanX(0);
       setPopupPanY(0);
@@ -257,13 +265,12 @@ function Productos() {
               <i className="fas fa-times"></i>
             </button>
             <div className="popup-img-editor">
-              <button type="button" className="popup-arrow popup-arrow-top" onClick={() => popupMoveImg('y', -5)}>
-                <i className="fas fa-chevron-up"></i>
-              </button>
-              <div className="popup-img-editor-middle">
-                <button type="button" className="popup-arrow" onClick={() => popupMoveImg('x', -5)}>
-                  <i className="fas fa-chevron-left"></i>
-                </button>
+              <div className="popup-carousel">
+                {popupImagenes.length > 1 && (
+                  <button type="button" className="carousel-arrow carousel-arrow-left" onClick={() => setPopupImgIndex((prev) => (prev - 1 + popupImagenes.length) % popupImagenes.length)}>
+                    <i className="fas fa-chevron-left"></i>
+                  </button>
+                )}
                 <div
                   className="producto-popup-img"
                   ref={popupImgRef}
@@ -275,16 +282,27 @@ function Productos() {
                   <div className="popup-img-pan-wrapper" style={{
                     transform: `scale(${popupZoom}) translate(${(50 - (popupProducto.imagePosX ?? 50)) + popupPanX}%, ${(50 - (popupProducto.imagePosY ?? 50)) + popupPanY}%)`,
                   }}>
-                    <img src={popupProducto.imagen} alt={popupProducto.nombre} />
+                    <img src={popupImagenes[popupImgIndex]} alt={popupProducto.nombre} />
                   </div>
                 </div>
-                <button type="button" className="popup-arrow" onClick={() => popupMoveImg('x', 5)}>
-                  <i className="fas fa-chevron-right"></i>
-                </button>
+                {popupImagenes.length > 1 && (
+                  <button type="button" className="carousel-arrow carousel-arrow-right" onClick={() => setPopupImgIndex((prev) => (prev + 1) % popupImagenes.length)}>
+                    <i className="fas fa-chevron-right"></i>
+                  </button>
+                )}
               </div>
-              <button type="button" className="popup-arrow popup-arrow-bottom" onClick={() => popupMoveImg('y', 5)}>
-                <i className="fas fa-chevron-down"></i>
-              </button>
+              {popupImagenes.length > 1 && (
+                <div className="carousel-dots">
+                  {popupImagenes.map((_, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      className={`carousel-dot ${idx === popupImgIndex ? 'active' : ''}`}
+                      onClick={() => setPopupImgIndex(idx)}
+                    />
+                  ))}
+                </div>
+              )}
               <div className="popup-zoom-bar">
                 <i className="fas fa-search-minus"></i>
                 <input

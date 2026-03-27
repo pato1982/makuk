@@ -7,6 +7,36 @@
 
 ---
 
+## 2026-03-27
+
+### Soporte para 3 imágenes por producto con carrusel en popup
+- **Base de datos:** Nueva migración `migration-004-product-images.sql` agrega columnas `imagen_2` e `imagen_3` a la tabla `products`.
+- **Admin - Subir productos:** El formulario de cada producto ahora tiene 3 uploaders: "Imagen principal (tarjeta)", "Imagen 2" e "Imagen 3".
+- **Popup de producto:** Cuando un producto tiene más de una imagen, aparecen flechas de navegación (izquierda/derecha) y puntos indicadores para rotar entre las imágenes.
+- **Retrocompatibilidad:** Productos existentes con una sola imagen se comportan igual que antes (sin flechas ni puntos).
+- **Tarjeta de producto:** Sigue mostrando solo la imagen principal, sin cambios.
+
+### Archivos modificados
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `backend/src/config/migration-004-product-images.sql` | Nueva migración: `imagen_2`, `imagen_3` en tabla products |
+| `backend/src/controllers/adminController.js` | INSERT incluye `imagen_2`, `imagen_3` |
+| `backend/src/controllers/contentController.js` | SELECT devuelve `imagen2`, `imagen3` al frontend |
+| `src/pages/admin/AdminProducts.jsx` | 2 ImageUploaders adicionales en formulario de producto |
+| `src/pages/Productos.jsx` | Carrusel con flechas y puntos en popup de producto |
+| `src/styles/productos.css` | Estilos del carrusel: flechas circulares, dots, responsive móvil |
+
+### Commits de la sesión
+| Hash | Descripción |
+|------|------------|
+| `pendiente` | Agregar soporte para 3 imágenes por producto con carrusel en popup |
+
+### Deploy
+- **Push:** GitHub `origin/main`
+- **VPS:** Deploy + migración BD
+
+---
+
 ## 2026-03-24
 
 ### Dropdown de estado administrativo en Registro de Ventas
