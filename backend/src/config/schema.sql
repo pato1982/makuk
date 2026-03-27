@@ -101,6 +101,7 @@ CREATE TABLE IF NOT EXISTS products (
   precio_actual INT DEFAULT 0,
   precio_anterior INT DEFAULT 0,
   descripcion TEXT,
+  delivery_time VARCHAR(100) DEFAULT '',
   destacado TINYINT(1) DEFAULT 0,
   sort_order INT DEFAULT 0,
   image_pos_x DECIMAL(5,2) DEFAULT 50.00,

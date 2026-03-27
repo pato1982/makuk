@@ -12,11 +12,12 @@ const FLOW_STATUSES = {
 };
 
 const ADMIN_STATUSES = [
-  { value: 'en_proceso',   label: 'En proceso',   icon: 'fa-spinner',      color: '#5b9bd5', bg: 'rgba(91,155,213,0.1)' },
-  { value: 'produciendo',  label: 'Produciendo',   icon: 'fa-cog',          color: '#e8a862', bg: 'rgba(232,168,98,0.1)' },
-  { value: 'enviado',      label: 'Enviado',       icon: 'fa-truck',        color: '#9b59b6', bg: 'rgba(155,89,182,0.1)' },
+  { value: 'en_proceso',   label: 'En proceso',    icon: 'fa-spinner',      color: '#5b9bd5', bg: 'rgba(91,155,213,0.1)' },
+  { value: 'en_transito',  label: 'En tránsito',   icon: 'fa-truck',        color: '#9b59b6', bg: 'rgba(155,89,182,0.1)' },
   { value: 'entregado',    label: 'Entregado',     icon: 'fa-check-circle', color: '#4caf50', bg: 'rgba(76,175,80,0.1)' },
   { value: 'cancelado',    label: 'Cancelado',     icon: 'fa-ban',          color: '#888',    bg: 'rgba(136,136,136,0.1)' },
+  { value: 'produciendo',  label: 'Produciendo',   icon: 'fa-cog',          color: '#e8a862', bg: 'rgba(232,168,98,0.1)' },
+  { value: 'enviado',      label: 'Enviado',       icon: 'fa-truck',        color: '#9b59b6', bg: 'rgba(155,89,182,0.1)' },
 ];
 
 function getAdminStatusInfo(status) {
@@ -376,6 +377,38 @@ function AdminControl() {
                         </div>
                       </div>
 
+                      {(selectedOrder.shipping_commune || selectedOrder.shipping_region) && (
+                        <>
+                          <h4 className="ventas-detail-section-title"><i className="fas fa-truck"></i> Despacho</h4>
+                          <div className="ventas-detail-rows">
+                            {selectedOrder.shipping_region && (
+                              <div className="ventas-detail-row">
+                                <span className="ventas-detail-label">Región</span>
+                                <span className="ventas-detail-value">{selectedOrder.shipping_region}</span>
+                              </div>
+                            )}
+                            {selectedOrder.shipping_commune && (
+                              <div className="ventas-detail-row">
+                                <span className="ventas-detail-label">Comuna</span>
+                                <span className="ventas-detail-value">{selectedOrder.shipping_commune}</span>
+                              </div>
+                            )}
+                            {selectedOrder.shipping_cost > 0 && (
+                              <div className="ventas-detail-row">
+                                <span className="ventas-detail-label">Costo despacho</span>
+                                <span className="ventas-detail-value">{formatPrice(selectedOrder.shipping_cost)}</span>
+                              </div>
+                            )}
+                            {selectedOrder.document_type && (
+                              <div className="ventas-detail-row">
+                                <span className="ventas-detail-label">Documento</span>
+                                <span className="ventas-detail-value" style={{ textTransform: 'capitalize' }}>{selectedOrder.document_type}</span>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
+
                       <h4 className="ventas-detail-section-title"><i className="fas fa-calendar-alt"></i> Fechas</h4>
                       <div className="ventas-detail-rows">
                         <div className="ventas-detail-row">
@@ -415,6 +448,12 @@ function AdminControl() {
                           <span>IVA (19%)</span>
                           <span>{formatPrice(selectedOrder.iva)}</span>
                         </div>
+                        {selectedOrder.shipping_cost > 0 && (
+                          <div className="ventas-detail-total-row">
+                            <span><i className="fas fa-truck" style={{ marginRight: 4 }}></i>Despacho ({selectedOrder.shipping_commune})</span>
+                            <span>{formatPrice(selectedOrder.shipping_cost)}</span>
+                          </div>
+                        )}
                         <div className="ventas-detail-total-row ventas-detail-total-final">
                           <span>Total</span>
                           <span>{formatPrice(selectedOrder.total)}</span>

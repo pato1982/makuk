@@ -40,6 +40,11 @@ function ProductoCard({ producto, onImageClick }) {
             <span className="precio-anterior">{formatearPrecio(producto.precioAnterior)}</span>
           )}
         </div>
+        {producto.deliveryTime && (
+          <div className="producto-delivery-time">
+            <i className="fas fa-truck"></i> {producto.deliveryTime}
+          </div>
+        )}
         <div className="producto-acciones">
           <div className="cantidad-selector">
             <button

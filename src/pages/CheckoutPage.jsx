@@ -1,7 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { REGIONES, getComunasByRegion } from '../data/comunasChile';
 import '../styles/checkout.css';
+
+// Zonas de despacho para mostrar en el frontend
+const SHIPPING_ZONES = [
+  { communes: ['Santiago', 'Providencia', 'La Florida'], price: 3600, label: 'RM Central' },
+  { communes: ['Colina', 'Buin', 'San Bernardo', 'Maipú', 'Padre Hurtado'], price: 6000, label: 'RM Periferia 1' },
+  { communes: ['Melipilla', 'Talagante', 'Lo Barnechea', 'Chicureo', 'Huechuraba', 'Quilicura', 'Las Condes'], price: 6900, label: 'RM Periferia 2' },
+];
+const DEFAULT_SHIPPING = 7000;
+
+function calcShippingCost(commune) {
+  if (!commune) return null;
+  const norm = commune.trim().toLowerCase();
+  for (const zone of SHIPPING_ZONES) {
+    if (zone.communes.some(c => c.toLowerCase() === norm)) return zone.price;
+  }
+  return DEFAULT_SHIPPING;
+}
 
 function CheckoutPage() {
   const navigate = useNavigate();
@@ -9,8 +27,29 @@ function CheckoutPage() {
   const { totalNeto, totalIva, totalTotal } = getTotales();
 
   const [customer, setCustomer] = useState({ name: '', email: '', phone: '' });
+  const [region, setRegion] = useState('');
+  const [commune, setCommune] = useState('');
+  const [comunas, setComunas] = useState([]);
+  const [shippingCost, setShippingCost] = useState(null);
+  const [documentType, setDocumentType] = useState('boleta');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Actualizar comunas cuando cambia la región
+  useEffect(() => {
+    setComunas(getComunasByRegion(region));
+    setCommune('');
+    setShippingCost(null);
+  }, [region]);
+
+  // Calcular costo de despacho cuando cambia la comuna
+  useEffect(() => {
+    if (commune) {
+      setShippingCost(calcShippingCost(commune));
+    } else {
+      setShippingCost(null);
+    }
+  }, [commune]);
 
   // Si el carrito está vacío, redirigir
   if (carrito.length === 0) {
@@ -30,13 +69,20 @@ function CheckoutPage() {
     );
   }
 
+  const grandTotal = totalTotal + (shippingCost ?? 0);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+
+    if (!region || !commune) {
+      setError('Debes seleccionar tu región y comuna de despacho');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // Preparar items para el backend
       const items = carrito.map(item => ({
         nombre: item.nombre,
         precioUnitario: item.precioTotal,
@@ -46,7 +92,12 @@ function CheckoutPage() {
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ customer, items }),
+        body: JSON.stringify({
+          customer,
+          items,
+          shipping: { region, commune, cost: shippingCost ?? DEFAULT_SHIPPING },
+          documentType,
+        }),
       });
 
       const data = await res.json();
@@ -58,7 +109,6 @@ function CheckoutPage() {
         throw new Error(`${data.error || 'Error al crear la orden'}${detail ? ` — ${detail}` : ''}`);
       }
 
-      // Vaciar carrito y redirigir a Flow checkout
       vaciarCarrito();
       window.location.href = data.checkoutUrl;
 
@@ -84,6 +134,8 @@ function CheckoutPage() {
           <div className="checkout-form-section">
             <h2><i className="fas fa-user"></i> Datos del Comprador</h2>
             <form onSubmit={handleSubmit} className="checkout-form">
+
+              {/* Nombre */}
               <div className="checkout-field">
                 <label htmlFor="name">Nombre completo *</label>
                 <input
@@ -96,6 +148,7 @@ function CheckoutPage() {
                 />
               </div>
 
+              {/* Email */}
               <div className="checkout-field">
                 <label htmlFor="email">Email *</label>
                 <input
@@ -111,6 +164,7 @@ function CheckoutPage() {
                 </span>
               </div>
 
+              {/* Teléfono */}
               <div className="checkout-field">
                 <label htmlFor="phone">Teléfono (opcional)</label>
                 <input
@@ -122,6 +176,79 @@ function CheckoutPage() {
                 />
               </div>
 
+              {/* Separador despacho */}
+              <div className="checkout-section-divider">
+                <i className="fas fa-truck"></i> Datos de Despacho
+              </div>
+
+              {/* Región */}
+              <div className="checkout-field">
+                <label htmlFor="region">Región *</label>
+                <select
+                  id="region"
+                  required
+                  value={region}
+                  onChange={e => setRegion(e.target.value)}
+                  className="checkout-select"
+                >
+                  <option value="">Selecciona tu región</option>
+                  {REGIONES.map(r => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Comuna */}
+              <div className="checkout-field">
+                <label htmlFor="commune">Comuna *</label>
+                <select
+                  id="commune"
+                  required
+                  value={commune}
+                  onChange={e => setCommune(e.target.value)}
+                  disabled={!region}
+                  className="checkout-select"
+                >
+                  <option value="">{region ? 'Selecciona tu comuna' : 'Primero selecciona una región'}</option>
+                  {comunas.map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Costo de despacho dinámico */}
+              {shippingCost !== null && (
+                <div className="checkout-shipping-info">
+                  <i className="fas fa-map-marker-alt"></i>
+                  <span>Despacho a <strong>{commune}</strong>: <strong>{formatearPrecio(shippingCost)}</strong></span>
+                </div>
+              )}
+
+              {/* Separador documento */}
+              <div className="checkout-section-divider">
+                <i className="fas fa-file-invoice"></i> Documento Tributario
+              </div>
+
+              {/* Tipo de documento */}
+              <div className="checkout-doc-selector">
+                <button
+                  type="button"
+                  className={`checkout-doc-btn${documentType === 'boleta' ? ' active' : ''}`}
+                  onClick={() => setDocumentType('boleta')}
+                >
+                  <i className="fas fa-receipt"></i>
+                  <span>Boleta</span>
+                </button>
+                <button
+                  type="button"
+                  className={`checkout-doc-btn${documentType === 'factura' ? ' active' : ''}`}
+                  onClick={() => setDocumentType('factura')}
+                >
+                  <i className="fas fa-file-invoice-dollar"></i>
+                  <span>Factura</span>
+                </button>
+              </div>
+
               {error && (
                 <div className="checkout-error">
                   <i className="fas fa-exclamation-circle"></i> {error}
@@ -131,7 +258,7 @@ function CheckoutPage() {
               <button
                 type="submit"
                 className="checkout-btn primary"
-                disabled={loading}
+                disabled={loading || shippingCost === null}
               >
                 {loading ? (
                   <><i className="fas fa-spinner fa-spin"></i> Procesando...</>
@@ -175,11 +302,25 @@ function CheckoutPage() {
                   <span>IVA (19%)</span>
                   <span>{formatearPrecio(totalIva)}</span>
                 </div>
-                <div className="checkout-total-row total">
-                  <span>Total a pagar</span>
+                <div className="checkout-total-row">
+                  <span>Productos</span>
                   <span>{formatearPrecio(totalTotal)}</span>
                 </div>
+                <div className="checkout-total-row checkout-total-shipping">
+                  <span><i className="fas fa-truck"></i> Despacho</span>
+                  <span>{shippingCost !== null ? formatearPrecio(shippingCost) : '—'}</span>
+                </div>
+                <div className="checkout-total-row total">
+                  <span>Total a pagar</span>
+                  <span>{shippingCost !== null ? formatearPrecio(grandTotal) : '—'}</span>
+                </div>
               </div>
+
+              {shippingCost === null && (
+                <p className="checkout-shipping-pending">
+                  <i className="fas fa-info-circle"></i> Selecciona tu comuna para ver el total con despacho
+                </p>
+              )}
             </div>
           </div>
         </div>

@@ -157,6 +157,7 @@ export async function getAllContent(req, res) {
           precioActual: p.precio_actual,
           precioAnterior: p.precio_anterior,
           descripcion: p.descripcion,
+          deliveryTime: p.delivery_time || '',
           destacado: p.destacado === 1,
           imagePosX: p.image_pos_x ?? 50,
           imagePosY: p.image_pos_y ?? 50,

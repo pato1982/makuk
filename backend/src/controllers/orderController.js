@@ -96,7 +96,7 @@ export async function createOrder(req, res) {
   const conn = await pool.getConnection();
 
   try {
-    const { customer, items } = req.body;
+    const { customer, items, shipping, documentType } = req.body;
 
     // Validar datos del cliente
     if (!customer?.name || !customer?.email) {
@@ -104,6 +104,9 @@ export async function createOrder(req, res) {
     }
     if (!items?.length) {
       return res.status(400).json({ error: 'El carrito está vacío' });
+    }
+    if (!shipping?.commune || !shipping?.region) {
+      return res.status(400).json({ error: 'La región y comuna de despacho son requeridas' });
     }
 
     await conn.beginTransaction();
@@ -147,9 +150,11 @@ export async function createOrder(req, res) {
     }
 
     // subtotal ya viene con IVA incluido (precio bruto del frontend)
-    const total = subtotal;
-    const neto = Math.round(total / 1.19);
-    const iva = total - neto;
+    // Se agrega el costo de despacho al total cobrado
+    const shippingCost = shipping?.cost ?? 0;
+    const total = subtotal + shippingCost;
+    const neto = Math.round(subtotal / 1.19);
+    const iva = subtotal - neto;
 
     // Generar ID de orden del comercio
     const commerceOrder = generateCommerceOrder();
@@ -162,10 +167,12 @@ export async function createOrder(req, res) {
     // Crear orden en DB con estado pending
     const [orderResult] = await conn.execute(
       `INSERT INTO orders (commerce_order, customer_name, customer_email, customer_phone,
+        shipping_region, shipping_commune, shipping_cost, document_type,
         subtotal, iva, total, url_confirmation, url_return, ip_address, user_agent)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         commerceOrder, customer.name, customer.email, customer.phone || null,
+        shipping.region, shipping.commune, shippingCost, documentType || 'boleta',
         subtotal, iva, total, urlConfirmation, urlReturn,
         req.ip, req.get('user-agent'),
       ]
@@ -555,7 +562,7 @@ export async function updateAdminOrderStatus(req, res) {
     const { commerceOrder } = req.params;
     const { admin_status } = req.body;
 
-    const allowed = ['en_proceso', 'cancelado', 'produciendo', 'enviado', 'entregado'];
+    const allowed = ['en_proceso', 'en_transito', 'entregado', 'cancelado', 'produciendo', 'enviado'];
     if (!allowed.includes(admin_status)) {
       return res.status(400).json({ error: `Estado inválido. Permitidos: ${allowed.join(', ')}` });
     }

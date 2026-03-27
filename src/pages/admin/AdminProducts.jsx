@@ -41,7 +41,8 @@ function AdminProducts() {
         precioActual: '',
         precioAnterior: '',
         destacado: false,
-        descripcion: 'Descripción del producto'
+        descripcion: 'Descripción del producto',
+        deliveryTime: ''
       }]
     });
     setEditIndex(data.items.length);
@@ -102,6 +103,7 @@ function AdminProducts() {
                     </div>
                     <AdminFormField label="Destacado" type="toggle" value={item.destacado} onChange={(v) => updateItem(origIdx, 'destacado', v)} />
                     <AdminFormField label="Descripción" type="textarea" value={item.descripcion} onChange={(v) => updateItem(origIdx, 'descripcion', v)} />
+                    <AdminFormField label="Tiempo de entrega" value={item.deliveryTime || ''} onChange={(v) => updateItem(origIdx, 'deliveryTime', v)} />
                     <button type="button" className="btn-delete-item" onClick={() => removeItem(origIdx)}>
                       <i className="fas fa-trash"></i> Eliminar producto
                     </button>

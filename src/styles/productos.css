@@ -134,6 +134,20 @@
     text-decoration: line-through;
 }
 
+.producto-delivery-time {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: var(--copper);
+    margin-top: 6px;
+    opacity: 0.85;
+}
+
+.producto-delivery-time i {
+    font-size: 0.75rem;
+}
+
 .producto-acciones {
     display: flex !important;
     flex-direction: row !important;
