@@ -146,8 +146,10 @@ export async function createOrder(req, res) {
       });
     }
 
-    const iva = Math.round(subtotal * 0.19);
-    const total = subtotal + iva;
+    // subtotal ya viene con IVA incluido (precio bruto del frontend)
+    const total = subtotal;
+    const neto = Math.round(total / 1.19);
+    const iva = total - neto;
 
     // Generar ID de orden del comercio
     const commerceOrder = generateCommerceOrder();

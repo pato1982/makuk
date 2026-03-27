@@ -58,6 +58,7 @@ export function CartProvider({ children }) {
   };
 
   const vaciarCarrito = () => {
+    localStorage.removeItem(STORAGE_KEY);
     setCarrito([]);
   };
 
