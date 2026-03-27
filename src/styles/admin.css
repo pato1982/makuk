@@ -2478,6 +2478,178 @@
   position: relative;
 }
 
+/* --- Filtros de ventas --- */
+.ventas-filters {
+  margin-bottom: 0.75rem;
+}
+
+.ventas-filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.ventas-filter-search {
+  position: relative;
+  flex: 1;
+  min-width: 180px;
+}
+
+.ventas-filter-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+  font-size: 0.8rem;
+  pointer-events: none;
+}
+
+.ventas-filter-input {
+  width: 100%;
+  padding: 7px 10px 7px 30px;
+  border: 1px solid #2e2e2e;
+  border-radius: 8px;
+  background: #1a1a1a;
+  color: #e0e0e0;
+  font-size: 0.82rem;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.ventas-filter-input:focus {
+  border-color: #c9a96e;
+}
+
+.ventas-filter-dates {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ventas-filter-date {
+  padding: 7px 8px;
+  border: 1px solid #2e2e2e;
+  border-radius: 8px;
+  background: #1a1a1a;
+  color: #e0e0e0;
+  font-size: 0.8rem;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.ventas-filter-date:focus {
+  border-color: #c9a96e;
+}
+
+.ventas-filter-date-sep {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.ventas-filter-select {
+  padding: 7px 10px;
+  border: 1px solid #2e2e2e;
+  border-radius: 8px;
+  background: #1a1a1a;
+  color: #e0e0e0;
+  font-size: 0.8rem;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.ventas-filter-select:focus {
+  border-color: #c9a96e;
+}
+
+.ventas-filter-reset {
+  padding: 7px 10px;
+  border: 1px solid #e05555;
+  border-radius: 8px;
+  background: rgba(224,85,85,0.1);
+  color: #e05555;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ventas-filter-reset:hover {
+  background: rgba(224,85,85,0.2);
+}
+
+/* --- Sort icons en headers --- */
+.ventas-th-sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.ventas-th-sortable:hover {
+  color: #c9a96e;
+}
+
+.ventas-sort-icon {
+  margin-left: 4px;
+  font-size: 0.7rem;
+  color: #c9a96e;
+}
+
+.ventas-sort-inactive {
+  color: #555;
+}
+
+/* --- Título de tabla con spinner inline --- */
+.ventas-table-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* --- Paginación --- */
+.ventas-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 0 4px;
+  border-top: 1px solid #1e1e1e;
+  margin-top: 8px;
+}
+
+.ventas-page-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #2e2e2e;
+  border-radius: 8px;
+  background: #1a1a1a;
+  color: #e0e0e0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+}
+
+.ventas-page-btn:hover:not(:disabled) {
+  border-color: #c9a96e;
+  color: #c9a96e;
+}
+
+.ventas-page-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.ventas-page-info {
+  font-size: 0.82rem;
+  color: #888;
+}
+
 /* --- Payment status badge (solo lectura, no interactivo) --- */
 .ventas-payment-badge {
   display: inline-flex;

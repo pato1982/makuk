@@ -53,6 +53,20 @@ function AdminControl() {
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersError, setOrdersError] = useState('');
   const [ordersTotal, setOrdersTotal] = useState(0);
+  const [ordersPage, setOrdersPage] = useState(1);
+  const [ordersPages, setOrdersPages] = useState(1);
+  const ORDERS_LIMIT = 20;
+
+  // Filtros
+  const [filterSearch, setFilterSearch] = useState('');
+  const [filterDateFrom, setFilterDateFrom] = useState('');
+  const [filterDateTo, setFilterDateTo] = useState('');
+  const [filterPayStatus, setFilterPayStatus] = useState('');
+  const [filterAdminStatus, setFilterAdminStatus] = useState('');
+
+  // Sorting
+  const [sortBy, setSortBy] = useState('date');
+  const [sortDir, setSortDir] = useState('desc');
 
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -95,21 +109,53 @@ function AdminControl() {
   }, []);
 
   // Load orders when ventas tab is shown
-  const loadOrders = useCallback(() => {
+  const loadOrders = useCallback((page = 1) => {
     setOrdersLoading(true);
     setOrdersError('');
-    getAdminOrders({ limit: 50 })
+    const params = {
+      page,
+      limit: ORDERS_LIMIT,
+      ...(filterSearch && { search: filterSearch }),
+      ...(filterDateFrom && { dateFrom: filterDateFrom }),
+      ...(filterDateTo && { dateTo: filterDateTo }),
+      ...(filterPayStatus && { status: filterPayStatus }),
+      ...(filterAdminStatus && { adminStatus: filterAdminStatus }),
+      sortBy,
+      sortDir,
+    };
+    getAdminOrders(params)
       .then(data => {
         setOrders(data.orders || []);
         setOrdersTotal(data.total || 0);
+        setOrdersPage(data.page || 1);
+        setOrdersPages(data.pages || 1);
       })
       .catch(err => setOrdersError(err.message || 'Error cargando órdenes'))
       .finally(() => setOrdersLoading(false));
-  }, []);
+  }, [filterSearch, filterDateFrom, filterDateTo, filterPayStatus, filterAdminStatus, sortBy, sortDir]);
 
   useEffect(() => {
-    if (tab === 'ventas') loadOrders();
+    if (tab === 'ventas') loadOrders(1);
   }, [tab, loadOrders]);
+
+  const handleSort = (col) => {
+    if (sortBy === col) {
+      setSortDir(d => d === 'desc' ? 'asc' : 'desc');
+    } else {
+      setSortBy(col);
+      setSortDir('desc');
+    }
+  };
+
+  const handleFilterReset = () => {
+    setFilterSearch('');
+    setFilterDateFrom('');
+    setFilterDateTo('');
+    setFilterPayStatus('');
+    setFilterAdminStatus('');
+    setSortBy('date');
+    setSortDir('desc');
+  };
 
   // Load detail when a row is clicked
   const handleSelectOrder = (commerceOrder) => {
@@ -228,20 +274,19 @@ function AdminControl() {
     );
   };
 
+  const SortIcon = ({ col }) => {
+    if (sortBy !== col) return <i className="fas fa-sort ventas-sort-icon ventas-sort-inactive"></i>;
+    return <i className={`fas fa-sort-${sortDir === 'asc' ? 'up' : 'down'} ventas-sort-icon`}></i>;
+  };
+
   const renderVentas = () => {
-    if (ordersLoading) {
-      return (
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#888' }}>
-          <i className="fas fa-spinner fa-spin" style={{ fontSize: '1.5rem' }}></i>
-        </div>
-      );
-    }
+    const hasFilters = filterSearch || filterDateFrom || filterDateTo || filterPayStatus || filterAdminStatus;
 
     if (ordersError) {
       return (
         <div className="save-error">
           <i className="fas fa-exclamation-circle"></i> {ordersError}
-          <button className="ventas-reload-btn" onClick={loadOrders} style={{ marginLeft: '1rem' }}>
+          <button className="ventas-reload-btn" onClick={() => loadOrders(ordersPage)} style={{ marginLeft: '1rem' }}>
             <i className="fas fa-redo"></i> Reintentar
           </button>
         </div>
@@ -252,14 +297,83 @@ function AdminControl() {
       <div className="ventas-layout">
         {/* Columna izquierda: tabla de órdenes */}
         <div className="ventas-table-col">
-          <AdminCard title={`Órdenes${ordersTotal ? ` (${ordersTotal})` : ''}`}>
+          {/* Barra de filtros */}
+          <div className="ventas-filters">
+            <div className="ventas-filters-row">
+              <div className="ventas-filter-search">
+                <i className="fas fa-search ventas-filter-search-icon"></i>
+                <input
+                  type="text"
+                  className="ventas-filter-input"
+                  placeholder="Buscar orden, nombre o email..."
+                  value={filterSearch}
+                  onChange={e => setFilterSearch(e.target.value)}
+                />
+              </div>
+              <div className="ventas-filter-dates">
+                <input
+                  type="date"
+                  className="ventas-filter-date"
+                  title="Desde"
+                  value={filterDateFrom}
+                  onChange={e => setFilterDateFrom(e.target.value)}
+                />
+                <span className="ventas-filter-date-sep">→</span>
+                <input
+                  type="date"
+                  className="ventas-filter-date"
+                  title="Hasta"
+                  value={filterDateTo}
+                  onChange={e => setFilterDateTo(e.target.value)}
+                />
+              </div>
+              <select
+                className="ventas-filter-select"
+                value={filterPayStatus}
+                onChange={e => setFilterPayStatus(e.target.value)}
+              >
+                <option value="">Pago: todos</option>
+                {Object.entries(FLOW_STATUSES).map(([k, v]) => (
+                  <option key={k} value={k}>{v.label}</option>
+                ))}
+              </select>
+              <select
+                className="ventas-filter-select"
+                value={filterAdminStatus}
+                onChange={e => setFilterAdminStatus(e.target.value)}
+              >
+                <option value="">Estado: todos</option>
+                {ADMIN_STATUSES.map(s => (
+                  <option key={s.value} value={s.value}>{s.label}</option>
+                ))}
+              </select>
+              {hasFilters && (
+                <button className="ventas-filter-reset" onClick={handleFilterReset} title="Limpiar filtros">
+                  <i className="fas fa-times"></i>
+                </button>
+              )}
+            </div>
+          </div>
+
+          <AdminCard title={
+            <span className="ventas-table-title">
+              <span>Órdenes{ordersTotal > 0 ? ` (${ordersTotal})` : ''}</span>
+              {ordersLoading && <i className="fas fa-spinner fa-spin" style={{ fontSize: '0.9rem', color: '#888' }}></i>}
+            </span>
+          }>
             <div className="ventas-table-wrapper">
               <table className="ventas-table">
                 <thead>
                   <tr>
-                    <th>Fecha</th>
-                    <th>Orden</th>
-                    <th>Total</th>
+                    <th className="ventas-th-sortable" onClick={() => handleSort('date')}>
+                      Fecha <SortIcon col="date" />
+                    </th>
+                    <th className="ventas-th-sortable" onClick={() => handleSort('order')}>
+                      Orden <SortIcon col="order" />
+                    </th>
+                    <th className="ventas-th-sortable" onClick={() => handleSort('total')}>
+                      Total <SortIcon col="total" />
+                    </th>
                     <th>Pago</th>
                     <th>Estado</th>
                   </tr>
@@ -327,13 +441,36 @@ function AdminControl() {
                   })}
                 </tbody>
               </table>
-              {orders.length === 0 && (
+              {!ordersLoading && orders.length === 0 && (
                 <div className="ventas-empty">
                   <i className="fas fa-receipt"></i>
-                  <p>No hay órdenes registradas</p>
+                  <p>{hasFilters ? 'Sin resultados para los filtros aplicados' : 'No hay órdenes registradas'}</p>
                 </div>
               )}
             </div>
+
+            {/* Paginación */}
+            {ordersPages > 1 && (
+              <div className="ventas-pagination">
+                <button
+                  className="ventas-page-btn"
+                  disabled={ordersPage <= 1 || ordersLoading}
+                  onClick={() => loadOrders(ordersPage - 1)}
+                >
+                  <i className="fas fa-chevron-left"></i>
+                </button>
+                <span className="ventas-page-info">
+                  Página {ordersPage} de {ordersPages}
+                </span>
+                <button
+                  className="ventas-page-btn"
+                  disabled={ordersPage >= ordersPages || ordersLoading}
+                  onClick={() => loadOrders(ordersPage + 1)}
+                >
+                  <i className="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            )}
           </AdminCard>
         </div>
 

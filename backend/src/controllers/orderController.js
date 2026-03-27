@@ -523,41 +523,63 @@ export async function getOrder(req, res) {
 
 export async function getAdminOrders(req, res) {
   try {
-    const limit = Math.min(parseInt(req.query.limit) || 50, 200);
-    const offset = parseInt(req.query.offset) || 0;
-    const status = req.query.status || null;
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const limit = Math.min(parseInt(req.query.limit) || 20, 100);
+    const offset = (page - 1) * limit;
+    const { status, adminStatus, search, dateFrom, dateTo, sortBy, sortDir } = req.query;
 
-    let query = `
+    const conditions = [];
+    const params = [];
+
+    if (status) {
+      conditions.push('o.status = ?');
+      params.push(status);
+    }
+    if (adminStatus) {
+      conditions.push('o.admin_status = ?');
+      params.push(adminStatus);
+    }
+    if (search) {
+      conditions.push('(o.commerce_order LIKE ? OR o.customer_name LIKE ? OR o.customer_email LIKE ?)');
+      const s = `%${search}%`;
+      params.push(s, s, s);
+    }
+    if (dateFrom) {
+      conditions.push('DATE(o.created_at) >= ?');
+      params.push(dateFrom);
+    }
+    if (dateTo) {
+      conditions.push('DATE(o.created_at) <= ?');
+      params.push(dateTo);
+    }
+
+    const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+
+    const allowedSort = { date: 'o.created_at', total: 'o.total', order: 'o.commerce_order' };
+    const sortCol = allowedSort[sortBy] || 'o.created_at';
+    const sortDirSafe = sortDir === 'asc' ? 'ASC' : 'DESC';
+
+    const query = `
       SELECT o.id, o.commerce_order, o.customer_name, o.customer_email, o.customer_phone,
              o.subtotal, o.iva, o.total, o.status, o.admin_status, o.flow_status, o.payment_method,
              o.flow_order, o.created_at, o.paid_at,
              (SELECT COUNT(*) FROM order_items WHERE order_id = o.id) AS item_count
       FROM orders o
+      ${where}
+      ORDER BY ${sortCol} ${sortDirSafe}
+      LIMIT ${limit} OFFSET ${offset}
     `;
-    const params = [];
-
-    if (status) {
-      query += ' WHERE o.status = ?';
-      params.push(status);
-    }
-
-    query += ` ORDER BY o.created_at DESC LIMIT ${limit} OFFSET ${offset}`;
 
     const [orders] = await pool.execute(query, params);
-
-    let countQuery = 'SELECT COUNT(*) AS total FROM orders';
-    const countParams = [];
-    if (status) {
-      countQuery += ' WHERE status = ?';
-      countParams.push(status);
-    }
-    const [countResult] = await pool.execute(countQuery, countParams);
+    const [countResult] = await pool.execute(`SELECT COUNT(*) AS total FROM orders o ${where}`, params);
+    const total = countResult[0].total;
 
     res.json({
       orders,
-      total: countResult[0].total,
+      total,
+      page,
       limit,
-      offset,
+      pages: Math.ceil(total / limit),
     });
   } catch (err) {
     console.error('Error fetching admin orders:', err);
