@@ -2501,26 +2501,32 @@
   left: 10px;
   top: 50%;
   transform: translateY(-50%);
-  color: #888;
-  font-size: 0.8rem;
+  color: #aaa;
+  font-size: 0.78rem;
   pointer-events: none;
 }
 
 .ventas-filter-input {
   width: 100%;
   padding: 7px 10px 7px 30px;
-  border: 1px solid #2e2e2e;
+  border: 1.5px solid #e0e0e0;
   border-radius: 8px;
-  background: #1a1a1a;
-  color: #e0e0e0;
+  background: #fff;
+  color: #333;
   font-size: 0.82rem;
   outline: none;
   box-sizing: border-box;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+}
+
+.ventas-filter-input::placeholder {
+  color: #bbb;
 }
 
 .ventas-filter-input:focus {
-  border-color: #c9a96e;
+  border-color: #b87333;
+  box-shadow: 0 0 0 3px rgba(184, 115, 51, 0.1);
 }
 
 .ventas-filter-dates {
@@ -2531,54 +2537,62 @@
 
 .ventas-filter-date {
   padding: 7px 8px;
-  border: 1px solid #2e2e2e;
+  border: 1.5px solid #e0e0e0;
   border-radius: 8px;
-  background: #1a1a1a;
-  color: #e0e0e0;
+  background: #fff;
+  color: #555;
   font-size: 0.8rem;
   outline: none;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
 }
 
 .ventas-filter-date:focus {
-  border-color: #c9a96e;
+  border-color: #b87333;
+  box-shadow: 0 0 0 3px rgba(184, 115, 51, 0.1);
 }
 
 .ventas-filter-date-sep {
-  color: #666;
-  font-size: 0.85rem;
+  color: #ccc;
+  font-size: 0.9rem;
+  font-weight: 300;
 }
 
 .ventas-filter-select {
   padding: 7px 10px;
-  border: 1px solid #2e2e2e;
+  border: 1.5px solid #e0e0e0;
   border-radius: 8px;
-  background: #1a1a1a;
-  color: #e0e0e0;
+  background: #fff;
+  color: #555;
   font-size: 0.8rem;
   outline: none;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
 }
 
 .ventas-filter-select:focus {
-  border-color: #c9a96e;
+  border-color: #b87333;
+  box-shadow: 0 0 0 3px rgba(184, 115, 51, 0.1);
 }
 
 .ventas-filter-reset {
-  padding: 7px 10px;
-  border: 1px solid #e05555;
+  padding: 6px 11px;
+  border: 1.5px solid #e0e0e0;
   border-radius: 8px;
-  background: rgba(224,85,85,0.1);
-  color: #e05555;
-  font-size: 0.82rem;
+  background: #fff;
+  color: #999;
+  font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.2s;
+  line-height: 1;
 }
 
 .ventas-filter-reset:hover {
-  background: rgba(224,85,85,0.2);
+  border-color: #b87333;
+  color: #b87333;
+  background: rgba(184, 115, 51, 0.06);
 }
 
 /* --- Sort icons en headers --- */
@@ -2589,17 +2603,18 @@
 }
 
 .ventas-th-sortable:hover {
-  color: #c9a96e;
+  color: #b87333;
 }
 
 .ventas-sort-icon {
   margin-left: 4px;
-  font-size: 0.7rem;
-  color: #c9a96e;
+  font-size: 0.65rem;
+  color: #b87333;
+  vertical-align: middle;
 }
 
 .ventas-sort-inactive {
-  color: #555;
+  color: #ccc;
 }
 
 /* --- Título de tabla con spinner inline --- */
@@ -2616,17 +2631,17 @@
   justify-content: center;
   gap: 12px;
   padding: 12px 0 4px;
-  border-top: 1px solid #1e1e1e;
+  border-top: 1px solid #f0f0f0;
   margin-top: 8px;
 }
 
 .ventas-page-btn {
   width: 32px;
   height: 32px;
-  border: 1px solid #2e2e2e;
+  border: 1.5px solid #e0e0e0;
   border-radius: 8px;
-  background: #1a1a1a;
-  color: #e0e0e0;
+  background: #fff;
+  color: #666;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -2636,12 +2651,13 @@
 }
 
 .ventas-page-btn:hover:not(:disabled) {
-  border-color: #c9a96e;
-  color: #c9a96e;
+  border-color: #b87333;
+  color: #b87333;
+  background: rgba(184, 115, 51, 0.06);
 }
 
 .ventas-page-btn:disabled {
-  opacity: 0.3;
+  opacity: 0.35;
   cursor: default;
 }
 
