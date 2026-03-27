@@ -96,7 +96,7 @@ export async function createOrder(req, res) {
   const conn = await pool.getConnection();
 
   try {
-    const { customer, items, shipping, documentType } = req.body;
+    const { customer, items, shipping, documentType, factura } = req.body;
 
     // Validar datos del cliente
     if (!customer?.name || !customer?.email) {
@@ -107,6 +107,19 @@ export async function createOrder(req, res) {
     }
     if (!shipping?.commune || !shipping?.region) {
       return res.status(400).json({ error: 'La región y comuna de despacho son requeridas' });
+    }
+
+    // Validar datos de factura si el tipo es factura
+    if (documentType === 'factura') {
+      const { rut, razonSocial, giro, direccion, comuna } = req.body.factura || {};
+      if (!rut || !razonSocial || !giro || !direccion || !comuna) {
+        return res.status(400).json({ error: 'Todos los campos de factura son requeridos (RUT, razón social, giro, dirección, comuna)' });
+      }
+      // Validar formato RUT chileno (NN.NNN.NNN-X o sin puntos)
+      const rutClean = rut.replace(/[.\-]/g, '').toUpperCase();
+      if (!/^\d{7,8}[0-9K]$/.test(rutClean)) {
+        return res.status(400).json({ error: 'Formato de RUT inválido' });
+      }
     }
 
     await conn.beginTransaction();
@@ -165,14 +178,19 @@ export async function createOrder(req, res) {
     const urlReturn = `${baseUrl}/api/orders/return`;
 
     // Crear orden en DB con estado pending
+    // Datos de factura (solo si documentType === 'factura')
+    const f = documentType === 'factura' && factura ? factura : {};
+
     const [orderResult] = await conn.execute(
       `INSERT INTO orders (commerce_order, customer_name, customer_email, customer_phone,
         shipping_region, shipping_commune, shipping_cost, document_type,
+        factura_rut, factura_razon_social, factura_giro, factura_direccion, factura_comuna,
         subtotal, iva, total, url_confirmation, url_return, ip_address, user_agent)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         commerceOrder, customer.name, customer.email, customer.phone || null,
         shipping.region, shipping.commune, shippingCost, documentType || 'boleta',
+        f.rut || null, f.razonSocial || null, f.giro || null, f.direccion || null, f.comuna || null,
         subtotal, iva, total, urlConfirmation, urlReturn,
         req.ip, req.get('user-agent'),
       ]

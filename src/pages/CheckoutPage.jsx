@@ -21,6 +21,33 @@ function calcShippingCost(commune) {
   return DEFAULT_SHIPPING;
 }
 
+// Validar dígito verificador de RUT chileno
+function validarRut(rut) {
+  const clean = rut.replace(/[.\-]/g, '').toUpperCase();
+  if (clean.length < 8 || clean.length > 9) return false;
+  const body = clean.slice(0, -1);
+  const dv = clean.slice(-1);
+  if (!/^\d+$/.test(body)) return false;
+  let sum = 0, mul = 2;
+  for (let i = body.length - 1; i >= 0; i--) {
+    sum += parseInt(body[i]) * mul;
+    mul = mul === 7 ? 2 : mul + 1;
+  }
+  const expected = 11 - (sum % 11);
+  const dvCalc = expected === 11 ? '0' : expected === 10 ? 'K' : String(expected);
+  return dv === dvCalc;
+}
+
+// Formatear RUT: 12.345.678-9
+function formatRut(value) {
+  let clean = value.replace(/[^0-9kK]/g, '').toUpperCase();
+  if (clean.length <= 1) return clean;
+  const dv = clean.slice(-1);
+  let body = clean.slice(0, -1);
+  body = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return `${body}-${dv}`;
+}
+
 function CheckoutPage() {
   const navigate = useNavigate();
   const { carrito, formatearPrecio, calcularDesglose, getTotales, vaciarCarrito } = useCart();
@@ -32,6 +59,8 @@ function CheckoutPage() {
   const [comunas, setComunas] = useState([]);
   const [shippingCost, setShippingCost] = useState(null);
   const [documentType, setDocumentType] = useState('boleta');
+  const [factura, setFactura] = useState({ rut: '', razonSocial: '', giro: '', direccion: '', comuna: '' });
+  const [rutError, setRutError] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -80,6 +109,17 @@ function CheckoutPage() {
       return;
     }
 
+    if (documentType === 'factura') {
+      if (!factura.rut || !factura.razonSocial || !factura.giro || !factura.direccion || !factura.comuna) {
+        setError('Todos los campos de factura son requeridos');
+        return;
+      }
+      if (!validarRut(factura.rut)) {
+        setError('El RUT ingresado no es válido. Verifica el dígito verificador.');
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
@@ -97,6 +137,7 @@ function CheckoutPage() {
           items,
           shipping: { region, commune, cost: shippingCost ?? DEFAULT_SHIPPING },
           documentType,
+          ...(documentType === 'factura' ? { factura } : {}),
         }),
       });
 
@@ -248,6 +289,81 @@ function CheckoutPage() {
                   <span>Factura</span>
                 </button>
               </div>
+
+              {/* Campos de factura (condicional) */}
+              {documentType === 'factura' && (
+                <div className="checkout-factura-fields">
+                  <div className="checkout-field">
+                    <label htmlFor="factura-rut">RUT Empresa *</label>
+                    <input
+                      id="factura-rut"
+                      type="text"
+                      required
+                      placeholder="Ej: 76.123.456-7"
+                      value={factura.rut}
+                      onChange={e => {
+                        const formatted = formatRut(e.target.value);
+                        setFactura(p => ({ ...p, rut: formatted }));
+                        if (formatted.replace(/[.\-]/g, '').length >= 8) {
+                          setRutError(validarRut(formatted) ? '' : 'RUT inválido');
+                        } else {
+                          setRutError('');
+                        }
+                      }}
+                      maxLength={12}
+                    />
+                    {rutError && <span className="checkout-field-error">{rutError}</span>}
+                  </div>
+                  <div className="checkout-field">
+                    <label htmlFor="factura-razon">Razón Social *</label>
+                    <input
+                      id="factura-razon"
+                      type="text"
+                      required
+                      placeholder="Ej: Empresa SpA"
+                      value={factura.razonSocial}
+                      onChange={e => setFactura(p => ({ ...p, razonSocial: e.target.value }))}
+                      maxLength={200}
+                    />
+                  </div>
+                  <div className="checkout-field">
+                    <label htmlFor="factura-giro">Giro Comercial *</label>
+                    <input
+                      id="factura-giro"
+                      type="text"
+                      required
+                      placeholder="Ej: Venta al por menor"
+                      value={factura.giro}
+                      onChange={e => setFactura(p => ({ ...p, giro: e.target.value }))}
+                      maxLength={200}
+                    />
+                  </div>
+                  <div className="checkout-field">
+                    <label htmlFor="factura-dir">Dirección de Facturación *</label>
+                    <input
+                      id="factura-dir"
+                      type="text"
+                      required
+                      placeholder="Ej: Av. Libertador Bernardo O'Higgins 1234"
+                      value={factura.direccion}
+                      onChange={e => setFactura(p => ({ ...p, direccion: e.target.value }))}
+                      maxLength={300}
+                    />
+                  </div>
+                  <div className="checkout-field">
+                    <label htmlFor="factura-comuna">Comuna de Facturación *</label>
+                    <input
+                      id="factura-comuna"
+                      type="text"
+                      required
+                      placeholder="Ej: Santiago"
+                      value={factura.comuna}
+                      onChange={e => setFactura(p => ({ ...p, comuna: e.target.value }))}
+                      maxLength={100}
+                    />
+                  </div>
+                </div>
+              )}
 
               {error && (
                 <div className="checkout-error">

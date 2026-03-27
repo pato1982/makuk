@@ -576,6 +576,29 @@
   font-weight: 600;
 }
 
+/* --- Factura Fields --- */
+.checkout-factura-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(184, 115, 51, 0.04);
+  border: 1px dashed rgba(184, 115, 51, 0.25);
+  border-radius: 10px;
+  animation: fadeInDown 0.3s ease;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.checkout-field-error {
+  font-size: 0.8rem;
+  color: #dc2626;
+  font-weight: 500;
+}
+
 /* --- Shipping totals row --- */
 .checkout-total-shipping {
   color: var(--copper) !important;

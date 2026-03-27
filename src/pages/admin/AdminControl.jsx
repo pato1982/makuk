@@ -409,6 +409,34 @@ function AdminControl() {
                         </>
                       )}
 
+                      {selectedOrder.document_type === 'factura' && selectedOrder.factura_rut && (
+                        <>
+                          <h4 className="ventas-detail-section-title"><i className="fas fa-file-invoice-dollar"></i> Datos de Factura</h4>
+                          <div className="ventas-detail-rows">
+                            <div className="ventas-detail-row">
+                              <span className="ventas-detail-label">RUT</span>
+                              <span className="ventas-detail-value" style={{ fontFamily: 'monospace' }}>{selectedOrder.factura_rut}</span>
+                            </div>
+                            <div className="ventas-detail-row">
+                              <span className="ventas-detail-label">Razón Social</span>
+                              <span className="ventas-detail-value">{selectedOrder.factura_razon_social}</span>
+                            </div>
+                            <div className="ventas-detail-row">
+                              <span className="ventas-detail-label">Giro</span>
+                              <span className="ventas-detail-value">{selectedOrder.factura_giro}</span>
+                            </div>
+                            <div className="ventas-detail-row">
+                              <span className="ventas-detail-label">Dirección</span>
+                              <span className="ventas-detail-value">{selectedOrder.factura_direccion}</span>
+                            </div>
+                            <div className="ventas-detail-row">
+                              <span className="ventas-detail-label">Comuna</span>
+                              <span className="ventas-detail-value">{selectedOrder.factura_comuna}</span>
+                            </div>
+                          </div>
+                        </>
+                      )}
+
                       <h4 className="ventas-detail-section-title"><i className="fas fa-calendar-alt"></i> Fechas</h4>
                       <div className="ventas-detail-rows">
                         <div className="ventas-detail-row">
