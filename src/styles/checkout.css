@@ -51,6 +51,35 @@
   align-items: start;
 }
 
+/* --- Form section scrollable --- */
+.checkout-form-section {
+  max-height: calc(100vh - 180px);
+  overflow-y: auto;
+  padding-right: 6px;
+  /* Scrollbar sutil */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(184, 115, 51, 0.3) transparent;
+}
+
+.checkout-form-section::-webkit-scrollbar {
+  width: 4px;
+}
+
+.checkout-form-section::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.checkout-form-section::-webkit-scrollbar-thumb {
+  background-color: rgba(184, 115, 51, 0.3);
+  border-radius: 4px;
+}
+
+/* --- Summary section sticky --- */
+.checkout-summary-section {
+  position: sticky;
+  top: 20px;
+}
+
 /* --- Form Section --- */
 .checkout-form-section h2,
 .checkout-summary-section h2 {
@@ -575,6 +604,16 @@
   .checkout-grid {
     grid-template-columns: 1fr;
     gap: 24px;
+  }
+
+  .checkout-form-section {
+    max-height: none;
+    overflow-y: visible;
+    padding-right: 0;
+  }
+
+  .checkout-summary-section {
+    position: static;
   }
 
   .checkout-header h1 {
