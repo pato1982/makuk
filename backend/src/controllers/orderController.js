@@ -221,6 +221,7 @@ export async function createOrder(req, res) {
       currency: 'CLP',
       urlConfirmation,
       urlReturn,
+      timeout: 3600, // 1 hora: si el comprador no paga, Flow expira y cancela la orden
     };
 
     const flowResult = await flowPost('/payment/create', flowParams);

@@ -260,6 +260,7 @@ function AdminControl() {
                     <th>Fecha</th>
                     <th>Orden</th>
                     <th>Total</th>
+                    <th>Pago</th>
                     <th>Estado</th>
                   </tr>
                 </thead>
@@ -278,6 +279,16 @@ function AdminControl() {
                         <td className="ventas-cell-date">{formatDate(order.created_at).split(',')[0]}</td>
                         <td className="ventas-cell-order">{order.commerce_order}</td>
                         <td className="ventas-cell-total">{formatPrice(order.total)}</td>
+                        <td className="ventas-cell-payment">
+                          {(() => {
+                            const st = getStatusInfo(order.status);
+                            return (
+                              <span className="ventas-payment-badge" style={{ color: st.color, borderColor: st.color, background: st.color + '18' }}>
+                                <i className={`fas ${st.icon}`}></i> {st.label}
+                              </span>
+                            );
+                          })()}
+                        </td>
                         <td className="ventas-cell-status">
                           <div className="ventas-status-wrapper" ref={isMenuOpen ? statusMenuRef : null}>
                             <button
@@ -336,13 +347,19 @@ function AdminControl() {
             </AdminCard>
           ) : selectedOrder ? (() => {
             const adminSt = getAdminStatusInfo(selectedOrder.admin_status);
+            const pagoSt = getStatusInfo(selectedOrder.status);
 
             return (
               <AdminCard title={
                 <span className="ventas-detail-header">
                   <span>{selectedOrder.commerce_order}</span>
-                  <span className="ventas-detail-header-status" style={{ color: adminSt.color }}>
-                    <i className={`fas ${adminSt.icon}`}></i> {adminSt.label}
+                  <span style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <span className="ventas-payment-badge ventas-payment-badge--lg" style={{ color: pagoSt.color, borderColor: pagoSt.color, background: pagoSt.color + '18' }}>
+                      <i className={`fas ${pagoSt.icon}`}></i> {pagoSt.label}
+                    </span>
+                    <span className="ventas-detail-header-status" style={{ color: adminSt.color }}>
+                      <i className={`fas ${adminSt.icon}`}></i> {adminSt.label}
+                    </span>
                   </span>
                 </span>
               }>
