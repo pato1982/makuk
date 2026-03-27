@@ -1315,6 +1315,84 @@
   color: #b87333;
 }
 
+/* --- Tabs M1/M2/M3 --- */
+.img-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.img-tab {
+  flex: 1;
+  padding: 6px 0;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  background: #f5f5f5;
+  color: #999;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.img-tab.has-img {
+  border-color: #b87333;
+  color: #b87333;
+  background: #fdf6ee;
+}
+
+.img-tab.active {
+  background: #b87333;
+  border-color: #b87333;
+  color: white;
+}
+
+/* --- Botón eliminar imagen --- */
+.img-delete-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(220, 53, 69, 0.85);
+  color: white;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  z-index: 3;
+  transition: background 0.2s;
+}
+
+.img-delete-btn:hover {
+  background: rgba(220, 53, 69, 1);
+}
+
+/* --- Preview simple para M2/M3 --- */
+.img-editor-simple {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f9f9f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  max-height: 200px;
+}
+
+.img-editor-simple img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  max-height: 200px;
+}
+
 /* --- Image Upload Row (normal mode) --- */
 .image-upload-row {
   display: flex;

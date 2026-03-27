@@ -3,7 +3,7 @@ import { useContent } from '../../context/ContentContext';
 import AdminFormField from '../../components/admin/AdminFormField';
 import AdminCard from '../../components/admin/AdminCard';
 import ImageUploader from '../../components/admin/ImageUploader';
-import { uploadImage } from '../../services/api';
+import { uploadImage, deleteImage } from '../../services/api';
 
 function AdminCategories() {
   const { content, updateSection } = useContent();
@@ -31,6 +31,7 @@ function AdminCategories() {
   const [modalError, setModalError] = useState('');
   const [tab, setTab] = useState('tipos');
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [imgTab, setImgTab] = useState('m1');
 
   const [modalPos, setModalPos] = useState({ x: 0, y: 0 });
   const [productModalPos, setProductModalPos] = useState({ x: 0, y: 0 });
@@ -77,17 +78,24 @@ function AdminCategories() {
     setTab(newTab);
   };
 
+  const imgFieldMap = { m1: 'imagen', m2: 'imagen2', m3: 'imagen3' };
+
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file || !editProduct) return;
     setImgUploading(true);
+    const field = imgFieldMap[imgTab];
     try {
       const { url } = await uploadImage(file);
+      const updates = { [field]: url };
+      if (field === 'imagen') {
+        updates.imagePosX = 50;
+        updates.imagePosY = 50;
+        updates.imageZoom = 1;
+      }
       setProductsData(prev => ({
         ...prev,
-        items: prev.items.map(p => p.id === editProduct
-          ? { ...p, imagen: url, imagePosX: 50, imagePosY: 50, imageZoom: 1 }
-          : p)
+        items: prev.items.map(p => p.id === editProduct ? { ...p, ...updates } : p)
       }));
     } catch {
       // error silencioso
@@ -95,6 +103,29 @@ function AdminCategories() {
       setImgUploading(false);
       e.target.value = '';
     }
+  };
+
+  const handleDeleteImage = async () => {
+    if (!editProduct) return;
+    const field = imgFieldMap[imgTab];
+    const prod = productsData.items.find(p => p.id === editProduct);
+    const url = prod?.[field];
+    if (!url) return;
+    try {
+      await deleteImage(url);
+    } catch {
+      // silencioso — igual limpiamos el campo
+    }
+    const updates = { [field]: '' };
+    if (field === 'imagen') {
+      updates.imagePosX = 50;
+      updates.imagePosY = 50;
+      updates.imageZoom = 1;
+    }
+    setProductsData(prev => ({
+      ...prev,
+      items: prev.items.map(p => p.id === editProduct ? { ...p, ...updates } : p)
+    }));
   };
 
   const addProduct = () => {
@@ -116,6 +147,7 @@ function AdminCategories() {
     };
     setProductsData({ ...productsData, items: [...productsData.items, newProduct] });
     setModalError('');
+    setImgTab('m1');
     setEditProduct(newProduct.id);
     setIsNewProduct(true);
   };
@@ -380,7 +412,7 @@ function AdminCategories() {
                       </div>
                     </div>
                     <div className="admin-grid-card-actions">
-                      <button className="btn-card-edit" onClick={() => { setProductModalPos({ x: 0, y: 0 }); setModalError(''); setIsNewProduct(false); setEditProduct(prod.id); }}>
+                      <button className="btn-card-edit" onClick={() => { setProductModalPos({ x: 0, y: 0 }); setModalError(''); setIsNewProduct(false); setImgTab('m1'); setEditProduct(prod.id); }}>
                         <i className="fas fa-edit btn-card-icon"></i><span className="btn-card-label">Editar</span>
                       </button>
                       <button className="btn-card-delete" onClick={() => removeProduct(prod.id)}>
@@ -455,65 +487,92 @@ function AdminCategories() {
             <AdminFormField label="Nombre del producto" value={getEditingProduct().nombre} onChange={(v) => updateProduct(editProduct, 'nombre', v)} />
             <AdminFormField label="Descripción" type="textarea" rows={1} value={getEditingProduct().descripcion} onChange={(v) => updateProduct(editProduct, 'descripcion', v)} />
             <div className="admin-field">
-              <label>Imagen</label>
-              {getEditingProduct().imagen ? (
-                <div className="img-editor">
-                  <div className="img-editor-body">
-                    <button type="button" className="img-editor-arrow" onClick={() => updateProduct(editProduct, 'imagePosY', Math.max(0, (getEditingProduct().imagePosY ?? 50) - 5))}>
-                      <i className="fas fa-chevron-up"></i>
-                    </button>
-                    <div className="img-editor-middle">
-                      <button type="button" className="img-editor-arrow" onClick={() => updateProduct(editProduct, 'imagePosX', Math.max(0, (getEditingProduct().imagePosX ?? 50) - 5))}>
-                        <i className="fas fa-chevron-left"></i>
-                      </button>
-                      <div className="img-editor-preview">
-                        {imgUploading && <div className="img-editor-loading"><i className="fas fa-spinner fa-spin"></i></div>}
-                        <div className="img-editor-wrapper" style={{
-                          transform: `scale(${getEditingProduct().imageZoom ?? 1}) translate(${50 - (getEditingProduct().imagePosX ?? 50)}%, ${50 - (getEditingProduct().imagePosY ?? 50)}%)`,
-                        }}>
-                          <img
-                            src={getEditingProduct().imagen}
-                            alt="Preview"
-                          />
-                        </div>
-                      </div>
-                      <button type="button" className="img-editor-arrow" onClick={() => updateProduct(editProduct, 'imagePosX', Math.min(100, (getEditingProduct().imagePosX ?? 50) + 5))}>
-                        <i className="fas fa-chevron-right"></i>
-                      </button>
-                    </div>
-                    <button type="button" className="img-editor-arrow" onClick={() => updateProduct(editProduct, 'imagePosY', Math.min(100, (getEditingProduct().imagePosY ?? 50) + 5))}>
-                      <i className="fas fa-chevron-down"></i>
-                    </button>
-                  </div>
-                  <div className="img-editor-zoom">
-                    <i className="fas fa-search-minus"></i>
-                    <input
-                      type="range"
-                      min="0.5"
-                      max="2"
-                      step="0.05"
-                      value={getEditingProduct().imageZoom ?? 1}
-                      onChange={(e) => updateProduct(editProduct, 'imageZoom', parseFloat(e.target.value))}
-                    />
-                    <i className="fas fa-search-plus"></i>
-                  </div>
-                  <button type="button" className="img-editor-change" onClick={() => imgInputRef.current.click()}>
-                    <i className="fas fa-camera"></i> Cambiar imagen
+              <label>Imágenes</label>
+              <div className="img-tabs">
+                {['m1', 'm2', 'm3'].map(t => (
+                  <button
+                    key={t}
+                    type="button"
+                    className={`img-tab ${imgTab === t ? 'active' : ''} ${getEditingProduct()[imgFieldMap[t]] ? 'has-img' : ''}`}
+                    onClick={() => setImgTab(t)}
+                  >
+                    {t.toUpperCase()}
                   </button>
-                  <input ref={imgInputRef} type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
-                </div>
-              ) : (
-                <ImageUploader value="" onChange={(v) => {
-                  updateProduct(editProduct, 'imagen', v);
-                  updateProduct(editProduct, 'imagePosX', 50);
-                  updateProduct(editProduct, 'imagePosY', 50);
-                  updateProduct(editProduct, 'imageZoom', 1);
-                }} compact />
-              )}
-            </div>
-            <div className="admin-row admin-row-images">
-              <ImageUploader label="Imagen 2" value={getEditingProduct().imagen2 || ''} onChange={(v) => updateProduct(editProduct, 'imagen2', v)} compact />
-              <ImageUploader label="Imagen 3" value={getEditingProduct().imagen3 || ''} onChange={(v) => updateProduct(editProduct, 'imagen3', v)} compact />
+                ))}
+              </div>
+              {(() => {
+                const field = imgFieldMap[imgTab];
+                const currentImg = getEditingProduct()[field];
+                if (currentImg) {
+                  return (
+                    <div className="img-editor">
+                      {imgTab === 'm1' ? (
+                        <>
+                          <div className="img-editor-body">
+                            <button type="button" className="img-editor-arrow" onClick={() => updateProduct(editProduct, 'imagePosY', Math.max(0, (getEditingProduct().imagePosY ?? 50) - 5))}>
+                              <i className="fas fa-chevron-up"></i>
+                            </button>
+                            <div className="img-editor-middle">
+                              <button type="button" className="img-editor-arrow" onClick={() => updateProduct(editProduct, 'imagePosX', Math.max(0, (getEditingProduct().imagePosX ?? 50) - 5))}>
+                                <i className="fas fa-chevron-left"></i>
+                              </button>
+                              <div className="img-editor-preview">
+                                {imgUploading && <div className="img-editor-loading"><i className="fas fa-spinner fa-spin"></i></div>}
+                                <button type="button" className="img-delete-btn" onClick={handleDeleteImage} title="Eliminar imagen">
+                                  <i className="fas fa-trash"></i>
+                                </button>
+                                <div className="img-editor-wrapper" style={{
+                                  transform: `scale(${getEditingProduct().imageZoom ?? 1}) translate(${50 - (getEditingProduct().imagePosX ?? 50)}%, ${50 - (getEditingProduct().imagePosY ?? 50)}%)`,
+                                }}>
+                                  <img src={currentImg} alt="Preview" />
+                                </div>
+                              </div>
+                              <button type="button" className="img-editor-arrow" onClick={() => updateProduct(editProduct, 'imagePosX', Math.min(100, (getEditingProduct().imagePosX ?? 50) + 5))}>
+                                <i className="fas fa-chevron-right"></i>
+                              </button>
+                            </div>
+                            <button type="button" className="img-editor-arrow" onClick={() => updateProduct(editProduct, 'imagePosY', Math.min(100, (getEditingProduct().imagePosY ?? 50) + 5))}>
+                              <i className="fas fa-chevron-down"></i>
+                            </button>
+                          </div>
+                          <div className="img-editor-zoom">
+                            <i className="fas fa-search-minus"></i>
+                            <input type="range" min="0.5" max="2" step="0.05" value={getEditingProduct().imageZoom ?? 1} onChange={(e) => updateProduct(editProduct, 'imageZoom', parseFloat(e.target.value))} />
+                            <i className="fas fa-search-plus"></i>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="img-editor-simple">
+                          {imgUploading && <div className="img-editor-loading"><i className="fas fa-spinner fa-spin"></i></div>}
+                          <button type="button" className="img-delete-btn" onClick={handleDeleteImage} title="Eliminar imagen">
+                            <i className="fas fa-trash"></i>
+                          </button>
+                          <img src={currentImg} alt="Preview" />
+                        </div>
+                      )}
+                      <button type="button" className="img-editor-change" onClick={() => imgInputRef.current.click()}>
+                        <i className="fas fa-camera"></i> Cambiar imagen
+                      </button>
+                      <input ref={imgInputRef} type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
+                    </div>
+                  );
+                }
+                return (
+                  <div className="image-upload-area" onClick={() => !imgUploading && imgInputRef.current.click()}>
+                    {imgUploading ? (
+                      <div className="image-upload-placeholder">
+                        <i className="fas fa-spinner fa-spin" style={{ fontSize: '1.2rem', marginBottom: '4px' }}></i>
+                        <span className="upload-text">Subiendo...</span>
+                      </div>
+                    ) : (
+                      <div className="image-upload-placeholder">
+                        <span className="upload-text">Apreta y elige una imagen</span>
+                      </div>
+                    )}
+                    <input ref={imgInputRef} type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
+                  </div>
+                );
+              })()}
             </div>
             <div className="admin-row">
               <AdminFormField label="Precio actual" type="number" value={getEditingProduct().precioActual} onChange={(v) => updateProduct(editProduct, 'precioActual', Number(v))} />

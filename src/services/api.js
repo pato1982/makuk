@@ -187,3 +187,11 @@ export async function uploadImage(file) {
     body: formData
   });
 }
+
+export async function deleteImage(url) {
+  return apiFetch('/api/upload', {
+    method: 'DELETE',
+    body: JSON.stringify({ url }),
+    headers: { 'Content-Type': 'application/json' }
+  });
+}

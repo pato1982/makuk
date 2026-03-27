@@ -66,4 +66,31 @@ router.post('/', requireAuth, (req, res, next) => {
   }
 });
 
+// DELETE /api/upload — elimina imagen del servidor
+router.delete('/', requireAuth, async (req, res) => {
+  const { url } = req.body;
+  if (!url || !url.startsWith('/uploads/')) {
+    return res.status(400).json({ error: 'URL inválida' });
+  }
+
+  const filename = path.basename(url);
+  // Validar que el nombre sea un UUID válido con extensión webp
+  if (!/^[a-f0-9-]+\.webp$/.test(filename)) {
+    return res.status(400).json({ error: 'Nombre de archivo inválido' });
+  }
+
+  const { unlink } = await import('node:fs/promises');
+  const mainPath = path.join(UPLOAD_DIR, filename);
+  const thumbPath = path.join(UPLOAD_DIR, filename.replace('.webp', '_thumb.webp'));
+
+  try {
+    await unlink(mainPath).catch(() => {});
+    await unlink(thumbPath).catch(() => {});
+    res.json({ message: 'Imagen eliminada' });
+  } catch (err) {
+    console.error('Error eliminando imagen:', err);
+    res.status(500).json({ error: 'Error al eliminar la imagen' });
+  }
+});
+
 export default router;
