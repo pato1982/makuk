@@ -10,7 +10,7 @@ import CartModal from './components/CartModal';
 import ConfirmModal from './components/ConfirmModal';
 
 // Cambiar a false para desactivar el modo "En Desarrollo"
-const COMING_SOON = true && !sessionStorage.getItem('makuk_site_unlocked');
+const COMING_SOON = false;
 
 // Admin (lazy loading - no se cargan en el bundle público)
 import ProtectedRoute from './components/admin/ProtectedRoute';
