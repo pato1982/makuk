@@ -1336,6 +1336,11 @@
   text-align: center;
 }
 
+.img-tab.is-main {
+  border-color: #d4a054;
+  box-shadow: 0 0 0 2px #d4a054;
+}
+
 .img-tab.has-img {
   border-color: #b87333;
   color: #b87333;

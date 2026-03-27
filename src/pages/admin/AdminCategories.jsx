@@ -492,7 +492,7 @@ function AdminCategories() {
                   <button
                     key={t}
                     type="button"
-                    className={`img-tab ${imgTab === t ? 'active' : ''} ${getEditingProduct()[imgFieldMap[t]] ? 'has-img' : ''}`}
+                    className={`img-tab ${imgTab === t ? 'active' : ''} ${getEditingProduct()[imgFieldMap[t]] ? 'has-img' : ''} ${t === 'm1' ? 'is-main' : ''}`}
                     onClick={() => setImgTab(t)}
                   >
                     {t.toUpperCase()}
