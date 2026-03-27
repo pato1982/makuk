@@ -4,22 +4,7 @@ import { useCart } from '../context/CartContext';
 import { REGIONES, getComunasByRegion } from '../data/comunasChile';
 import '../styles/checkout.css';
 
-// Zonas de despacho para mostrar en el frontend
-const SHIPPING_ZONES = [
-  { communes: ['Santiago', 'Providencia', 'La Florida'], price: 3600, label: 'RM Central' },
-  { communes: ['Colina', 'Buin', 'San Bernardo', 'Maipú', 'Padre Hurtado'], price: 6000, label: 'RM Periferia 1' },
-  { communes: ['Melipilla', 'Talagante', 'Lo Barnechea', 'Chicureo', 'Huechuraba', 'Quilicura', 'Las Condes'], price: 6900, label: 'RM Periferia 2' },
-];
-const DEFAULT_SHIPPING = 7000;
-
-function calcShippingCost(commune) {
-  if (!commune) return null;
-  const norm = commune.trim().toLowerCase();
-  for (const zone of SHIPPING_ZONES) {
-    if (zone.communes.some(c => c.toLowerCase() === norm)) return zone.price;
-  }
-  return DEFAULT_SHIPPING;
-}
+// El despacho es siempre $0 en plataforma — el costo Starken es cargo del comprador
 
 // Validar dígito verificador de RUT chileno
 function validarRut(rut) {
@@ -57,7 +42,7 @@ function CheckoutPage() {
   const [region, setRegion] = useState('');
   const [commune, setCommune] = useState('');
   const [comunas, setComunas] = useState([]);
-  const [shippingCost, setShippingCost] = useState(null);
+  const shippingCost = 0; // Starken a cargo del comprador — siempre $0 en plataforma
   const [documentType, setDocumentType] = useState('boleta');
   const [factura, setFactura] = useState({ rut: '', razonSocial: '', giro: '', direccion: '', comuna: '' });
   const [rutError, setRutError] = useState('');
@@ -68,17 +53,7 @@ function CheckoutPage() {
   useEffect(() => {
     setComunas(getComunasByRegion(region));
     setCommune('');
-    setShippingCost(null);
   }, [region]);
-
-  // Calcular costo de despacho cuando cambia la comuna
-  useEffect(() => {
-    if (commune) {
-      setShippingCost(calcShippingCost(commune));
-    } else {
-      setShippingCost(null);
-    }
-  }, [commune]);
 
   // Si el carrito está vacío, redirigir
   if (carrito.length === 0) {
@@ -98,7 +73,7 @@ function CheckoutPage() {
     );
   }
 
-  const grandTotal = totalTotal + (shippingCost ?? 0);
+  const grandTotal = totalTotal; // despacho Starken a cargo del comprador, no se suma
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -135,7 +110,7 @@ function CheckoutPage() {
         body: JSON.stringify({
           customer,
           items,
-          shipping: { region, commune, cost: shippingCost ?? DEFAULT_SHIPPING },
+          shipping: { region, commune, cost: 0 },
           documentType,
           ...(documentType === 'factura' ? { factura } : {}),
         }),
@@ -257,11 +232,11 @@ function CheckoutPage() {
                 </select>
               </div>
 
-              {/* Costo de despacho dinámico */}
-              {shippingCost !== null && (
-                <div className="checkout-shipping-info">
-                  <i className="fas fa-map-marker-alt"></i>
-                  <span>Despacho a <strong>{commune}</strong>: <strong>{formatearPrecio(shippingCost)}</strong></span>
+              {/* Aviso despacho Starken */}
+              {commune && (
+                <div className="checkout-shipping-info checkout-shipping-starken">
+                  <i className="fas fa-box"></i>
+                  <span>El despacho a <strong>{commune}</strong> es por <strong>Starken</strong> a cargo del comprador. Te contactaremos para coordinar el envío.</span>
                 </div>
               )}
 
@@ -374,7 +349,7 @@ function CheckoutPage() {
               <button
                 type="submit"
                 className="checkout-btn primary"
-                disabled={loading || shippingCost === null}
+                disabled={loading || !commune}
               >
                 {loading ? (
                   <><i className="fas fa-spinner fa-spin"></i> Procesando...</>
@@ -422,21 +397,15 @@ function CheckoutPage() {
                   <span>Productos</span>
                   <span>{formatearPrecio(totalTotal)}</span>
                 </div>
-                <div className="checkout-total-row checkout-total-shipping">
-                  <span><i className="fas fa-truck"></i> Despacho</span>
-                  <span>{shippingCost !== null ? formatearPrecio(shippingCost) : '—'}</span>
-                </div>
                 <div className="checkout-total-row total">
                   <span>Total a pagar</span>
-                  <span>{shippingCost !== null ? formatearPrecio(grandTotal) : '—'}</span>
+                  <span>{formatearPrecio(grandTotal)}</span>
                 </div>
               </div>
 
-              {shippingCost === null && (
-                <p className="checkout-shipping-pending">
-                  <i className="fas fa-info-circle"></i> Selecciona tu comuna para ver el total con despacho
-                </p>
-              )}
+              <p className="checkout-shipping-pending">
+                <i className="fas fa-box"></i> Despacho Starken coordinado con el comprador — no incluido en el pago
+              </p>
             </div>
           </div>
         </div>

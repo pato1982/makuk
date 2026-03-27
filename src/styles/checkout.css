@@ -576,6 +576,16 @@
   font-weight: 600;
 }
 
+/* --- Starken notice --- */
+.checkout-shipping-starken {
+  background: rgba(59, 130, 246, 0.06);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.checkout-shipping-starken i {
+  color: #3b82f6 !important;
+}
+
 /* --- Factura Fields --- */
 .checkout-factura-fields {
   display: flex;
