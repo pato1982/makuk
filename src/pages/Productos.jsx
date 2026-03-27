@@ -144,7 +144,11 @@ function Productos() {
   // Armar array de imágenes disponibles para el carrusel
   const popupImagenes = useMemo(() => {
     if (!popupProducto) return [];
-    return [popupProducto.imagen, popupProducto.imagen2, popupProducto.imagen3].filter(Boolean);
+    return [
+      { url: popupProducto.imagen, posX: popupProducto.imagePosX, posY: popupProducto.imagePosY, zoom: popupProducto.imageZoom },
+      { url: popupProducto.imagen2, posX: popupProducto.image2PosX, posY: popupProducto.image2PosY, zoom: popupProducto.image2Zoom },
+      { url: popupProducto.imagen3, posX: popupProducto.image3PosX, posY: popupProducto.image3PosY, zoom: popupProducto.image3Zoom },
+    ].filter(img => img.url);
   }, [popupProducto]);
 
   useEffect(() => {
@@ -155,6 +159,15 @@ function Productos() {
       setPopupPanY(0);
     }
   }, [popupProducto]);
+
+  // Resetear zoom/pan al cambiar de imagen en el carrusel
+  useEffect(() => {
+    if (popupImagenes.length > 0 && popupImagenes[popupImgIndex]) {
+      setPopupZoom(popupImagenes[popupImgIndex].zoom ?? 1);
+      setPopupPanX(0);
+      setPopupPanY(0);
+    }
+  }, [popupImgIndex]);
 
   const popupMoveImg = (axis, delta) => {
     if (axis === 'x') {
@@ -280,9 +293,9 @@ function Productos() {
                   style={{ touchAction: isMobile ? 'none' : 'auto' }}
                 >
                   <div className="popup-img-pan-wrapper" style={{
-                    transform: `scale(${popupZoom}) translate(${(50 - (popupProducto.imagePosX ?? 50)) + popupPanX}%, ${(50 - (popupProducto.imagePosY ?? 50)) + popupPanY}%)`,
+                    transform: `scale(${popupZoom}) translate(${(50 - (popupImagenes[popupImgIndex]?.posX ?? 50)) + popupPanX}%, ${(50 - (popupImagenes[popupImgIndex]?.posY ?? 50)) + popupPanY}%)`,
                   }}>
-                    <img src={popupImagenes[popupImgIndex]} alt={popupProducto.nombre} />
+                    <img src={popupImagenes[popupImgIndex]?.url} alt={popupProducto.nombre} />
                   </div>
                 </div>
                 {popupImagenes.length > 1 && (
