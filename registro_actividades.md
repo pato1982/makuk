@@ -9,31 +9,47 @@
 
 ## 2026-03-27
 
-### Soporte para 3 imágenes por producto con carrusel en popup
-- **Base de datos:** Nueva migración `migration-004-product-images.sql` agrega columnas `imagen_2` e `imagen_3` a la tabla `products`.
-- **Admin - Subir productos:** El formulario de cada producto ahora tiene 3 uploaders: "Imagen principal (tarjeta)", "Imagen 2" e "Imagen 3".
-- **Popup de producto:** Cuando un producto tiene más de una imagen, aparecen flechas de navegación (izquierda/derecha) y puntos indicadores para rotar entre las imágenes.
-- **Retrocompatibilidad:** Productos existentes con una sola imagen se comportan igual que antes (sin flechas ni puntos).
-- **Tarjeta de producto:** Sigue mostrando solo la imagen principal, sin cambios.
+### Soporte para 3 imágenes por producto (Categorías y Piezas Únicas)
+- **Base de datos:** Migraciones `migration-004-product-images.sql` (columnas `imagen_2`, `imagen_3`) y `migration-005-image-positions.sql` (columnas `image2_pos_x/y/zoom`, `image3_pos_x/y/zoom`) en tabla `products`.
+- **Tabs M1/M2/M3:** Sistema de pestañas para cambiar entre las 3 imágenes en el modal de edición de producto. M1 tiene borde dorado indicando que es la imagen principal (tarjeta y portada de colecciones).
+- **Editor completo por imagen:** Las 3 imágenes tienen controles de zoom (barra), posición (flechas), botón cambiar y botón eliminar (trash rojo).
+- **Eliminación de imagen del servidor:** Endpoint `DELETE /api/upload` borra los archivos .webp y thumbnail del disco. Función `deleteImage` en api.js.
+- **Carrusel en popup público:** Tanto en la página de Productos como en la sección Piezas Únicas de la página principal, al hacer clic en un producto con múltiples imágenes aparecen flechas izquierda/derecha y puntos indicadores. Cada imagen usa su propia posición y zoom.
+- **Piezas Únicas:** La sección en la página principal ahora tiene popup al hacer clic en las tarjetas (antes no tenía).
+- **Retrocompatibilidad:** Productos con 1 sola imagen se comportan igual que antes.
+- **NGINX:** Se corrigió caché de `index.html` agregando `no-cache, no-store, must-revalidate` para que futuros deploys se reflejen inmediato.
 
-### Archivos modificados
+### Archivos modificados/creados
 | Archivo | Tipo de cambio |
 |---------|---------------|
-| `backend/src/config/migration-004-product-images.sql` | Nueva migración: `imagen_2`, `imagen_3` en tabla products |
-| `backend/src/controllers/adminController.js` | INSERT incluye `imagen_2`, `imagen_3` |
-| `backend/src/controllers/contentController.js` | SELECT devuelve `imagen2`, `imagen3` al frontend |
-| `src/pages/admin/AdminProducts.jsx` | 2 ImageUploaders adicionales en formulario de producto |
-| `src/pages/Productos.jsx` | Carrusel con flechas y puntos en popup de producto |
-| `src/styles/productos.css` | Estilos del carrusel: flechas circulares, dots, responsive móvil |
+| `backend/src/config/migration-004-product-images.sql` | Nueva migración: `imagen_2`, `imagen_3` |
+| `backend/src/config/migration-005-image-positions.sql` | Nueva migración: posición y zoom para imagen 2 y 3 |
+| `backend/src/controllers/adminController.js` | INSERT incluye las 3 imágenes y sus posiciones/zoom |
+| `backend/src/controllers/contentController.js` | SELECT devuelve imagen2/3 y posiciones en products y uniquePieces |
+| `backend/src/routes/upload.js` | Endpoint DELETE para eliminar imágenes del servidor |
+| `src/services/api.js` | Función `deleteImage` |
+| `src/pages/admin/AdminCategories.jsx` | Tabs M1/M2/M3 con editor completo, zoom, posición, delete |
+| `src/pages/admin/AdminUniquePieces.jsx` | Tabs M1/M2/M3 con editor completo, zoom, posición, delete |
+| `src/pages/admin/AdminProducts.jsx` | 3 ImageUploaders en formulario acordeón |
+| `src/pages/Productos.jsx` | Carrusel con flechas/dots en popup, posición por imagen |
+| `src/components/UniquePieces.jsx` | Popup con carrusel al hacer clic en tarjetas de piezas únicas |
+| `src/styles/productos.css` | Estilos del carrusel: flechas, dots, responsive |
+| `src/styles/admin.css` | Estilos tabs M1/M2/M3, borde dorado M1, botón delete, preview simple |
 
 ### Commits de la sesión
 | Hash | Descripción |
 |------|------------|
 | `bbf29e3` | Agregar soporte para 3 imágenes por producto con carrusel en popup |
+| `c0b113c` | Agregar uploaders de Imagen 2 e Imagen 3 en modal de AdminCategories |
+| `b970ea3` | Tabs M1/M2/M3 en modal de producto con eliminación de imagen del servidor |
+| `4869b90` | Zoom y posición para las 3 imágenes de producto, editor unificado M1/M2/M3 |
+| `e458e45` | Borde dorado en tab M1 para indicar imagen principal |
+| `9cdcd26` | Soporte 3 imágenes en piezas únicas: tabs M1/M2/M3 en admin + popup carrusel |
 
 ### Deploy
 - **Push:** GitHub `origin/main`
-- **VPS:** Deploy + migración BD
+- **VPS:** Frontend build + backend controllers/routes + migraciones BD + PM2 restart
+- **NGINX:** Regla no-cache para index.html
 
 ---
 
