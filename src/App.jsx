@@ -1,4 +1,3 @@
-// v2 - soporte 3 imágenes por producto
 import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
@@ -12,6 +11,7 @@ import ConfirmModal from './components/ConfirmModal';
 
 // Cambiar a false para desactivar el modo "En Desarrollo"
 const COMING_SOON = true && !sessionStorage.getItem('makuk_site_unlocked');
+console.log('[MAKUK] v2.1.0');
 
 // Admin (lazy loading - no se cargan en el bundle público)
 import ProtectedRoute from './components/admin/ProtectedRoute';
