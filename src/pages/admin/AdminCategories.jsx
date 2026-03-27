@@ -104,6 +104,8 @@ function AdminCategories() {
       nombre: 'Nuevo Producto',
       categoria: selectedCategory,
       imagen: '',
+      imagen2: '',
+      imagen3: '',
       precioActual: '',
       precioAnterior: '',
       destacado: false,
@@ -508,6 +510,10 @@ function AdminCategories() {
                   updateProduct(editProduct, 'imageZoom', 1);
                 }} compact />
               )}
+            </div>
+            <div className="admin-row admin-row-images">
+              <ImageUploader label="Imagen 2" value={getEditingProduct().imagen2 || ''} onChange={(v) => updateProduct(editProduct, 'imagen2', v)} compact />
+              <ImageUploader label="Imagen 3" value={getEditingProduct().imagen3 || ''} onChange={(v) => updateProduct(editProduct, 'imagen3', v)} compact />
             </div>
             <div className="admin-row">
               <AdminFormField label="Precio actual" type="number" value={getEditingProduct().precioActual} onChange={(v) => updateProduct(editProduct, 'precioActual', Number(v))} />
