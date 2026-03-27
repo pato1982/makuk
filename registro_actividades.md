@@ -29,7 +29,7 @@
 ### Commits de la sesión
 | Hash | Descripción |
 |------|------------|
-| `pendiente` | Agregar soporte para 3 imágenes por producto con carrusel en popup |
+| `bbf29e3` | Agregar soporte para 3 imágenes por producto con carrusel en popup |
 
 ### Deploy
 - **Push:** GitHub `origin/main`
