@@ -157,21 +157,47 @@ function AdminControl() {
         <h3 className="ctrl-section-title"><i className="fas fa-hdd"></i> Almacenamiento</h3>
         <div className="ctrl-storage-grid">
           <div className="ctrl-storage-card">
-            <div className="ctrl-gauge-wrap">
+            {/* Gauge for mobile */}
+            <div className="ctrl-gauge-wrap ctrl-mobile-only">
               <Gauge percentage={dbPct} color={getBarColor(dbPct)} />
               <span className="ctrl-gauge-pct" style={{ color: getBarColor(dbPct) }}>{dbPct}%</span>
             </div>
-            <div className="ctrl-storage-info">
+            {/* Bar for desktop */}
+            <div className="ctrl-bar-block ctrl-desktop-only">
+              <div className="ctrl-bar-header">
+                <span className="ctrl-storage-name"><i className="fas fa-database"></i> MySQL</span>
+                <span className="ctrl-bar-pct" style={{ color: getBarColor(dbPct) }}>{dbPct}%</span>
+              </div>
+              <div className="ctrl-bar-track">
+                <div className="ctrl-bar-fill" style={{ width: `${Math.min(dbPct, 100)}%`, background: getBarColor(dbPct) }}></div>
+              </div>
+              <span className="ctrl-storage-detail">{dbSizeKB} KB <span className="ctrl-storage-sep">/</span> {dbMaxKB.toLocaleString()} KB</span>
+            </div>
+            {/* Info for mobile */}
+            <div className="ctrl-storage-info ctrl-mobile-only">
               <span className="ctrl-storage-name"><i className="fas fa-database"></i> MySQL</span>
               <span className="ctrl-storage-detail">{dbSizeKB} KB <span className="ctrl-storage-sep">/</span> {dbMaxKB.toLocaleString()} KB</span>
             </div>
           </div>
           <div className="ctrl-storage-card">
-            <div className="ctrl-gauge-wrap">
+            {/* Gauge for mobile */}
+            <div className="ctrl-gauge-wrap ctrl-mobile-only">
               <Gauge percentage={diskPct} color={getBarColor(diskPct)} />
               <span className="ctrl-gauge-pct" style={{ color: getBarColor(diskPct) }}>{diskPct}%</span>
             </div>
-            <div className="ctrl-storage-info">
+            {/* Bar for desktop */}
+            <div className="ctrl-bar-block ctrl-desktop-only">
+              <div className="ctrl-bar-header">
+                <span className="ctrl-storage-name"><i className="fas fa-server"></i> Servidor</span>
+                <span className="ctrl-bar-pct" style={{ color: getBarColor(diskPct) }}>{diskPct}%</span>
+              </div>
+              <div className="ctrl-bar-track">
+                <div className="ctrl-bar-fill" style={{ width: `${Math.min(diskPct, 100)}%`, background: getBarColor(diskPct) }}></div>
+              </div>
+              <span className="ctrl-storage-detail">{diskUsedGB} GB <span className="ctrl-storage-sep">/</span> {diskTotalGB} GB <span className="ctrl-storage-free">({diskFreeGB} GB libres)</span></span>
+            </div>
+            {/* Info for mobile */}
+            <div className="ctrl-storage-info ctrl-mobile-only">
               <span className="ctrl-storage-name"><i className="fas fa-server"></i> Servidor</span>
               <span className="ctrl-storage-detail">{diskUsedGB} GB <span className="ctrl-storage-sep">/</span> {diskTotalGB} GB <span className="ctrl-storage-free">({diskFreeGB} GB libres)</span></span>
             </div>
