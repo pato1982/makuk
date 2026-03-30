@@ -168,6 +168,21 @@ export async function updateOrderAdminStatus(commerceOrder, admin_status) {
   });
 }
 
+// --- Visitas ---
+
+export async function trackVisit(page = '/') {
+  try {
+    const url = `${API_URL}/api/visits`;
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ page }),
+    });
+  } catch {
+    // silencioso — no bloquear la UX por un error de tracking
+  }
+}
+
 // --- Contacto ---
 
 export async function sendContactForm(data) {

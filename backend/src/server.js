@@ -8,6 +8,7 @@ import uploadRoutes from './routes/upload.js';
 import contactRoutes from './routes/contact.js';
 import orderRoutes from './routes/orders.js';
 import shippingRoutes from './routes/shipping.js';
+import visitRoutes from './routes/visits.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -34,6 +35,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/shipping', shippingRoutes);
+app.use('/api/visits', visitRoutes);
 
 // Servir imágenes subidas
 app.use('/uploads', express.static(process.env.UPLOAD_DIR || '/var/www/makuk/uploads'));

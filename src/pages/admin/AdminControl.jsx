@@ -52,6 +52,26 @@ function AdminControl() {
 
     return (
       <>
+        <AdminCard title="Visitas al sitio">
+          <div className="control-stats">
+            <div className="control-stat-card">
+              <i className="fas fa-calendar-week control-stat-icon"></i>
+              <span className="control-stat-count">{stats.visitsWeekly}</span>
+              <span className="control-stat-label">Última semana</span>
+            </div>
+            <div className="control-stat-card">
+              <i className="fas fa-calendar-alt control-stat-icon"></i>
+              <span className="control-stat-count">{stats.visitsMonthly}</span>
+              <span className="control-stat-label">Último mes</span>
+            </div>
+            <div className="control-stat-card">
+              <i className="fas fa-chart-line control-stat-icon"></i>
+              <span className="control-stat-count">{stats.visitsDailyAvg}</span>
+              <span className="control-stat-label">Promedio diario</span>
+            </div>
+          </div>
+        </AdminCard>
+
         <AdminCard title="Almacenamiento">
           <div className="control-storage-row">
             <div className="control-storage">

@@ -1,5 +1,6 @@
-import { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { trackVisit } from './services/api';
 import { CartProvider } from './context/CartContext';
 import { ContentProvider } from './context/ContentContext';
 import { AuthProvider } from './context/AuthContext';
@@ -45,12 +46,23 @@ import './styles/admin.css';
 import './styles/coming-soon.css';
 import './styles/checkout.css';
 
+function VisitTracker() {
+  const location = useLocation();
+  useEffect(() => {
+    if (!location.pathname.startsWith('/admin')) {
+      trackVisit(location.pathname);
+    }
+  }, [location.pathname]);
+  return null;
+}
+
 function App() {
   return (
     <AuthProvider>
       <ContentProvider>
         <CartProvider>
           <Router>
+            <VisitTracker />
             <Routes>
               {/* Public */}
               <Route path="/" element={COMING_SOON ? <ComingSoon /> : <Home />} />

@@ -293,7 +293,10 @@ export async function getStats(req, res) {
       [[countryCount]],
       [[stepsCount]],
       [[featuresCount]],
-      [[dbSizeRow]]
+      [[dbSizeRow]],
+      [[weeklyVisits]],
+      [[monthlyVisits]],
+      [[dailyAvg]]
     ] = await Promise.all([
       pool.query('SELECT COUNT(*) as total FROM products'),
       pool.query('SELECT COUNT(*) as total FROM categories'),
@@ -304,6 +307,18 @@ export async function getStats(req, res) {
       pool.query(
         `SELECT SUM(data_length + index_length) as dbSize
          FROM information_schema.tables WHERE table_schema = DATABASE()`
+      ),
+      pool.query(
+        `SELECT COUNT(*) as total FROM page_visits
+         WHERE visited_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)`
+      ),
+      pool.query(
+        `SELECT COUNT(*) as total FROM page_visits
+         WHERE visited_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)`
+      ),
+      pool.query(
+        `SELECT IFNULL(ROUND(COUNT(*) / NULLIF(DATEDIFF(NOW(), MIN(visited_at)), 0), 1), 0) as avg_daily
+         FROM page_visits`
       )
     ]);
 
@@ -325,7 +340,10 @@ export async function getStats(req, res) {
       aboutFeatures: featuresCount.total,
       dbSizeBytes: Number(dbSizeRow.dbSize) || 0,
       diskTotal,
-      diskUsed
+      diskUsed,
+      visitsWeekly: weeklyVisits.total,
+      visitsMonthly: monthlyVisits.total,
+      visitsDailyAvg: Number(dailyAvg.avg_daily) || 0
     });
   } catch (err) {
     console.error('Error getStats:', err);
