@@ -1319,3 +1319,49 @@ Rediseno completo del popup de detalle de producto: layout cuadrado con dos colu
 ### Deploy
 - **Push:** GitHub `origin/main`
 - **VPS:** Deploy exitoso via `ssh makuk` → git pull + build + deploy
+
+---
+
+## 2026-03-30
+
+### Registro de Ventas como sección independiente
+- **Antes:** "Registro de Ventas" era una pestaña dentro de la sección "Control" del panel admin.
+- **Después:** Se extrajo como sección propia en el sidebar, debajo de "Control", con icono `fa-cash-register`.
+- Se creó `AdminVentas.jsx` con toda la funcionalidad (filtros, paginación, sorting, datos de factura).
+- Se limpió `AdminControl.jsx` eliminando todo el código de ventas y los tabs.
+- Se agregó ruta `/admin/ventas` en `App.jsx` y el item de navegación en `AdminLayout.jsx`.
+
+### KPIs de visitas al sitio
+- **Tabla `page_visits`:** Nueva tabla con campos `page`, `ip`, `user_agent`, `visited_at` e índices por fecha y página. Migración: `migration-006-page-visits.sql`.
+- **Endpoint `POST /api/visits`:** Ruta pública (sin auth) que registra cada visita con IP y user-agent. Archivo: `backend/src/routes/visits.js`.
+- **VisitTracker en App.jsx:** Componente que se monta dentro del Router y registra una visita cada vez que el usuario navega a una ruta pública (excluye `/admin`). Llamada silenciosa que no bloquea la UX.
+- **Función `trackVisit()` en api.js:** Fetch directo (sin apiFetch) con try/catch silencioso.
+- **Stats actualizados:** `getStats` en `adminController.js` ahora ejecuta 3 queries adicionales para visitas semanales, mensuales y promedio diario.
+- **KPIs en Control:** Nueva tarjeta "Visitas al sitio" con 3 cards: última semana, último mes y promedio diario.
+- **CSS:** Grid de `.control-stats` cambiado de `repeat(4, 1fr)` a `repeat(auto-fit, minmax(100px, 1fr))` para adaptarse a 3 o 4 columnas.
+
+### Archivos modificados/creados
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `backend/src/config/migration-006-page-visits.sql` | Nueva migración: tabla `page_visits` |
+| `backend/src/routes/visits.js` | Nuevo: endpoint POST /api/visits |
+| `backend/src/server.js` | Registro de ruta `/api/visits` |
+| `backend/src/controllers/adminController.js` | 3 queries de visitas en getStats |
+| `src/services/api.js` | Función `trackVisit()` |
+| `src/App.jsx` | Componente `VisitTracker` + import |
+| `src/pages/admin/AdminControl.jsx` | Tarjeta KPIs de visitas, eliminado código de ventas |
+| `src/pages/admin/AdminVentas.jsx` | Nuevo: sección independiente de registro de ventas |
+| `src/pages/admin/AdminLayout.jsx` | Item "Registro de Ventas" en sidebar |
+| `src/styles/admin.css` | Grid auto-fit en `.control-stats` |
+
+### Commits de la sesión
+| Hash | Descripción |
+|------|------------|
+| `463c0e9` | Separar Registro de Ventas como sección independiente del panel admin |
+| `47db9da` | KPIs de visitas: tracking de páginas públicas + dashboard semanal/mensual/promedio diario |
+
+### Deploy
+- **Push:** GitHub `origin/main`
+- **VPS:** Frontend build + backend archivos copiados via SCP + PM2 restart
+- **Migración SQL:** Tabla `page_visits` creada directamente en el VPS
+- **Verificación:** Endpoint de visitas testeado OK, stats con KPIs confirmados funcionales
