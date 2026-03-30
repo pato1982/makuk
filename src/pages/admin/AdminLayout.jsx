@@ -14,6 +14,7 @@ const navItems = [
   { to: '/admin/testimonials', label: 'Testimonios', icon: 'fa-quote-left' },
   { to: '/admin/footer', label: 'Footer', icon: 'fa-shoe-prints' },
   { to: '/admin/control', label: 'Control', icon: 'fa-database' },
+  { to: '/admin/ventas', label: 'Registro de Ventas', icon: 'fa-cash-register' },
 ];
 
 function AdminLayout() {
