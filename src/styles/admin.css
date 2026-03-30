@@ -1863,7 +1863,7 @@
 }
 
 .ctrl-section-title {
-  font-size: 1.05rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: #333;
   margin: 0 0 22px 0;
@@ -1874,7 +1874,7 @@
 
 .ctrl-section-title i {
   color: #b87333;
-  font-size: 1.05rem;
+  font-size: 1.25rem;
 }
 
 /* ── Visits ── */
