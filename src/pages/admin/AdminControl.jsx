@@ -20,13 +20,13 @@ function AdminControl() {
   };
 
   // SVG semicircle gauge
-  const Gauge = ({ percentage, color, size = 100, strokeWidth = 10 }) => {
+  const Gauge = ({ percentage, color, size = 140, strokeWidth = 12 }) => {
     const radius = (size - strokeWidth) / 2;
     const circumference = Math.PI * radius;
     const filled = (Math.min(percentage, 100) / 100) * circumference;
 
     return (
-      <svg width={size} height={size / 2 + strokeWidth} viewBox={`0 0 ${size} ${size / 2 + strokeWidth}`} className="ctrl-gauge-svg">
+      <svg viewBox={`0 0 ${size} ${size / 2 + strokeWidth}`} className="ctrl-gauge-svg">
         <path
           d={`M ${strokeWidth / 2} ${size / 2} A ${radius} ${radius} 0 0 1 ${size - strokeWidth / 2} ${size / 2}`}
           fill="none"
@@ -48,14 +48,14 @@ function AdminControl() {
   };
 
   // Donut ring for visit KPIs
-  const DonutRing = ({ value, max, color, size = 72, strokeWidth = 7 }) => {
+  const DonutRing = ({ value, max, color, size = 100, strokeWidth = 9 }) => {
     const radius = (size - strokeWidth) / 2;
     const circumference = 2 * Math.PI * radius;
     const pct = max > 0 ? Math.min(value / max, 1) : 0;
     const filled = pct * circumference;
 
     return (
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="ctrl-donut-svg">
+      <svg viewBox={`0 0 ${size} ${size}`} className="ctrl-donut-svg">
         <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#e9ecef" strokeWidth={strokeWidth} />
         <circle
           cx={size / 2} cy={size / 2} r={radius}
