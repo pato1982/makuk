@@ -1354,11 +1354,42 @@ Rediseno completo del popup de detalle de producto: layout cuadrado con dos colu
 | `src/pages/admin/AdminLayout.jsx` | Item "Registro de Ventas" en sidebar |
 | `src/styles/admin.css` | Grid auto-fit en `.control-stats` |
 
+### Rediseño visual completo de la sección Control
+- **Antes:** Cards planas con texto simple y barras de almacenamiento básicas.
+- **Después:** Diseño moderno con gráficos SVG y animaciones:
+  - **Visitas:** 3 donut rings animados (100px desktop / 56px mobile) con valores centrados.
+  - **Almacenamiento:** Barras de progreso con borde negro (28px alto) en desktop; gauges semicirculares en mobile.
+  - **Contenido:** Tarjetas horizontales con iconos de color en fondo translúcido, números grandes.
+  - **Estado del sistema:** Indicadores con pulso animado verde y tags de estado.
+- Se eliminó `AdminCard` wrapper en Control, ahora usa secciones propias con clase `ctrl-section`.
+- Componentes SVG: `Gauge` (semicircular) y `DonutRing` (circular) con viewBox responsive.
+- Clases `ctrl-mobile-only` y `ctrl-desktop-only` para mostrar barras en desktop y gauges en mobile.
+- Títulos de sección agrandados a 1.3rem en desktop, 0.78rem en mobile.
+- **Responsive completo:** mobile (<700px), tablet (700-1100px) y desktop (>1100px).
+
+### Archivos modificados/creados
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `backend/src/config/migration-006-page-visits.sql` | Nueva migración: tabla `page_visits` |
+| `backend/src/routes/visits.js` | Nuevo: endpoint POST /api/visits |
+| `backend/src/server.js` | Registro de ruta `/api/visits` |
+| `backend/src/controllers/adminController.js` | 3 queries de visitas en getStats |
+| `src/services/api.js` | Función `trackVisit()` |
+| `src/App.jsx` | Componente `VisitTracker` + import |
+| `src/pages/admin/AdminControl.jsx` | Rediseño completo: donut rings, gauges, barras, pulse indicators |
+| `src/pages/admin/AdminVentas.jsx` | Nuevo: sección independiente de registro de ventas |
+| `src/pages/admin/AdminLayout.jsx` | Item "Registro de Ventas" en sidebar |
+| `src/styles/admin.css` | Estilos nuevos `ctrl-*`, eliminados estilos viejos `control-*`, responsive 3 breakpoints |
+
 ### Commits de la sesión
 | Hash | Descripción |
 |------|------------|
 | `463c0e9` | Separar Registro de Ventas como sección independiente del panel admin |
 | `47db9da` | KPIs de visitas: tracking de páginas públicas + dashboard semanal/mensual/promedio diario |
+| `dbc32b2` | Rediseño visual de la sección Control: donut rings, gauges semicirculares y pulse indicators |
+| `066bfef` | Agrandar elementos de Control en modo desktop sin modificar mobile |
+| `6c13e02` | Almacenamiento con barras de progreso y borde negro en desktop, gauges solo en mobile |
+| `dc54b61` | Agrandar títulos de secciones en Control (modo desktop) |
 
 ### Deploy
 - **Push:** GitHub `origin/main`
