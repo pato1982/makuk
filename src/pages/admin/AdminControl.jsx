@@ -1,10 +1,20 @@
 import { useState, useEffect } from 'react';
 import { getAdminStats } from '../../services/api';
 
+const kpiHelp = {
+  visitsWeekly: 'Cantidad total de veces que alguien entró a tu sitio en los últimos 7 días. Si una misma persona entró 5 veces, se cuentan las 5.',
+  visitsMonthly: 'Cantidad total de veces que alguien entró a tu sitio en los últimos 30 días. Incluye todas las visitas, aunque sean de la misma persona.',
+  visitsDailyAvg: 'En promedio, cuántas visitas recibe tu sitio por día desde que se empezó a medir.',
+  uniqueWeekly: 'Cantidad de personas diferentes que visitaron tu sitio en los últimos 7 días. Si alguien entró varias veces, se cuenta solo una vez.',
+  uniqueMonthly: 'Cantidad de personas diferentes que visitaron tu sitio en los últimos 30 días. Cada persona se cuenta una sola vez.',
+  returning: 'Personas que han vuelto a visitar tu sitio más de una vez. Indica cuántos visitantes les gustó tu sitio lo suficiente como para regresar.',
+};
+
 function AdminControl() {
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(true);
   const [statsError, setStatsError] = useState('');
+  const [helpPopup, setHelpPopup] = useState(null);
 
   useEffect(() => {
     getAdminStats()
@@ -118,6 +128,7 @@ function AdminControl() {
   ];
 
   const visitMax = Math.max(stats.visitsMonthly, 1);
+  const uniqueMax = Math.max(stats.uniqueMonthly, 1);
 
   return (
     <div className="admin-page">
@@ -127,30 +138,89 @@ function AdminControl() {
       {/* ── Visitas ── */}
       <div className="ctrl-section">
         <h3 className="ctrl-section-title"><i className="fas fa-chart-bar"></i> Visitas al sitio</h3>
+        <p className="ctrl-visits-subtitle">Total de visitas (incluye repetidas)</p>
         <div className="ctrl-visits-grid">
           <div className="ctrl-visit-card">
             <div className="ctrl-donut-wrap">
               <DonutRing value={stats.visitsWeekly} max={visitMax} color="#5b9bd5" />
               <span className="ctrl-donut-value">{stats.visitsWeekly}</span>
             </div>
-            <span className="ctrl-visit-label">Última semana</span>
+            <span className="ctrl-visit-label">
+              Última semana
+              <button type="button" className="ctrl-help-btn" onClick={() => setHelpPopup('visitsWeekly')}>?</button>
+            </span>
           </div>
           <div className="ctrl-visit-card">
             <div className="ctrl-donut-wrap">
               <DonutRing value={stats.visitsMonthly} max={visitMax} color="#b87333" />
               <span className="ctrl-donut-value">{stats.visitsMonthly}</span>
             </div>
-            <span className="ctrl-visit-label">Último mes</span>
+            <span className="ctrl-visit-label">
+              Último mes
+              <button type="button" className="ctrl-help-btn" onClick={() => setHelpPopup('visitsMonthly')}>?</button>
+            </span>
           </div>
           <div className="ctrl-visit-card">
             <div className="ctrl-donut-wrap">
               <DonutRing value={stats.visitsDailyAvg} max={Math.max(stats.visitsDailyAvg, 1)} color="#4caf50" />
               <span className="ctrl-donut-value">{stats.visitsDailyAvg}</span>
             </div>
-            <span className="ctrl-visit-label">Promedio diario</span>
+            <span className="ctrl-visit-label">
+              Promedio diario
+              <button type="button" className="ctrl-help-btn" onClick={() => setHelpPopup('visitsDailyAvg')}>?</button>
+            </span>
+          </div>
+        </div>
+
+        <p className="ctrl-visits-subtitle" style={{ marginTop: '20px' }}>Visitantes únicos (por IP)</p>
+        <div className="ctrl-visits-grid">
+          <div className="ctrl-visit-card">
+            <div className="ctrl-donut-wrap">
+              <DonutRing value={stats.uniqueWeekly} max={uniqueMax} color="#8e44ad" />
+              <span className="ctrl-donut-value">{stats.uniqueWeekly}</span>
+            </div>
+            <span className="ctrl-visit-label">
+              Únicos semana
+              <button type="button" className="ctrl-help-btn" onClick={() => setHelpPopup('uniqueWeekly')}>?</button>
+            </span>
+          </div>
+          <div className="ctrl-visit-card">
+            <div className="ctrl-donut-wrap">
+              <DonutRing value={stats.uniqueMonthly} max={uniqueMax} color="#e67e22" />
+              <span className="ctrl-donut-value">{stats.uniqueMonthly}</span>
+            </div>
+            <span className="ctrl-visit-label">
+              Únicos mes
+              <button type="button" className="ctrl-help-btn" onClick={() => setHelpPopup('uniqueMonthly')}>?</button>
+            </span>
+          </div>
+          <div className="ctrl-visit-card">
+            <div className="ctrl-donut-wrap">
+              <DonutRing value={stats.returningVisitors} max={Math.max(stats.uniqueVisitors, 1)} color="#e05555" />
+              <span className="ctrl-donut-value">{stats.returningVisitors}</span>
+            </div>
+            <span className="ctrl-visit-label">
+              Recurrentes
+              <button type="button" className="ctrl-help-btn" onClick={() => setHelpPopup('returning')}>?</button>
+            </span>
           </div>
         </div>
       </div>
+
+      {/* ── Popup de ayuda KPI ── */}
+      {helpPopup && (
+        <div className="ctrl-help-overlay" onClick={() => setHelpPopup(null)}>
+          <div className="ctrl-help-popup" onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="ctrl-help-popup-close" onClick={() => setHelpPopup(null)}>
+              <i className="fas fa-times"></i>
+            </button>
+            <div className="ctrl-help-popup-icon">
+              <i className="fas fa-question-circle"></i>
+            </div>
+            <p className="ctrl-help-popup-text">{kpiHelp[helpPopup]}</p>
+          </div>
+        </div>
+      )}
 
       {/* ── Almacenamiento ── */}
       <div className="ctrl-section">

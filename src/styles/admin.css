@@ -1878,6 +1878,13 @@
 }
 
 /* ── Visits ── */
+.ctrl-visits-subtitle {
+  font-size: 0.82rem;
+  color: #888;
+  font-weight: 500;
+  margin: 0 0 12px 0;
+}
+
 .ctrl-visits-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1929,6 +1936,99 @@
   color: #666;
   font-weight: 500;
   text-align: center;
+}
+
+/* ── KPI Help Button ── */
+.ctrl-help-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  background: #f5c518;
+  color: #3d2914;
+  font-size: 0.65rem;
+  font-weight: 800;
+  cursor: pointer;
+  margin-left: 5px;
+  vertical-align: middle;
+  line-height: 1;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ctrl-help-btn:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(245, 197, 24, 0.5);
+}
+
+/* ── KPI Help Popup ── */
+.ctrl-help-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: ctrl-help-fade-in 0.2s ease;
+}
+
+@keyframes ctrl-help-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.ctrl-help-popup {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px 28px 28px;
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  animation: ctrl-help-slide-up 0.25s ease;
+}
+
+@keyframes ctrl-help-slide-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.ctrl-help-popup-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: #999;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.ctrl-help-popup-close:hover {
+  color: #333;
+}
+
+.ctrl-help-popup-icon {
+  font-size: 2.2rem;
+  color: #f5c518;
+  margin-bottom: 16px;
+}
+
+.ctrl-help-popup-text {
+  font-size: 0.92rem;
+  color: #444;
+  line-height: 1.6;
+  margin: 0;
 }
 
 /* ── Visibility helpers ── */
@@ -2159,6 +2259,7 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
+  .ctrl-visits-subtitle { font-size: 0.75rem; }
   .ctrl-gauge-wrap { width: 100px; height: 58px; }
   .ctrl-gauge-pct { font-size: 1rem; }
   .ctrl-donut-value { font-size: 1.1rem; }
@@ -2180,6 +2281,8 @@
     margin-bottom: 12px;
   }
 
+  .ctrl-visits-subtitle { font-size: 0.68rem; margin-bottom: 8px; }
+
   .ctrl-visits-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
@@ -2190,6 +2293,11 @@
   .ctrl-donut-wrap { width: 56px; height: 56px; }
   .ctrl-donut-value { font-size: 1rem; }
   .ctrl-visit-label { font-size: 0.62rem; }
+
+  .ctrl-help-btn { width: 14px; height: 14px; font-size: 0.5rem; margin-left: 3px; }
+  .ctrl-help-popup { padding: 24px 20px 20px; max-width: 290px; }
+  .ctrl-help-popup-icon { font-size: 1.8rem; margin-bottom: 12px; }
+  .ctrl-help-popup-text { font-size: 0.82rem; }
 
   .ctrl-storage-grid {
     grid-template-columns: 1fr;

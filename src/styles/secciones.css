@@ -596,7 +596,11 @@
     }
 
     .category-img {
-        height: 105px !important;
+        height: 140px !important;
+    }
+
+    .category-img img {
+        object-fit: contain;
     }
 
     .category-info {
@@ -646,12 +650,16 @@
     }
 
     .unique-img {
-        height: 105px !important;
+        height: 140px !important;
         margin-bottom: 8px;
     }
 
     .unique-img-wrapper {
-        height: 105px !important;
+        height: 140px !important;
+    }
+
+    .unique-img img {
+        object-fit: contain;
     }
 
     .unique-card h4 {

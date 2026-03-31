@@ -296,7 +296,11 @@ export async function getStats(req, res) {
       [[dbSizeRow]],
       [[weeklyVisits]],
       [[monthlyVisits]],
-      [[dailyAvg]]
+      [[dailyAvg]],
+      [[uniqueVisitors]],
+      [[uniqueWeekly]],
+      [[uniqueMonthly]],
+      [[returningRow]]
     ] = await Promise.all([
       pool.query('SELECT COUNT(*) as total FROM products'),
       pool.query('SELECT COUNT(*) as total FROM categories'),
@@ -319,6 +323,20 @@ export async function getStats(req, res) {
       pool.query(
         `SELECT IFNULL(ROUND(COUNT(*) / NULLIF(DATEDIFF(NOW(), MIN(visited_at)), 0), 1), 0) as avg_daily
          FROM page_visits`
+      ),
+      pool.query('SELECT COUNT(DISTINCT ip) as total FROM page_visits'),
+      pool.query(
+        `SELECT COUNT(DISTINCT ip) as total FROM page_visits
+         WHERE visited_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)`
+      ),
+      pool.query(
+        `SELECT COUNT(DISTINCT ip) as total FROM page_visits
+         WHERE visited_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)`
+      ),
+      pool.query(
+        `SELECT COUNT(*) as total FROM (
+           SELECT ip FROM page_visits GROUP BY ip HAVING COUNT(*) > 1
+         ) as returning_visitors`
       )
     ]);
 
@@ -343,7 +361,11 @@ export async function getStats(req, res) {
       diskUsed,
       visitsWeekly: weeklyVisits.total,
       visitsMonthly: monthlyVisits.total,
-      visitsDailyAvg: Number(dailyAvg.avg_daily) || 0
+      visitsDailyAvg: Number(dailyAvg.avg_daily) || 0,
+      uniqueVisitors: uniqueVisitors.total,
+      uniqueWeekly: uniqueWeekly.total,
+      uniqueMonthly: uniqueMonthly.total,
+      returningVisitors: returningRow.total
     });
   } catch (err) {
     console.error('Error getStats:', err);
