@@ -159,37 +159,6 @@ CREATE TABLE IF NOT EXISTS process_steps (
 );
 
 -- ============================================
--- PRESENCIA GLOBAL
--- ============================================
-
-CREATE TABLE IF NOT EXISTS worldwide (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  title VARCHAR(255) NOT NULL DEFAULT '',
-  subtitle VARCHAR(500) DEFAULT '',
-  paragraph TEXT
-);
-
-CREATE TABLE IF NOT EXISTS worldwide_stats (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  worldwide_id INT NOT NULL DEFAULT 1,
-  numero VARCHAR(50) NOT NULL,
-  label VARCHAR(255) NOT NULL,
-  label_corta VARCHAR(100) DEFAULT '',
-  sort_order INT DEFAULT 0,
-  FOREIGN KEY (worldwide_id) REFERENCES worldwide(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS worldwide_countries (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  worldwide_id INT NOT NULL DEFAULT 1,
-  nombre VARCHAR(255) NOT NULL,
-  descripcion TEXT,
-  imagen VARCHAR(500) DEFAULT '',
-  sort_order INT DEFAULT 0,
-  FOREIGN KEY (worldwide_id) REFERENCES worldwide(id) ON DELETE CASCADE
-);
-
--- ============================================
 -- TESTIMONIOS
 -- ============================================
 

@@ -10,7 +10,6 @@ const navItems = [
   { to: '/admin/unique-pieces', label: 'Piezas Únicas', icon: 'fa-gem' },
   { to: '/admin/about', label: 'Nosotros', icon: 'fa-users' },
   { to: '/admin/process', label: 'Proceso', icon: 'fa-cogs' },
-  { to: '/admin/worldwide', label: 'Presencia Global', icon: 'fa-globe' },
   { to: '/admin/testimonials', label: 'Testimonios', icon: 'fa-quote-left' },
   { to: '/admin/footer', label: 'Footer', icon: 'fa-shoe-prints' },
   { to: '/admin/control', label: 'Control', icon: 'fa-database' },

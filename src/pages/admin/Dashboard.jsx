@@ -8,7 +8,6 @@ function Dashboard() {
     { label: 'Productos', value: content.products.items.length, icon: 'fa-box' },
     { label: 'Piezas Únicas', value: content.uniquePieces.items.length, icon: 'fa-gem' },
     { label: 'Testimonios', value: content.testimonials.items.length, icon: 'fa-quote-left' },
-    { label: 'Países', value: content.worldwide.countries.length, icon: 'fa-globe' },
     { label: 'Pasos del Proceso', value: content.process.steps.length, icon: 'fa-cogs' },
   ];
 

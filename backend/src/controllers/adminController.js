@@ -187,43 +187,6 @@ export async function updateProcess(req, res) {
   }
 }
 
-// PUT /api/admin/worldwide
-export async function updateWorldwide(req, res) {
-  const { title, subtitle, paragraph, stats, countries } = req.body;
-  const conn = await pool.getConnection();
-  try {
-    await conn.beginTransaction();
-    await conn.query(
-      'UPDATE worldwide SET title = ?, subtitle = ?, paragraph = ? WHERE id = 1',
-      [title, subtitle, paragraph]
-    );
-    await conn.query('DELETE FROM worldwide_stats WHERE worldwide_id = 1');
-    for (let i = 0; i < stats.length; i++) {
-      const s = stats[i];
-      await conn.query(
-        'INSERT INTO worldwide_stats (worldwide_id, numero, label, label_corta, sort_order) VALUES (1, ?, ?, ?, ?)',
-        [s.numero, s.label, s.labelCorta, i + 1]
-      );
-    }
-    await conn.query('DELETE FROM worldwide_countries WHERE worldwide_id = 1');
-    for (let i = 0; i < countries.length; i++) {
-      const c = countries[i];
-      await conn.query(
-        'INSERT INTO worldwide_countries (worldwide_id, nombre, descripcion, imagen, sort_order) VALUES (1, ?, ?, ?, ?)',
-        [c.nombre, c.descripcion, c.imagen, i + 1]
-      );
-    }
-    await conn.commit();
-    res.json({ message: 'Worldwide actualizado' });
-  } catch (err) {
-    await conn.rollback();
-    console.error('Error updateWorldwide:', err);
-    res.status(500).json({ error: 'Error del servidor' });
-  } finally {
-    conn.release();
-  }
-}
-
 // PUT /api/admin/testimonials
 export async function updateTestimonials(req, res) {
   const { title, items } = req.body;
@@ -290,7 +253,6 @@ export async function getStats(req, res) {
       [[prodCount]],
       [[catCount]],
       [[testCount]],
-      [[countryCount]],
       [[stepsCount]],
       [[featuresCount]],
       [[dbSizeRow]],
@@ -305,7 +267,6 @@ export async function getStats(req, res) {
       pool.query('SELECT COUNT(*) as total FROM products'),
       pool.query('SELECT COUNT(*) as total FROM categories'),
       pool.query('SELECT COUNT(*) as total FROM testimonials'),
-      pool.query('SELECT COUNT(*) as total FROM worldwide_countries'),
       pool.query('SELECT COUNT(*) as total FROM process_steps'),
       pool.query('SELECT COUNT(*) as total FROM about_features'),
       pool.query(
@@ -353,7 +314,6 @@ export async function getStats(req, res) {
       products: prodCount.total,
       categories: catCount.total,
       testimonials: testCount.total,
-      countries: countryCount.total,
       processSteps: stepsCount.total,
       aboutFeatures: featuresCount.total,
       dbSizeBytes: Number(dbSizeRow.dbSize) || 0,

@@ -17,9 +17,6 @@ export async function getAllContent(req, res) {
       [aboutFeaturesRows],
       [processSectionRows],
       [processStepsRows],
-      [worldwideRows],
-      [worldwideStatsRows],
-      [worldwideCountriesRows],
       [testimonialsSectionRows],
       [testimonialRows],
       [footerRows],
@@ -37,9 +34,6 @@ export async function getAllContent(req, res) {
       pool.query('SELECT icon, text FROM about_features WHERE about_id = 1 ORDER BY sort_order'),
       pool.query('SELECT * FROM process_section WHERE id = 1'),
       pool.query('SELECT icon, title, description FROM process_steps WHERE process_id = 1 ORDER BY sort_order'),
-      pool.query('SELECT * FROM worldwide WHERE id = 1'),
-      pool.query('SELECT numero, label, label_corta FROM worldwide_stats WHERE worldwide_id = 1 ORDER BY sort_order'),
-      pool.query('SELECT nombre, descripcion, imagen FROM worldwide_countries WHERE worldwide_id = 1 ORDER BY sort_order'),
       pool.query('SELECT * FROM testimonials_section WHERE id = 1'),
       pool.query('SELECT texto, nombre, ubicacion FROM testimonials WHERE section_id = 1 ORDER BY sort_order'),
       pool.query('SELECT * FROM footer WHERE id = 1'),
@@ -53,7 +47,6 @@ export async function getAllContent(req, res) {
     const uniqueSection = uniqueSectionRows[0] || {};
     const about = aboutRows[0] || {};
     const processSection = processSectionRows[0] || {};
-    const worldwide = worldwideRows[0] || {};
     const testimonialsSection = testimonialsSectionRows[0] || {};
     const footer = footerRows[0] || {};
     const productsPage = productsPageRows[0] || {};
@@ -125,21 +118,6 @@ export async function getAllContent(req, res) {
           icon: s.icon,
           title: s.title,
           description: s.description
-        }))
-      },
-      worldwide: {
-        title: worldwide.title,
-        subtitle: worldwide.subtitle,
-        paragraph: worldwide.paragraph,
-        stats: worldwideStatsRows.map(s => ({
-          numero: s.numero,
-          label: s.label,
-          labelCorta: s.label_corta
-        })),
-        countries: worldwideCountriesRows.map(c => ({
-          nombre: c.nombre,
-          descripcion: c.descripcion,
-          imagen: c.imagen
         }))
       },
       testimonials: {

@@ -3,7 +3,7 @@ import { requireAuth } from '../middleware/auth.js';
 import {
   updateHeader, updateHero, updateIntro,
   updateCategories, updateProducts, updateUniquePieces,
-  updateAbout, updateProcess, updateWorldwide,
+  updateAbout, updateProcess,
   updateTestimonials, updateFooter, updateProductsPage,
   getStats
 } from '../controllers/adminController.js';
@@ -22,7 +22,6 @@ router.put('/products', updateProducts);
 router.put('/unique-pieces', updateUniquePieces);
 router.put('/about', updateAbout);
 router.put('/process', updateProcess);
-router.put('/worldwide', updateWorldwide);
 router.put('/testimonials', updateTestimonials);
 router.put('/footer', updateFooter);
 router.put('/products-page', updateProductsPage);

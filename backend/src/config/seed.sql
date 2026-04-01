@@ -11,8 +11,7 @@ INSERT INTO nav_items (header_id, label, section_id, sort_order) VALUES
 (1, 'Inicio', 'inicio', 1),
 (1, 'Colecciones', 'categorias', 2),
 (1, 'Nosotros', 'nosotros', 3),
-(1, 'Presencia Global', 'mundial', 4),
-(1, 'Contacto', 'contacto', 5);
+(1, 'Contacto', 'contacto', 4);
 
 -- HERO
 INSERT INTO hero (id, title, subtitle, cta_text, background_image) VALUES
@@ -75,26 +74,6 @@ INSERT INTO process_steps (process_id, icon, title, description, sort_order) VAL
 (1, 'fa-fire', 'Preparación', 'Preparamos y damos forma a los hilos de cobre', 2),
 (1, 'fa-hands', 'Creación', 'Manos expertas tejen cada pieza de cobre a mano', 3),
 (1, 'fa-star', 'Perfección', 'Pulido y acabado de alta calidad', 4);
-
--- WORLDWIDE
-INSERT INTO worldwide (id, title, subtitle, paragraph) VALUES
-(1, 'Presencia Global', 'El arte de la joyería fina conquista el mundo', 'Nuestras joyas han cruzado fronteras para adornar a personas en los cinco continentes. La exclusividad de nuestros diseños tejidos en cobre ha cautivado a amantes del arte y la joyería en todo el mundo.');
-
--- WORLDWIDE STATS
-INSERT INTO worldwide_stats (worldwide_id, numero, label, label_corta, sort_order) VALUES
-(1, '25+', 'Países', 'Países', 1),
-(1, '10K+', 'Clientes Felices', 'Clientes', 2),
-(1, '15', 'Años de Experiencia', 'Trayectoria', 3),
-(1, '100%', 'Artesanal', 'Artesanal', 4);
-
--- WORLDWIDE COUNTRIES
-INSERT INTO worldwide_countries (worldwide_id, nombre, descripcion, imagen, sort_order) VALUES
-(1, 'Francia', 'París nos recibe con elegancia', 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=300&h=200&fit=crop', 1),
-(1, 'Estados Unidos', 'Nueva York ama nuestro arte', 'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=300&h=200&fit=crop', 2),
-(1, 'Japón', 'Tokio valora la artesanía', 'https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=300&h=200&fit=crop', 3),
-(1, 'España', 'Madrid celebra nuestra tradición', 'https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=300&h=200&fit=crop', 4),
-(1, 'Australia', 'Sídney descubre el cobre', 'https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=300&h=200&fit=crop', 5),
-(1, 'Italia', 'Roma aprecia la belleza', 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=300&h=200&fit=crop', 6);
 
 -- TESTIMONIALS SECTION
 INSERT INTO testimonials_section (id, title) VALUES

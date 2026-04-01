@@ -6,7 +6,6 @@
       { "label": "Inicio", "sectionId": "inicio" },
       { "label": "Colecciones", "sectionId": "categorias" },
       { "label": "Nosotros", "sectionId": "nosotros" },
-      { "label": "Presencia Global", "sectionId": "mundial" },
       { "label": "Contacto", "sectionId": "contacto" }
     ]
   },
@@ -148,49 +147,6 @@
         "icon": "fa-star",
         "title": "Perfección",
         "description": "Pulido y acabado de alta calidad"
-      }
-    ]
-  },
-  "worldwide": {
-    "title": "Presencia Global",
-    "subtitle": "El arte de la joyería fina conquista el mundo",
-    "paragraph": "Nuestras joyas han cruzado fronteras para adornar a personas en los cinco continentes. La exclusividad de nuestros diseños tejidos en cobre ha cautivado a amantes del arte y la joyería en todo el mundo.",
-    "stats": [
-      { "numero": "25+", "label": "Países", "labelCorta": "Países" },
-      { "numero": "10K+", "label": "Clientes Felices", "labelCorta": "Clientes" },
-      { "numero": "15", "label": "Años de Experiencia", "labelCorta": "Trayectoria" },
-      { "numero": "100%", "label": "Artesanal", "labelCorta": "Artesanal" }
-    ],
-    "countries": [
-      {
-        "nombre": "Francia",
-        "descripcion": "París nos recibe con elegancia",
-        "imagen": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=300&h=200&fit=crop"
-      },
-      {
-        "nombre": "Estados Unidos",
-        "descripcion": "Nueva York ama nuestro arte",
-        "imagen": "https://images.unsplash.com/photo-1534430480872-3498386e7856?w=300&h=200&fit=crop"
-      },
-      {
-        "nombre": "Japón",
-        "descripcion": "Tokio valora la artesanía",
-        "imagen": "https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=300&h=200&fit=crop"
-      },
-      {
-        "nombre": "España",
-        "descripcion": "Madrid celebra nuestra tradición",
-        "imagen": "https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=300&h=200&fit=crop"
-      },
-      {
-        "nombre": "Australia",
-        "descripcion": "Sídney descubre el cobre",
-        "imagen": "https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=300&h=200&fit=crop"
-      },
-      {
-        "nombre": "Italia",
-        "descripcion": "Roma aprecia la belleza",
-        "imagen": "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=300&h=200&fit=crop"
       }
     ]
   },

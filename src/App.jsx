@@ -24,7 +24,6 @@ const AdminCategories = lazy(() => import('./pages/admin/AdminCategories'));
 const AdminUniquePieces = lazy(() => import('./pages/admin/AdminUniquePieces'));
 const AdminAbout = lazy(() => import('./pages/admin/AdminAbout'));
 const AdminProcess = lazy(() => import('./pages/admin/AdminProcess'));
-const AdminWorldwide = lazy(() => import('./pages/admin/AdminWorldwide'));
 const AdminTestimonials = lazy(() => import('./pages/admin/AdminTestimonials'));
 const AdminFooter = lazy(() => import('./pages/admin/AdminFooter'));
 const AdminProducts = lazy(() => import('./pages/admin/AdminProducts'));
@@ -83,7 +82,6 @@ function App() {
                   <Route path="unique-pieces" element={<AdminUniquePieces />} />
                   <Route path="about" element={<AdminAbout />} />
                   <Route path="process" element={<AdminProcess />} />
-                  <Route path="worldwide" element={<AdminWorldwide />} />
                   <Route path="testimonials" element={<AdminTestimonials />} />
                   <Route path="footer" element={<AdminFooter />} />
                   <Route path="products" element={<AdminProducts />} />

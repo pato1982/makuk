@@ -31,7 +31,6 @@ async function seed() {
     const tables = [
       'products_page', 'footer',
       'testimonials', 'testimonials_section',
-      'worldwide_countries', 'worldwide_stats', 'worldwide',
       'process_steps', 'process_section',
       'about_features', 'about',
       'unique_pieces_section',

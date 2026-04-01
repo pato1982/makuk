@@ -7,7 +7,6 @@ import Categories from '../components/Categories';
 import UniquePieces from '../components/UniquePieces';
 import About from '../components/About';
 import Process from '../components/Process';
-import Worldwide from '../components/Worldwide';
 import Testimonials from '../components/Testimonials';
 import Footer from '../components/Footer';
 
@@ -39,7 +38,6 @@ function Home() {
         <UniquePieces />
         <About />
         <Process />
-        <Worldwide />
         <Testimonials />
       </main>
       <Footer />
