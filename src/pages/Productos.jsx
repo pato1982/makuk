@@ -73,10 +73,10 @@ function ProductoCard({ producto, onImageClick }) {
 function Productos() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { content } = useContent();
+  const { content, contentLoading } = useContent();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 700);
 
-  const productos = content.products.items;
+  const productos = contentLoading ? [] : content.products.items;
   const nombresCategorias = content.products.nombresCategorias;
   const pageConfig = content.productsPage;
 

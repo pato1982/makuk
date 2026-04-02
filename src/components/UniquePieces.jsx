@@ -4,7 +4,8 @@ import { useContent } from '../context/ContentContext';
 import { getThumb } from '../utils/imageUtils';
 
 function UniquePieces() {
-  const { content } = useContent();
+  const { content, contentLoading } = useContent();
+  if (contentLoading) return null;
   const { title, subtitle, items } = content.uniquePieces;
   const [popupPieza, setPopupPieza] = useState(null);
   const [popupImgIndex, setPopupImgIndex] = useState(0);

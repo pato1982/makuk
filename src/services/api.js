@@ -152,6 +152,11 @@ export async function getAdminStats() {
   return apiFetch('/api/admin/stats');
 }
 
+export async function getAuditLog(params = {}) {
+  const qs = new URLSearchParams(params).toString();
+  return apiFetch(`/api/admin/audit-log${qs ? '?' + qs : ''}`);
+}
+
 export async function getAdminOrders(params = {}) {
   const qs = new URLSearchParams(params).toString();
   return apiFetch(`/api/admin/orders${qs ? '?' + qs : ''}`);

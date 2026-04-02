@@ -22,11 +22,19 @@ export function ContentProvider({ children }) {
   }, []);
 
   const updateSection = useCallback(async (sectionKey, data) => {
+    // Guardar estado anterior para rollback si falla
+    const previous = content[sectionKey];
     // Actualización optimista del state local
     setContent(prev => ({ ...prev, [sectionKey]: data }));
-    // Persistir en el backend (los errores suben al caller para mostrar feedback)
-    await saveSection(sectionKey, data);
-  }, []);
+    try {
+      // Persistir en el backend
+      await saveSection(sectionKey, data);
+    } catch (err) {
+      // Rollback: restaurar estado anterior si el guardado falló
+      setContent(prev => ({ ...prev, [sectionKey]: previous }));
+      throw err; // re-lanzar para que el caller muestre feedback
+    }
+  }, [content]);
 
   const reloadContent = useCallback(async () => {
     try {

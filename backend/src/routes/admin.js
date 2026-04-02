@@ -5,7 +5,7 @@ import {
   updateCategories, updateProducts, updateUniquePieces,
   updateAbout, updateProcess,
   updateTestimonials, updateFooter, updateProductsPage,
-  getStats
+  getStats, getAuditLog
 } from '../controllers/adminController.js';
 import { getAdminOrders, getAdminOrderDetail, updateAdminOrderStatus } from '../controllers/orderController.js';
 
@@ -26,6 +26,7 @@ router.put('/testimonials', updateTestimonials);
 router.put('/footer', updateFooter);
 router.put('/products-page', updateProductsPage);
 router.get('/stats', getStats);
+router.get('/audit-log', getAuditLog);
 
 // Órdenes de venta
 router.get('/orders', getAdminOrders);

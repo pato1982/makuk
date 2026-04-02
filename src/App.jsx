@@ -30,6 +30,7 @@ const AdminProducts = lazy(() => import('./pages/admin/AdminProducts'));
 const AdminProductsPage = lazy(() => import('./pages/admin/AdminProductsPage'));
 const AdminControl = lazy(() => import('./pages/admin/AdminControl'));
 const AdminVentas = lazy(() => import('./pages/admin/AdminVentas'));
+const AdminAuditLog = lazy(() => import('./pages/admin/AdminAuditLog'));
 const FlowTestPage = lazy(() => import('./pages/flow/FlowTestPage'));
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage'));
 const PaymentResultPage = lazy(() => import('./pages/PaymentResultPage'));
@@ -88,6 +89,7 @@ function App() {
                   <Route path="products-page" element={<AdminProductsPage />} />
                   <Route path="control" element={<AdminControl />} />
                   <Route path="ventas" element={<AdminVentas />} />
+                  <Route path="audit-log" element={<AdminAuditLog />} />
                 </Route>
             </Routes>
             <CartModal />

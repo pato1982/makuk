@@ -29,6 +29,7 @@ function AdminCategories() {
   const [isNewProduct, setIsNewProduct] = useState(false);
   const [saving, setSaving] = useState(false);
   const [modalError, setModalError] = useState('');
+  const [pageError, setPageError] = useState('');
   const [tab, setTab] = useState('tipos');
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [imgTab, setImgTab] = useState('m1');
@@ -160,10 +161,16 @@ function AdminCategories() {
 
   const removeProduct = async (id) => {
     if (!window.confirm('¿Eliminar este producto?')) return;
+    const prevData = productsData;
     const newData = { ...productsData, items: productsData.items.filter(p => p.id !== id) };
     setProductsData(newData);
     setEditProduct(null);
-    try { await updateSection('products', newData); } catch { /* silencioso */ }
+    try {
+      await updateSection('products', newData);
+    } catch {
+      setProductsData(prevData);
+      setPageError('Error al eliminar producto. Intenta de nuevo.');
+    }
   };
 
   const cancelProduct = () => {
@@ -189,6 +196,7 @@ function AdminCategories() {
   };
 
   const toggleDestacado = async (id) => {
+    const prevData = productsData;
     const prod = productsData.items.find(p => p.id === id);
     const items = productsData.items.map(p => {
       if (p.id === id) return { ...p, destacado: !prod.destacado };
@@ -197,7 +205,12 @@ function AdminCategories() {
     });
     const newData = { ...productsData, items };
     setProductsData(newData);
-    try { await updateSection('products', newData); } catch { /* silencioso */ }
+    try {
+      await updateSection('products', newData);
+    } catch {
+      setProductsData(prevData);
+      setPageError('Error al actualizar destacado. Intenta de nuevo.');
+    }
   };
 
   const getEditingProduct = () => productsData.items.find(p => p.id === editProduct);
@@ -246,6 +259,8 @@ function AdminCategories() {
 
   const confirmDeleteCategory = async () => {
     const cat = data.items[deleteConfirm];
+    const prevData = data;
+    const prevProductsData = productsData;
     const newData = { ...data, items: data.items.filter((_, i) => i !== deleteConfirm) };
     const newProductsData = { ...productsData, items: productsData.items.filter(p => p.categoria !== cat.slug) };
     setData(newData);
@@ -256,7 +271,11 @@ function AdminCategories() {
     try {
       await updateSection('categories', newData);
       await updateSection('products', newProductsData);
-    } catch { /* silencioso */ }
+    } catch {
+      setData(prevData);
+      setProductsData(prevProductsData);
+      setPageError('Error al eliminar categoría. Intenta de nuevo.');
+    }
   };
 
   const saveCategory = async () => {
@@ -615,6 +634,7 @@ function AdminCategories() {
         );
       })()}
 
+      {pageError && <div className="save-error"><i className="fas fa-exclamation-circle"></i> {pageError}</div>}
     </div>
   );
 }

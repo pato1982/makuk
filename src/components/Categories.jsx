@@ -3,7 +3,8 @@ import { useContent } from '../context/ContentContext';
 import { getThumb } from '../utils/imageUtils';
 
 function Categories() {
-  const { content } = useContent();
+  const { content, contentLoading } = useContent();
+  if (contentLoading) return null;
   const { title, subtitle, items } = content.categories;
   const productos = content.products.items;
 

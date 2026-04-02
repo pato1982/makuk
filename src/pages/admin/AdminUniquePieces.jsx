@@ -72,10 +72,8 @@ function AdminUniquePieces() {
     const selectedProducts = productsData.items.filter(p => p.categoria === 'piezas-unicas' && p.destacado);
     const newItems = selectedProducts.map(p => ({ nombre: p.nombre, imagen: p.imagen }));
     try {
-      await Promise.all([
-        updateSection('uniquePieces', { ...data, items: newItems }),
-        updateSection('products', productsData),
-      ]);
+      await updateSection('products', productsData);
+      await updateSection('uniquePieces', { ...data, items: newItems });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
       setEditProduct(null);
@@ -93,17 +91,17 @@ function AdminUniquePieces() {
       setShowLimitPopup(true);
       return;
     }
+    const prevProductsData = productsData;
     const items = productsData.items.map(p => p.id === id ? { ...p, destacado: !p.destacado } : p);
     const newProductsData = { ...productsData, items };
     setProductsData(newProductsData);
     try {
       const selectedProducts = items.filter(p => p.categoria === 'piezas-unicas' && p.destacado);
       const newItems = selectedProducts.map(p => ({ nombre: p.nombre, imagen: p.imagen }));
-      await Promise.all([
-        updateSection('uniquePieces', { ...data, items: newItems }),
-        updateSection('products', newProductsData),
-      ]);
+      await updateSection('products', newProductsData);
+      await updateSection('uniquePieces', { ...data, items: newItems });
     } catch {
+      setProductsData(prevProductsData);
       setSaveError('Error al actualizar. Intenta de nuevo.');
     }
   };
@@ -180,6 +178,7 @@ function AdminUniquePieces() {
 
   const removeProduct = async (id) => {
     if (!window.confirm('¿Eliminar este producto?')) return;
+    const prevProductsData = productsData;
     const newProductsData = { ...productsData, items: productsData.items.filter(p => p.id !== id) };
     setProductsData(newProductsData);
     setEditProduct(null);
@@ -187,11 +186,10 @@ function AdminUniquePieces() {
     try {
       const selectedProducts = newProductsData.items.filter(p => p.categoria === 'piezas-unicas' && p.destacado);
       const newItems = selectedProducts.map(p => ({ nombre: p.nombre, imagen: p.imagen }));
-      await Promise.all([
-        updateSection('uniquePieces', { ...data, items: newItems }),
-        updateSection('products', newProductsData),
-      ]);
+      await updateSection('products', newProductsData);
+      await updateSection('uniquePieces', { ...data, items: newItems });
     } catch {
+      setProductsData(prevProductsData);
       setSaveError('Error al eliminar. Intenta de nuevo.');
     }
   };

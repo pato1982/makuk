@@ -15,11 +15,9 @@ function AdminHeader() {
   const handleSave = async () => {
     setSaveError('');
     try {
-      await Promise.all([
-        updateSection('header', data),
-        updateSection('hero', heroData),
-        updateSection('intro', introData),
-      ]);
+      await updateSection('header', data);
+      await updateSection('hero', heroData);
+      await updateSection('intro', introData);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch {

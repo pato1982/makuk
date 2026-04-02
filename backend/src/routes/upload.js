@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import sharp from 'sharp';
 import { requireAuth } from '../middleware/auth.js';
+import { logAudit } from '../utils/auditLog.js';
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR || '/var/www/makuk/uploads';
 const MAX_SIZE = parseInt(process.env.MAX_FILE_SIZE || '5242880'); // 5MB
@@ -59,6 +60,7 @@ router.post('/', requireAuth, (req, res, next) => {
 
     const url = `/uploads/${mainFilename}`;
     const thumbUrl = `/uploads/${thumbFilename}`;
+    await logAudit(req, 'crear', 'imagen', `Subida: ${url} (${req.file.originalname})`);
     res.json({ url, thumbUrl });
   } catch (err) {
     console.error('Error procesando imagen:', err);
@@ -86,6 +88,7 @@ router.delete('/', requireAuth, async (req, res) => {
   try {
     await unlink(mainPath).catch(() => {});
     await unlink(thumbPath).catch(() => {});
+    await logAudit(req, 'eliminar', 'imagen', `Eliminada: ${url}`);
     res.json({ message: 'Imagen eliminada' });
   } catch (err) {
     console.error('Error eliminando imagen:', err);

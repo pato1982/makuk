@@ -7,6 +7,97 @@
 
 ---
 
+## 2026-04-02
+
+### Corrección de desaparición temporal de productos + Sistema de auditoría
+
+**Diagnóstico realizado:**
+- Se detectaron **deadlocks MySQL (`ER_LOCK_DEADLOCK`)** en los logs de PM2 causados por el patrón `DELETE FROM products` + INSERT de 72 filas al guardar productos.
+- Las llamadas simultáneas (`Promise.all`) desde el frontend causaban race conditions entre secciones dependientes.
+- Los catches silenciosos en AdminCategories ocultaban errores al admin, dejando el estado local inconsistente con la BD.
+- Los componentes públicos mostraban datos de fallback (`content.json`) antes de que la API respondiera.
+
+**Correcciones backend (`adminController.js`):**
+- Reemplazado patrón `DELETE ALL + INSERT ALL` por UPSERT: UPDATE para productos existentes (por ID), INSERT solo para nuevos, DELETE solo para eliminados (`WHERE id NOT IN (...)`).
+- Agregado helper `withDeadlockRetry()` con hasta 3 reintentos y backoff exponencial.
+
+**Correcciones frontend:**
+- `ContentContext.jsx`: `updateSection` ahora guarda estado anterior y hace rollback si el API call falla.
+- `AdminUniquePieces.jsx`: 3 funciones cambiadas de `Promise.all` a secuencial + rollback local de `productsData`.
+- `AdminCategories.jsx`: 3 catches silenciosos reemplazados por rollback + mensaje de error visible al usuario.
+- `AdminHeader.jsx`: `Promise.all` de 3 calls cambiado a secuencial.
+- `UniquePieces.jsx`, `Categories.jsx`: retornan `null` mientras `contentLoading` es true.
+- `Productos.jsx`: usa array vacío mientras `contentLoading` es true.
+
+**Sistema de auditoría (nuevo):**
+- Nueva tabla `admin_audit_log` (migración 007) con: id, user_id, user_email, ip, action (crear/editar/eliminar), section, details, created_at.
+- Helper `utils/auditLog.js` que captura IP real via `X-Real-IP` de NGINX y email del JWT.
+- 14 puntos de auditoría: 12 en `adminController.js` (todos los PUT) + 2 en `upload.js` (subida y eliminación de imágenes).
+- Endpoint `GET /api/admin/audit-log` con paginación y filtro por sección.
+- Nueva página `AdminAuditLog.jsx` con tabla, filtro por sección, paginación, color-coded por tipo de acción.
+- Link "Registro de Cambios" agregado al sidebar del admin.
+
+### Archivos nuevos
+| Archivo | Descripción |
+|---------|-------------|
+| `backend/src/config/migration-007-audit-log.sql` | Migración para tabla admin_audit_log |
+| `backend/src/utils/auditLog.js` | Helper para registrar acciones de auditoría |
+| `src/pages/admin/AdminAuditLog.jsx` | Vista del registro de cambios en el admin |
+
+### Archivos modificados
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `backend/src/controllers/adminController.js` | UPSERT products, deadlock retry, logAudit en 12 endpoints, endpoint audit-log |
+| `backend/src/routes/admin.js` | Ruta GET /audit-log + import getAuditLog |
+| `backend/src/routes/upload.js` | logAudit en upload y delete de imágenes |
+| `src/services/api.js` | Función getAuditLog |
+| `src/context/ContentContext.jsx` | Rollback en updateSection si API falla |
+| `src/pages/admin/AdminUniquePieces.jsx` | Secuencial + rollback en 3 funciones |
+| `src/pages/admin/AdminCategories.jsx` | Error feedback + rollback en 3 funciones |
+| `src/pages/admin/AdminHeader.jsx` | Secuencial en handleSave |
+| `src/pages/admin/AdminLayout.jsx` | Link "Registro de Cambios" en sidebar |
+| `src/App.jsx` | Lazy import + ruta /admin/audit-log |
+| `src/components/UniquePieces.jsx` | contentLoading check |
+| `src/components/Categories.jsx` | contentLoading check |
+| `src/pages/Productos.jsx` | contentLoading check |
+
+---
+
+## 2026-04-01
+
+### Eliminación completa de la sección "Presencia Global" (worldwide)
+- **Motivo:** Sección removida por decisión del usuario, tanto del sitio público como del panel de administración.
+- **Base de datos (producción):** Se ejecutaron `DROP TABLE worldwide_countries, worldwide_stats, worldwide` y `DELETE FROM nav_items WHERE section_id = 'mundial'` directamente en MySQL del VPS.
+- **Frontend:** Se eliminó el componente `Worldwide.jsx` de la página principal y `AdminWorldwide.jsx` del panel admin. Se quitó el link "Presencia Global" del sidebar del admin, la ruta `/admin/worldwide` del router, el KPI "Países" del Dashboard y el navItem "Presencia Global" del header en `content.json`.
+- **Backend:** Se eliminó la función `updateWorldwide` del controlador admin, la ruta `PUT /api/admin/worldwide`, las queries de worldwide del endpoint `GET /api/content`, y el conteo de `worldwide_countries` del endpoint de stats.
+- **CSS:** Se eliminaron todos los estilos de `.worldwide`, `.country-*`, `.stats-row`, `.stat-*` (desktop y mobile).
+- **Schema/Seed:** Se quitaron las 3 tablas del `schema.sql`, los INSERTs del `seed.sql` y las referencias del `seed.js`.
+- **Deploy:** Push a GitHub (`e99ddcc`), rebuild del frontend en VPS, archivos backend subidos manualmente y PM2 reiniciado.
+
+### Archivos eliminados
+| Archivo | Descripción |
+|---------|-------------|
+| `src/components/Worldwide.jsx` | Componente público de la sección |
+| `src/pages/admin/AdminWorldwide.jsx` | Panel de administración de la sección |
+
+### Archivos modificados
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `src/pages/Home.jsx` | Quitado import y uso de `<Worldwide />` |
+| `src/App.jsx` | Quitado lazy import y ruta admin |
+| `src/pages/admin/AdminLayout.jsx` | Quitado link del sidebar |
+| `src/pages/admin/Dashboard.jsx` | Quitado KPI "Países" |
+| `src/styles/secciones.css` | Quitados estilos worldwide (desktop y mobile) |
+| `src/data/content.json` | Quitada key `worldwide` y navItem |
+| `backend/src/routes/admin.js` | Quitada ruta y import de updateWorldwide |
+| `backend/src/controllers/adminController.js` | Quitada función updateWorldwide y query countries |
+| `backend/src/controllers/contentController.js` | Quitadas queries y mapeo de worldwide |
+| `backend/src/config/schema.sql` | Quitadas 3 tablas worldwide |
+| `backend/src/config/seed.sql` | Quitados INSERTs worldwide y navItem |
+| `backend/src/config/seed.js` | Quitadas tablas del array de limpieza |
+
+---
+
 ## 2026-03-27
 
 ### Soporte para 3 imágenes por producto (Categorías y Piezas Únicas)
@@ -1396,3 +1487,42 @@ Rediseno completo del popup de detalle de producto: layout cuadrado con dos colu
 - **VPS:** Frontend build + backend archivos copiados via SCP + PM2 restart
 - **Migración SQL:** Tabla `page_visits` creada directamente en el VPS
 - **Verificación:** Endpoint de visitas testeado OK, stats con KPIs confirmados funcionales
+
+---
+
+## 2026-03-31
+
+### KPIs de visitantes únicos y recurrentes en Control
+- **Backend:** 4 nuevas queries en `getStats`: visitantes únicos totales (`COUNT(DISTINCT ip)`), únicos última semana, únicos último mes, y recurrentes (IPs con más de 1 visita usando `GROUP BY ip HAVING COUNT(*) > 1`).
+- **Frontend:** Segunda fila de 3 KPIs con donut rings: "Únicos semana" (morado), "Únicos mes" (naranja), "Recurrentes" (rojo).
+- Subtítulos separadores: "Total de visitas (incluye repetidas)" y "Visitantes únicos (por IP)" para diferenciar las dos filas.
+
+### Botón de ayuda (?) en cada KPI de visitas
+- Botón circular amarillo (`#f5c518`) al lado de cada nombre de KPI (los 6).
+- Al presionar abre un popup centrado con overlay oscuro, animación de entrada, icono de interrogación amarillo y texto explicativo sin tecnicismos.
+- Se cierra tocando la X o tocando fuera del popup.
+- Textos explicativos redactados en lenguaje simple para usuario no técnico.
+- Responsive: botón más pequeño en mobile (14px), popup más angosto (290px).
+
+### Tarjetas de portada más altas en mobile
+- Tarjetas de Colecciones y Piezas Únicas en la página principal: altura aumentada de 105px a 140px solo en mobile (`max-width: 699px`).
+- Imágenes cambiadas de `object-fit: cover` a `object-fit: contain` para mostrarse completas sin recorte.
+- No se modificaron los estilos de tablet ni desktop.
+
+### Archivos modificados
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `backend/src/controllers/adminController.js` | 4 queries nuevas: únicos totales, semanales, mensuales y recurrentes |
+| `src/pages/admin/AdminControl.jsx` | Segunda fila KPIs, estado `helpPopup`, diccionario `kpiHelp`, popup de ayuda |
+| `src/styles/admin.css` | Estilos `.ctrl-help-btn`, `.ctrl-help-overlay`, `.ctrl-help-popup`, `.ctrl-visits-subtitle`, responsive |
+| `src/styles/secciones.css` | Mobile: tarjetas 140px + `object-fit: contain` para categorías y piezas únicas |
+
+### Commits de la sesión
+| Hash | Descripción |
+|------|------------|
+| `f5d10f7` | Agregar KPIs de visitantes únicos/recurrentes en Control, botón de ayuda en cada KPI, y tarjetas mobile más altas en portada |
+
+### Deploy
+- **Push:** GitHub `origin/main`
+- **VPS:** Frontend build + backend copiado + PM2 restart
+- **Verificación:** Backend online, frontend desplegado
