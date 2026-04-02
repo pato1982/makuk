@@ -1676,23 +1676,23 @@
 
 /* Admin cards: tarjetas compactas con imagen proporcional */
 .admin-grid-4 .producto-card {
-  border-radius: 0 0 6px 6px;
+  border-radius: 0 0 10px 10px;
 }
 
 .admin-grid-4 .producto-img {
-  height: 180px;
+  height: 220px;
 }
 
 .admin-grid-4 .producto-info {
-  padding: 8px 6px;
+  padding: 14px 10px;
   justify-content: flex-start;
 }
 
 .admin-grid-4 .producto-info h4 {
-  font-size: 0.75rem;
-  margin-bottom: 4px;
-  min-height: 0;
-  -webkit-line-clamp: 1;
+  font-size: 1rem;
+  margin-bottom: 6px;
+  min-height: 2.4em;
+  -webkit-line-clamp: 2;
 }
 
 .admin-grid-4 .producto-precios {
@@ -1700,11 +1700,11 @@
 }
 
 .admin-grid-4 .precio-actual {
-  font-size: 0.8rem;
+  font-size: 1rem;
 }
 
 .admin-grid-4 .precio-anterior {
-  font-size: 0.65rem;
+  font-size: 0.8rem;
 }
 
 .admin-grid-card-add {
@@ -3390,7 +3390,7 @@
   }
 
   .admin-grid-4 .producto-img {
-    height: 160px;
+    height: 180px;
   }
 
   /* Testimonials grid */
