@@ -185,6 +185,30 @@
       }
     ]
   },
+  "logros": {
+    "title": "Nuestros Logros",
+    "subtitle": "Reconocimientos que avalan nuestra pasión por la artesanía en cobre",
+    "items": [
+      {
+        "imagen": "/imagenes/logros/1.png",
+        "titulo": "Emprendimiento Más Innovador",
+        "descripcion": "Certificado de Premiación en Expo Artesanía Valdivia 2018, categoría Emprendimiento más innovador",
+        "año": "2018"
+      },
+      {
+        "imagen": "/imagenes/logros/2.png",
+        "titulo": "Premio a la Innovación Artesanal",
+        "descripcion": "Reconocimiento otorgado por la Municipalidad de Concepción a la artesana Rossana Arias Rojas",
+        "año": "2025"
+      },
+      {
+        "imagen": "/imagenes/logros/3.png",
+        "titulo": "Destacados por NY NOW",
+        "descripcion": "Publicación compartida por @NY_NOW, feria internacional de diseño en Nueva York",
+        "año": ""
+      }
+    ]
+  },
   "footer": {
     "logo": "MAKUK",
     "description": "Joyería tejida en cobre, creada con pasión y dedicación desde Chile para el mundo.",

@@ -8,6 +8,7 @@ import UniquePieces from '../components/UniquePieces';
 import About from '../components/About';
 import Process from '../components/Process';
 import Testimonials from '../components/Testimonials';
+import Logros from '../components/Logros';
 import Footer from '../components/Footer';
 
 function Home() {
@@ -38,6 +39,7 @@ function Home() {
         <UniquePieces />
         <About />
         <Process />
+        <Logros />
         <Testimonials />
       </main>
       <Footer />
