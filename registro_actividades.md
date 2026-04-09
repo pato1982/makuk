@@ -7,7 +7,79 @@
 
 ---
 
+## 2026-04-09
+
+### Cambio de imagen en sección Logros
+
+- Se reemplazó la imagen del segundo logro ("Premio a la Innovación Artesanal") de `2.png` a `4.png`
+- Se copió `4.png` desde carpeta `logros/` a `public/imagenes/logros/`
+
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `src/data/content.json` | Cambio ruta imagen logro 2: `2.png` → `4.png` |
+| `public/imagenes/logros/4.png` | Nueva imagen agregada |
+
+---
+
+### Nueva sección Nuestros Logros + Rediseño testimonios y Nuestro Arte
+
+**Sección Logros (nueva):**
+- Componente `Logros.jsx` con 3 tarjetas horizontales (imagen izquierda + texto derecha)
+- Imágenes reales: Expo Artesanía Valdivia 2018, Premio Innovación Concepción 2025, QR NY NOW
+- Popup modal al hacer clic en cualquier tarjeta para ver la imagen en grande
+- Fondo gradiente crema cálido con línea dorada superior decorativa
+- Fallback a `content.json` local cuando la API no tiene datos de logros
+- Responsive: tarjetas se apilan en mobile manteniendo layout imagen-texto
+
+**Rediseño testimonios (Lo Que Dicen Nuestros Clientes):**
+- Tarjetas más pequeñas (220px vs 300px anteriores)
+- Fondo blanco con bordes cobrizos sutiles (antes fondo oscuro charcoal/dark-brown)
+- Textos oscuros legibles, nombres en tono cobre
+- Mejor integración visual con el resto del sitio
+
+**Sección Nuestro Arte:**
+- Fondo cambiado a gradiente crema cálido (mismo que Logros) para coherencia visual
+
+### Archivos modificados/creados
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `src/components/Logros.jsx` | Nuevo componente con popup modal |
+| `src/data/content.json` | Agregada sección `logros` con 3 items |
+| `src/pages/Home.jsx` | Import y render de Logros antes de Testimonials |
+| `src/styles/secciones.css` | Estilos logros, modal, rediseño testimonios y process |
+| `public/imagenes/logros/1.png` | Certificado Expo Artesanía Valdivia |
+| `public/imagenes/logros/2.png` | Premio Innovación Artesanal Concepción |
+| `public/imagenes/logros/3.png` | QR publicación NY NOW |
+
+### Commit
+- `8fce196` — Agregar sección Nuestros Logros con popup de imagen, rediseñar testimonios y Nuestro Arte
+
+---
+
 ## 2026-04-02
+
+### Corrección slug categoría Brazaletes + Tarjetas admin igualadas a página pública
+
+**Fix categoría Brazaletes:**
+- Los 11 productos de brazaletes no se mostraban porque tenían `categoria = 'brazalete'` (sin "s") pero el slug de la categoría era `brazaletes` (con "s").
+- Se corrigió en la BD: `UPDATE products SET categoria = 'brazaletes' WHERE categoria = 'brazalete'`.
+- Se verificó que todas las categorías (anillos, brazaletes, collares, pulseras, aros) tienen sus productos correctamente vinculados.
+
+**Tarjetas de productos en admin igualadas a las públicas (`admin.css`):**
+- Imagen: 180px → 220px (desktop), 160px → 180px (tablet)
+- Nombre: 0.75rem → 1rem, de 1 línea a 2 líneas visibles
+- Precio actual: 0.8rem → 1rem
+- Precio anterior: 0.65rem → 0.8rem
+- Padding info: 8px 6px → 14px 10px
+- Border-radius: 6px → 10px
+- Aplica tanto a tarjetas de categorías como a piezas únicas (misma clase `admin-grid-4`)
+
+### Archivos modificados
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `src/styles/admin.css` | Alturas, fuentes, padding y border-radius de tarjetas en admin-grid-4 |
+
+---
 
 ### Corrección de desaparición temporal de productos + Sistema de auditoría
 
