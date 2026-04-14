@@ -29,7 +29,7 @@
 }
 
 .logo h1 {
-    font-size: 2.5rem;
+    font-size: 1.2rem;
     color: var(--copper-shine);
     letter-spacing: 8px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
@@ -37,7 +37,7 @@
 
 .logo .tagline {
     display: block;
-    font-size: 0.7rem;
+    font-size: 0.55rem;
     color: var(--cream);
     letter-spacing: 3px;
     text-transform: uppercase;

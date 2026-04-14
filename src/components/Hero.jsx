@@ -4,7 +4,13 @@ import { useContent } from '../context/ContentContext';
 function Hero() {
   const [opacity, setOpacity] = useState(1);
   const { content } = useContent();
-  const { title, subtitle, ctaText } = content.hero;
+  const { title, subtitle, ctaText, backgroundImage } = content.hero;
+
+  const heroStyle = { opacity };
+  if (backgroundImage) {
+    const bgUrl = /^(https?:|\/)/.test(backgroundImage) ? backgroundImage : `/${backgroundImage}`;
+    heroStyle['--hero-bg'] = `url('${bgUrl}')`;
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,7 +32,7 @@ function Hero() {
   };
 
   return (
-    <section id="inicio" className="hero" style={{ opacity }}>
+    <section id="inicio" className="hero" style={heroStyle}>
       <div className="hero-overlay"></div>
       <div className="hero-content">
         <h2>{title}</h2>
