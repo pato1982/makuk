@@ -159,14 +159,32 @@
         padding: 0 15px;
     }
 
+    .logo {
+        margin-left: 18px;
+    }
+
     .logo h1 {
-        font-size: 1.8rem;
-        letter-spacing: 4px;
+        font-size: 1rem;
+        letter-spacing: 1px;
     }
 
     .logo .tagline {
-        font-size: 0.6rem;
-        letter-spacing: 2px;
+        font-size: 0.5rem;
+        letter-spacing: 1px;
+        margin-top: 3px;
+    }
+
+    .cart-icon {
+        font-size: 1rem;
+        padding: 6px;
+    }
+
+    .menu-toggle {
+        padding: 6px;
+    }
+
+    .menu-toggle span {
+        width: 20px;
     }
 
     .menu-toggle {
@@ -220,7 +238,13 @@
         font-size: 0.7rem;
     }
 
+    .logo h1 {
+        font-size: 0.95rem;
+        letter-spacing: 2px;
+    }
+
     .logo .tagline {
-        font-size: 0.55rem;
+        font-size: 0.5rem;
+        letter-spacing: 1px;
     }
 }

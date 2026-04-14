@@ -180,8 +180,9 @@
     }
 
     .btn-hero {
-        padding: 10px 20px;
-        font-size: 0.7rem;
+        margin-top: 120px;
+        padding: 7px 14px;
+        font-size: 0.6rem;
         letter-spacing: 1px;
     }
 }
@@ -205,6 +206,7 @@
     }
 
     .btn-hero {
+        margin-top: 120px;
         padding: 10px 20px;
         font-size: 0.75rem;
     }
