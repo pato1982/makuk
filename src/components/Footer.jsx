@@ -49,6 +49,15 @@ function Footer() {
               </p>
             </div>
           </div>
+
+          {/* Sernatur */}
+          <div className="footer-section footer-sernatur">
+            <img
+              src="/images/sernatur.png"
+              alt="Registro Nacional de Servicios Turísticos - Sernatur"
+              className="sernatur-logo"
+            />
+          </div>
         </div>
 
         <div className="footer-bottom">
