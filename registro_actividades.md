@@ -1598,3 +1598,88 @@ Rediseno completo del popup de detalle de producto: layout cuadrado con dos colu
 - **Push:** GitHub `origin/main`
 - **VPS:** Frontend build + backend copiado + PM2 restart
 - **Verificación:** Backend online, frontend desplegado
+
+---
+
+## 2026-04-14
+
+### Imagen de fondo del hero conectada al admin
+- **Bug:** El campo "Imagen de fondo Header" se guardaba en la BD pero nunca se reflejaba en la home porque el fondo estaba hardcodeado en `hero.css` (`background-image: url('/imagenes/banner3.jpg')`).
+- **Fix:** `hero.css` ahora usa `var(--hero-bg, url('/imagenes/banner3.jpg'))` con fallback. `Hero.jsx` lee `backgroundImage` de `content.hero` y setea la CSS variable inline. Soporta URLs absolutas, paths absolutos y nombres sueltos.
+
+### Ajustes tipográficos y de layout del hero (desktop)
+- Logo MAKUK: `2.5rem → 1.2rem` en `header.css`.
+- Título hero "El Arte de la Elegancia": `4rem → 2rem`.
+- Altura del hero: `95vh / 600–900px → 78vh / 500–750px`.
+- Botón "Descubrir Colección": `margin-top: 90px → 360px`, padding `16px 45px → 10px 30px`, font `0.85rem → 0.7rem`.
+
+### Responsive móvil (`max-width: 699px`)
+- Logo: `1.8rem → 1rem`, letter-spacing `4px → 1px`.
+- Tagline: `0.6rem → 0.5rem`, `margin-top: 3px` para separarla del logo.
+- Logo con `margin-left: 18px` para despegarlo del borde.
+- Ícono carrito y login (`.cart-icon`): `1.3rem → 1rem`, padding `8 → 6`.
+- Menú hamburguesa: padding `10 → 6`, barras `25px → 20px`.
+- Botón CTA: `margin-top: 120px` (override del 360px base que lo sacaba del hero), padding `7px 14px`, font `0.6rem`.
+
+### Responsive tablet (`700–1100px`)
+- Logo: `0.95rem`, letter-spacing `2px`; tagline `0.5rem`.
+- Botón CTA: `margin-top: 120px`.
+
+### Archivos modificados
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `src/components/Hero.jsx` | Lee `backgroundImage` y setea `--hero-bg` inline |
+| `src/styles/hero.css` | CSS var para fondo, tipografías y layout del hero + overrides móvil/tablet |
+| `src/styles/header.css` | Logo, tagline, íconos y hamburguesa responsive |
+
+### Commits de la sesión
+| Hash | Descripción |
+|------|------------|
+| `6387abf` | Conectar imagen de fondo del hero a admin y ajustar tipografías |
+| `cfe0b80` | Ajustes responsive del header y hero en móvil/tablet |
+
+### Deploy
+- **Push:** GitHub `origin/main`
+- **VPS:** Frontend build + copiado a `/var/www/makuk/frontend/build/`
+- **Verificación:** Sitio en vivo en http://186.64.122.100
+
+---
+
+## 2026-04-24
+
+### Desactivar portada "En Desarrollo" y reforzar el acceso admin
+- **Contexto:** El flag `COMING_SOON` en `App.jsx` bloqueaba `/` y `/productos` con una portada. El ingreso al panel se hacía por un candado oculto en esa portada.
+- **Cambio 1 — Visibilidad pública:** `App.jsx:14` pasa de `COMING_SOON = true` a `COMING_SOON = false`. Los visitantes ya entran directo al `Home` y a `Productos`. `ComingSoon.jsx` y `coming-soon.css` quedan en el repo (inertes) por si se reactiva la portada en el futuro.
+- **Cambio 2 — Login no bypaseable:** El botón de usuario del header (`Header.jsx:96-102`) navegaba a `/admin/login`, pero `Login.jsx:19-23` auto-redirigía al panel si ya había un `makuk_access_token` válido en `localStorage`. Como el candado de la portada había dejado un token guardado, el botón del header saltaba directo al admin sin pedir clave.
+- **Fix:** el `onClick` del botón ahora llama a `logout()` del `AuthContext` y, además, hace `localStorage.removeItem` de `makuk_access_token` y `makuk_refresh_token` antes de `navigate('/admin/login')`. Así el formulario siempre exige email + contraseña.
+
+### Sección "Nuestras Colecciones": nueva distribución
+- **Desktop (>1100px):** hasta **7 tarjetas por fila** antes de envolver.
+  - `Categories.jsx`: chunk del `for` cambiado de 5 a 7.
+  - `secciones.css`: se añadió override `.categories .container { max-width: 1700px; }` solo para esta sección. Las demás secciones siguen en 1200px.
+  - `.category-card`: ancho fijo en `210px` (`flex: 0 0 210px`, `min-width: 210px`, `max-width: 210px`) para conservar el tamaño original — en viewports más estrechos las tarjetas envuelven pero no se deforman.
+  - `.categories-row`: `gap: 25px` (tamaño original).
+- **Móvil (<700px):** reemplazado el scroll horizontal por **grid de 2 columnas**.
+  - `.categories-row`: `display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;`. Se eliminaron `overflow-x`, `scroll-snap-type` y `scroll-snap-align`.
+  - `.category-card`: `flex: initial; min-width: 0; max-width: 100%;`.
+- **Tablet (700–1100px):** sin cambios.
+
+### Archivos modificados
+| Archivo | Tipo de cambio |
+|---------|---------------|
+| `src/App.jsx` | `COMING_SOON = false` |
+| `src/components/Header.jsx` | `useAuth` + logout + limpieza de tokens antes de navegar al login |
+| `src/components/Categories.jsx` | Chunk de 7 en vez de 5 |
+| `src/styles/secciones.css` | Container ensanchado para `.categories`, tarjetas a 210px fijos, móvil en grid 2 columnas |
+
+### Commits de la sesión
+| Hash | Descripción |
+|------|------------|
+| `32dacae` | Desactivar portada ComingSoon y forzar re-autenticación en header |
+| `1325e8a` | Colecciones: 7 tarjetas por fila en desktop, 2 columnas en móvil |
+| `f3d0b21` | Colecciones desktop: mantener tamaño original de tarjetas con hasta 7 por fila |
+
+### Deploy
+- **Push:** GitHub `origin/main`
+- **VPS:** Frontend build + `rm -rf ../build/* && cp -r dist/* ../build/`
+- **Verificación:** Sitio público accesible en https://makuk.cl/, bundle activo `index-Cyh5owyw.js`. Botón de usuario del header siempre abre formulario vacío (sin saltar al panel).
