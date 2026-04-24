@@ -32,18 +32,22 @@
     background: var(--cream-dark);
 }
 
+.categories .container {
+    max-width: 1700px;
+}
+
 .categories-row {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 20px;
+    gap: 25px;
     margin-bottom: 25px;
 }
 
 .category-card {
-    flex: 0 1 calc((100% - 120px) / 7);
-    max-width: calc((100% - 120px) / 7);
-    min-width: 130px;
+    flex: 0 0 210px;
+    max-width: 210px;
+    min-width: 210px;
     background: var(--white);
     border-radius: 0 0 8px 8px;
     overflow: hidden;
