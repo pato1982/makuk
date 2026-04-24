@@ -36,14 +36,14 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 25px;
+    gap: 20px;
     margin-bottom: 25px;
 }
 
 .category-card {
-    flex: 0 1 calc((100% - 100px) / 5);
-    max-width: calc((100% - 100px) / 5);
-    min-width: 180px;
+    flex: 0 1 calc((100% - 120px) / 7);
+    max-width: calc((100% - 120px) / 7);
+    min-width: 130px;
     background: var(--white);
     border-radius: 0 0 8px 8px;
     overflow: hidden;
@@ -659,19 +659,16 @@
     }
 
     .categories-row {
-        display: flex;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
         gap: 10px;
-        padding-bottom: 15px;
         margin-bottom: 15px;
-        -webkit-overflow-scrolling: touch;
     }
 
     .category-card {
-        flex: 0 0 42%;
-        min-width: 42%;
-        scroll-snap-align: start;
+        flex: initial;
+        min-width: 0;
+        max-width: 100%;
     }
 
     .category-img {
