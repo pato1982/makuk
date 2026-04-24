@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useContent } from '../context/ContentContext';
+import { useAuth } from '../context/AuthContext';
 import ContactModal from './ContactModal';
 import TrackingModal from './TrackingModal';
 
@@ -12,6 +13,7 @@ function Header({ alwaysScrolled = false }) {
   const [showTrackingModal, setShowTrackingModal] = useState(false);
   const { cantidadProductos, setShowCartModal } = useCart();
   const { content } = useContent();
+  const { logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const headerRef = useRef(null);
@@ -95,7 +97,12 @@ function Header({ alwaysScrolled = false }) {
           </button>
           <button
             className="cart-icon"
-            onClick={() => navigate('/admin/login')}
+            onClick={async () => {
+              try { await logout(); } catch { /* ignorar errores de red en logout */ }
+              localStorage.removeItem('makuk_access_token');
+              localStorage.removeItem('makuk_refresh_token');
+              navigate('/admin/login');
+            }}
             aria-label="Iniciar sesión"
           >
             <i className="fas fa-user"></i>
